@@ -20,5 +20,19 @@ class StripeBillingServiceProvider extends ServiceProvider
             __DIR__.'/../config/stripe-billing.php',
             'stripe-billing'
         );
+
+        if ( ! class_exists('CreatePlansTable')) {
+            $this->publishes([
+                __DIR__ . '/../database/migrations/create_plans_table.php' =>
+                    database_path('migrations/' . date('Y_m_d_His', time()) . '_1_create_plans_table.php'),
+            ], 'migrations');
+        }
+
+        if ( ! class_exists('CreateSubscriptionsTable')) {
+            $this->publishes([
+                __DIR__ . '/../database/migrations/create_subscriptions_table.php' =>
+                    database_path('migrations/' . date('Y_m_d_His', time()) . '_2_create_subscriptions_table.php'),
+            ], 'migrations');
+        }
     }
 }
