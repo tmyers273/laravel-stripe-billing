@@ -1,0 +1,59 @@
+{
+  "name": "tmyers273/laravel-stripe-billing",
+  "description": "Laravel Stripe Billing",
+  "keywords": [
+    "laravel",
+    "payments",
+    "stripe",
+    "billing"
+  ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Denis Mitrofanov",
+      "email": "denis.mitr@gmail.com"
+    },
+    {
+      "name": "Tom Myers",
+      "email": "tmyers273@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.0",
+    "illuminate/console": "~5.5.0|~5.6.0|~5.7.0",
+    "illuminate/database": "~5.5.0|~5.6.0|~5.7.0",
+    "illuminate/events": "~5.5.0|~5.6.0|~5.7.0",
+    "illuminate/support": "~5.5.0|~5.6.0|~5.7.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^6.5",
+    "mockery/mockery": "^1.1",
+    "orchestra/testbench": "^3.5"
+  },
+  "autoload": {
+    "psr-4": {
+      "TMyers\\StripeBilling\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "TMyers\\StripeBilling\\Tests\\": "tests"
+    }
+  },
+  "config": {
+    "sort-packages": true
+  },
+  "scripts": {
+    "test": "vendor/bin/phpunit"
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-master": "1.x-dev"
+    },
+    "laravel": {
+      "providers": [
+        "TMyers\\StripeBilling\\StripeBillingServiceProvider"
+      ]
+    }
+  }
+}
