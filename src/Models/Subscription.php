@@ -15,6 +15,13 @@ class Subscription extends Model
         'user_id' => 'integer',
     ];
 
+    protected $dates = [
+        'trial_ends_at',
+        'ends_at',
+        'created_at',
+        'updated_at',
+    ];
+
     /*
     |--------------------------------------------------------------------------
     | Getters
@@ -42,6 +49,42 @@ class Subscription extends Model
         return false;
     }
 
+    public function cancelled()
+    {
+        return ! is_null($this->ends_at);
+    }
+
+    public function ended()
+    {
+        return $this->cancelled() && ! $this->onGracePeriod();
+    }
+
+    public function onTrial(): bool
+    {
+        return $this->trial_ends_at && $this->trial_ends_at->isFuture();
+    }
+
+    public function isActive(): bool
+    {
+        return is_null($this->ends_at) || $this->ends_at->gt(now());
+    }
+
+    public function onGracePeriod(): bool
+    {
+        return $this->ends_at && $this->ends_at->isFuture();
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Scopes
+    |--------------------------------------------------------------------------
+    */
+
+    public function scopeActive()
+    {
+        return $this->whereNull('ends_at')->orWhere('ends_at', '>', now());
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Relationships
@@ -55,6 +98,6 @@ class Subscription extends Model
 
     public function user()
     {
-        return $this->belongsTo(config('stripe-billing.models.user'), 'user_id');
+        return $this->belongsTo(config('stripe-billing.models.user'), 'owner_id');
     }
 }

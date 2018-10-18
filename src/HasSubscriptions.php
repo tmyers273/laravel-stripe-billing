@@ -10,7 +10,7 @@ trait HasSubscriptions
 {
     public function isSubscribedTo($plan): bool
     {
-        $subscriptions = $this->subscriptions;
+        $subscriptions = $this->activeSubscriptions;
 
         foreach ($subscriptions as $subscription) {
             if ($subscription->isForPlan($plan)) {
@@ -41,11 +41,14 @@ trait HasSubscriptions
             throw AlreadySubscribed::toPlan($plan);
         }
 
+        $type = $plan->planType ? $plan->planType->code_name : 'deafult';
+
         // @TODO
         // CustomerManager::createCustomer($token);
         // SubscriptionManager::createSubscription();
         return $this->subscriptions()->create([
             'plan_id' => $plan->id,
+            'type' => $type,
         ]);
     }
 
@@ -57,6 +60,17 @@ trait HasSubscriptions
 
     public function subscriptions()
     {
-        return $this->hasMany(config('stripe-billing.models.subscription'), 'user_id');
+        return $this->hasMany(config('stripe-billing.models.subscription'), 'owner_id');
     }
+
+    public function activeSubscriptions()
+    {
+        return $this
+            ->hasMany(config('stripe-billing.models.subscription'), 'owner_id')
+            ->where(function($q) {
+                $q->whereNull('ends_at')->orWhere('ends_at', '>', now());
+            });
+    }
+
+
 }

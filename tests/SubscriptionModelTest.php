@@ -16,7 +16,7 @@ class SubscriptionModelTest extends TestCase
         $plan = $this->createBasicMonthlyPlan();
 
         $subscription = Subscription::create([
-            'user_id' => $user->id,
+            'owner_id' => $user->id,
             'plan_id' => $plan->id,
         ]);
 

@@ -15,15 +15,16 @@ class CreateSubscriptionsTable extends Migration
     {
         Schema::create('subscriptions', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('user_id');
+            $table->unsignedInteger('owner_id');
             $table->unsignedInteger('plan_id');
+            $table->string('type', 50)->default('default');
             $table->string('stripe_subscription_id')->nullable();
             $table->timestamp('trial_ends_at')->nullable();
             $table->timestamp('ends_at')->nullable();
             $table->timestamps();
 
             $table
-                ->foreign('user_id')
+                ->foreign('owner_id')
                 ->references('id')
                 ->on(config('stripe-billing.tables.users'))
                 ->onDelete('cascade');
