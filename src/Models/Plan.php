@@ -18,6 +18,15 @@ class Plan extends Model
             }
         });
     }
+
+    /**
+     * @param string $code
+     * @return Plan
+     */
+    public static function fromCode(string $code): self
+    {
+        return static::whereCode($code)->firstOrFail();
+    }
     
     /*
     |--------------------------------------------------------------------------

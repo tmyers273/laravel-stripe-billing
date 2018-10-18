@@ -9,7 +9,7 @@ use TMyers\StripeBilling\Models\Plan;
 use TMyers\StripeBilling\StripeBillingServiceProvider;
 use TMyers\StripeBilling\Tests\Stubs\Models\User;
 
-class TestCase extends OrchestraTestCase
+abstract class TestCase extends OrchestraTestCase
 {
     public function setUp()
     {

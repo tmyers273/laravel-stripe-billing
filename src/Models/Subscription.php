@@ -8,6 +8,31 @@ class Subscription extends Model
 {
     protected $guarded = ['id'];
 
+    protected $with = ['plan'];
+
+    /*
+    |--------------------------------------------------------------------------
+    | Getters
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * @param string|Plan $plan
+     * @return bool
+     */
+    public function isForPlan($plan): bool
+    {
+        if (is_string($plan)) {
+            return $this->plan->code === $plan;
+        }
+
+        if ($plan instanceof Plan) {
+            return $this->plan->is($plan);
+        }
+
+        return false;
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Relationships
