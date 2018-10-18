@@ -34,7 +34,7 @@ trait HasSubscriptions
         }
 
         if (is_string($plan)) {
-            $plan = Plan::fromCode($plan);
+            $plan = Plan::fromCodeName($plan);
         }
 
         if ($this->isSubscribedTo($plan)) {

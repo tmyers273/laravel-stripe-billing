@@ -6,7 +6,7 @@ namespace TMyers\StripeBilling\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
-class Plan extends Model
+class PlanType extends Model
 {
     protected $guarded = ['id'];
 
@@ -21,7 +21,7 @@ class Plan extends Model
 
     /**
      * @param string $codeName
-     * @return Plan
+     * @return PlanType
      */
     public static function fromCodeName(string $codeName): self
     {
@@ -39,6 +39,16 @@ class Plan extends Model
         return $builder->whereActive(true);
     }
 
+    public function scopeForIndividualUsers(Builder $builder)
+    {
+        return $builder->whereTeamsEnabled(false);
+    }
+
+    public function scopeForTeams(Builder $builder)
+    {
+        return $builder->whereTeamsEnabled(true);
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Relationships
@@ -47,11 +57,9 @@ class Plan extends Model
 
     public function subscriptions()
     {
-        return $this->hasMany(config('stripe-billing.models.subscription'));
-    }
-
-    public function planType()
-    {
-        return $this->belongsTo(config('stripe-billing.models.plan_type'));
+        return $this->hasManyThrough(
+            config('stripe-billing.models.subscription'),
+            config('stripe-billing.models.plan')
+        );
     }
 }

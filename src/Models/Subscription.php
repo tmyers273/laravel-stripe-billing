@@ -8,7 +8,12 @@ class Subscription extends Model
 {
     protected $guarded = ['id'];
 
-    protected $with = ['plan'];
+    protected $with = ['plan', 'plan.planType'];
+
+    protected $casts = [
+        'plan_id' => 'integer',
+        'user_id' => 'integer',
+    ];
 
     /*
     |--------------------------------------------------------------------------
@@ -23,11 +28,15 @@ class Subscription extends Model
     public function isForPlan($plan): bool
     {
         if (is_string($plan)) {
-            return $this->plan->code === $plan;
+            return $this->plan->code_name === $plan || optional($this->plan->planType)->code_name === $plan;
         }
 
         if ($plan instanceof Plan) {
-            return $this->plan->is($plan);
+            return $this->plan_id === $plan->id;
+        }
+
+        if ($plan instanceof PlanType) {
+            return optional($this->plan->planType)->id === $plan->id;
         }
 
         return false;
