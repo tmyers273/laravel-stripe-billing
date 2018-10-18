@@ -13,7 +13,7 @@ class SubscriptionModelTest extends TestCase
     public function it_belongs_to_user()
     {
         $user = $this->createUser();
-        $plan = $this->createPlan();
+        $plan = $this->createBasicMonthlyPlan();
 
         $subscription = Subscription::create([
             'user_id' => $user->id,

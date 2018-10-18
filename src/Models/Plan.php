@@ -13,15 +13,31 @@ class Plan extends Model
     public static function boot()
     {
         static::creating(function($user) {
-            if (empty($user->slug)) {
-                $user->slug = str_slug($user->name);
+            if (empty($user->code)) {
+                $user->code = str_slug($user->name);
             }
         });
     }
+    
+    /*
+    |--------------------------------------------------------------------------
+    | Scopes
+    |--------------------------------------------------------------------------
+    */
 
     public function scopeActive(Builder $builder)
     {
         return $builder->whereActive(true);
+    }
+
+    public function scopeForIndividualUsers(Builder $builder)
+    {
+        return $builder->whereTeamsEnabled(false);
+    }
+
+    public function scopeForTeams(Builder $builder)
+    {
+        return $builder->whereTeamsEnabled(true);
     }
 
     /*

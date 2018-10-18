@@ -74,13 +74,31 @@ class TestCase extends OrchestraTestCase
      * @param array $overrides
      * @return Plan
      */
-    protected function createPlan(array $overrides = []): Plan
+protected function createBasicMonthlyPlan(array $overrides = []): Plan
+{
+    return Plan::create(array_merge([
+        'name' => 'Basic monthly plan',
+        'code' => 'basic-monthly',
+        'interval' => 'month',
+        'stripe_plan_id' => 'basic_monthly',
+        'price' => 1500,
+    ], $overrides));
+}
+
+    /**
+     * @param array $overrides
+     * @return Plan
+     */
+    protected function createTeamMonthlyPlan(array $overrides = []): Plan
     {
         return Plan::create(array_merge([
-            'name' => 'monthly',
-            'slug' => 'monthly',
-            'stripe_name' => 'monthly',
-            'price' => 1500,
+            'name' => 'Team monthly plan for 10 users',
+            'code' => 'team-monthly-10',
+            'interval' => 'month',
+            'stripe_plan_id' => 'team_monthly_10',
+            'price' => 4500,
+            'teams_enabled' => true,
+            'team_users_limit' => 10,
         ], $overrides));
     }
 }
