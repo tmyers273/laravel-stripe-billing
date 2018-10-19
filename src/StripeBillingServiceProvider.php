@@ -4,6 +4,7 @@ namespace TMyers\StripeBilling;
 
 
 use Illuminate\Support\ServiceProvider;
+use TMyers\StripeBilling\Gateways\StripeCustomerGateway;
 
 class StripeBillingServiceProvider extends ServiceProvider
 {
@@ -41,5 +42,9 @@ class StripeBillingServiceProvider extends ServiceProvider
                     database_path('migrations/' . date('Y_m_d_His', time()) . '_3_create_subscriptions_table.php'),
             ], 'migrations');
         }
+
+        $this->app->bind('stripe-customer-gateway', function() {
+            return new StripeCustomerGateway();
+        });
     }
 }

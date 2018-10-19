@@ -75,4 +75,16 @@ abstract class TestCase extends OrchestraTestCase
             'email' => 'denis.mitr@gmail.com'
         ], $overrides));
     }
+
+    protected function getTestToken(): string
+    {
+        return \Stripe\Token::create([
+            'card' => [
+                'number' => '4242424242424242',
+                'exp_month' => 5,
+                'exp_year' => 2020,
+                'cvc' => '123',
+            ],
+        ], ['api_key' => getenv('STRIPE_SECRET')])->id;
+    }
 }

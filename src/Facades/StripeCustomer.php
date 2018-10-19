@@ -11,7 +11,7 @@ namespace TMyers\StripeBilling\Facades;
 
 use Illuminate\Support\Facades\Facade;
 
-class CustomerManager extends Facade
+class StripeCustomer extends Facade
 {
     /**
      * Get the registered name of the component.
@@ -22,6 +22,6 @@ class CustomerManager extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return 'laravel-stripe-billing-customer-manager';
+        return 'stripe-customer-gateway';
     }
 }

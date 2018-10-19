@@ -44,8 +44,8 @@ trait HasSubscriptions
         $type = $plan->planType ? $plan->planType->code_name : 'deafult';
 
         // @TODO
-        // CustomerManager::createCustomer($token);
-        // SubscriptionManager::createSubscription();
+        // StripeCustomer::createCustomer($token);
+        // StripeCustomer::createSubscription();
         return $this->subscriptions()->create([
             'plan_id' => $plan->id,
             'type' => $type,

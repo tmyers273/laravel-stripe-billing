@@ -7,7 +7,7 @@ use TMyers\StripeBilling\Models\Plan;
 use TMyers\StripeBilling\Models\Subscription;
 use TMyers\StripeBilling\Tests\Stubs\Models\User;
 
-class HashSubscriptionsTest extends TestCase
+class HasSubscriptionsTest extends TestCase
 {
     /** @test */
     public function user_can_subscribe_to_regular_monthly_plan()
