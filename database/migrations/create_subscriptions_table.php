@@ -18,7 +18,7 @@ class CreateSubscriptionsTable extends Migration
             $table->unsignedInteger('owner_id');
             $table->unsignedInteger('plan_id');
             $table->string('type', 50)->default('default');
-            $table->string('stripe_subscription_id')->nullable();
+            $table->string('stripe_subscription_id');
             $table->timestamp('trial_ends_at')->nullable();
             $table->timestamp('ends_at')->nullable();
             $table->timestamps();

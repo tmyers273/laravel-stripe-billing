@@ -18,6 +18,7 @@ class SubscriptionModelTest extends TestCase
         $subscription = Subscription::create([
             'owner_id' => $user->id,
             'plan_id' => $plan->id,
+            'stripe_subscription_id' => 'fake-stripe-id',
         ]);
 
         $this->assertInstanceOf(User::class, $subscription->user);

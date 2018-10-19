@@ -12,6 +12,7 @@ namespace TMyers\StripeBilling;
 use Carbon\Carbon;
 use Stripe\Customer;
 use TMyers\StripeBilling\Facades\StripeCustomer;
+use TMyers\StripeBilling\Facades\StripeSubscription;
 use TMyers\StripeBilling\Models\Plan;
 use TMyers\StripeBilling\Models\Subscription;
 
@@ -49,9 +50,10 @@ class StripeSubscriptionBuilder
      */
     public function create($token = null, array $options = []): Subscription
     {
-        $customer = $this->retrieveOrCreateStripeCustomer($token, $options);
-
-        $customer->subscriptions->create($this->getSubscriptionOptions());
+        $subscription = StripeSubscription::create(
+            $this->owner->retrieveOrCreateStripeCustomer($token, $options),
+            $this->getSubscriptionOptions()
+        );
 
         if ($this->skipTrial) {
             $trialEndsAt = null;
@@ -61,23 +63,10 @@ class StripeSubscriptionBuilder
 
         return $this->owner->subscriptions()->create([
             'plan_id' => $this->plan->id,
+            'stripe_subscription_id' => $subscription->id,
             'type' => $this->getPlanType(),
             'trial_ends_at' => $trialEndsAt,
         ]);
-    }
-
-    /**
-     * @param null $token
-     * @param array $options
-     * @return Customer
-     */
-    protected function retrieveOrCreateStripeCustomer($token = null, array $options = [])
-    {
-        if (! $this->owner->stripe_id) {
-            return StripeCustomer::create($token, $this->owner->email, $options);
-        }
-
-        return StripeCustomer::retrieve($this->owner->stripe_id);
     }
 
     protected function getPlanType(): string

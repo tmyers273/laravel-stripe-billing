@@ -4,27 +4,71 @@ namespace TMyers\StripeBilling\Tests;
 
 
 use Carbon\Carbon;
+use TMyers\StripeBilling\Facades\StripeCustomer;
+use TMyers\StripeBilling\Facades\StripeSubscription;
 use TMyers\StripeBilling\Models\Plan;
 use TMyers\StripeBilling\Models\Subscription;
+use TMyers\StripeBilling\Tests\Helpers\StripeObjectsFactory;
 use TMyers\StripeBilling\Tests\Stubs\Models\User;
 
 class HasSubscriptionsTest extends TestCase
 {
-    /** @test */
-    public function user_can_subscribe_to_regular_monthly_plan()
+    use StripeObjectsFactory;
+
+    public function setUp()
     {
-        // Given we have a user and two plans
+        parent::setUp();
+
+        Carbon::setTestNow(now());
+    }
+
+    protected function tearDown()
+    {
+        Carbon::setTestNow();
+        parent::tearDown();
+    }
+
+    /** @test */
+    public function user_can_subscribe_to_regular_monthly_plan_with_credit_card_token()
+    {
+        // Given we have a user and two simple plans
         $user = $this->createUser();
         $monthlyPlan = $this->createMonthlyPlan();
         $teamPlan = $this->createTeamMonthlyPlan();
 
-        $subscription = $user->subscribeTo($monthlyPlan, $this->getTestToken());
+        // Fake token
+        $token = 'fake-credit-card-token';
+
+        // Mock
+        // 1. new customer must be creaded via a fake token, and email
+        // 2. new subscription must be created for the customer mock
+        StripeCustomer::shouldReceive('create')
+            ->once()
+            ->with($token, $user->email, [])
+            ->andReturn($customer = $this->createCustomerObject('new-customer-id'));
+
+        StripeSubscription::shouldReceive('create')
+            ->once()
+            ->with($customer, [
+                'plan' => 'monthly',
+                'trial_end' => now()->getTimestamp(),
+            ])
+            ->andReturn($this->createSubscriptionObject('new-subscription-id'));
+
+        // Do subscribe to monthly plan
+        $subscription = $user->subscribeTo($monthlyPlan, $token);
 
         $this->assertInstanceOf(Subscription::class, $subscription);
+
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'stripe_id' => 'new-customer-id',
+        ]);
 
         $this->assertDatabaseHas('subscriptions', [
             'owner_id'=> $user->id,
             'plan_id' => $monthlyPlan->id,
+            'stripe_subscription_id' => 'new-subscription-id',
         ]);
 
         tap($user->fresh(), function(User $user) use ($monthlyPlan, $teamPlan) {
@@ -36,8 +80,6 @@ class HasSubscriptionsTest extends TestCase
     /** @test */
     public function user_can_subscribe_to_basic_type_monthly_plan()
     {
-        Carbon::setTestNow(now());
-
         // Given we have a user and two plans
         $user = $this->createUser();
         $basicType = $this->createBasicPlanType();
@@ -46,7 +88,26 @@ class HasSubscriptionsTest extends TestCase
         $teamType = $this->createTeamPlanType();
         $teamPlan = $this->createTeamMonthlyPlan($teamType);
 
-        $subscription = $user->subscribeTo($basicPlan, $this->getTestToken());
+        // Fake token
+        $token = 'fake-credit-card-token';
+
+        // Mock
+        // 1. new customer must be creaded via a fake token, and email
+        // 2. new subscription must be created for the customer mock
+        StripeCustomer::shouldReceive('create')
+            ->once()
+            ->with($token, $user->email, [])
+            ->andReturn($customer = $this->createCustomerObject('new-customer-id'));
+
+        StripeSubscription::shouldReceive('create')
+            ->once()
+            ->with($customer, [
+                'plan' => 'basic_monthly',
+                'trial_end' => now()->addDays($basicPlan->trial_days)->getTimestamp(),
+            ])
+            ->andReturn($this->createSubscriptionObject('new-subscription-id'));
+
+        $subscription = $user->subscribeTo($basicPlan, $token);
 
         $this->assertInstanceOf(Subscription::class, $subscription);
 
@@ -55,6 +116,7 @@ class HasSubscriptionsTest extends TestCase
             'owner_id'=> $user->id,
             'plan_id' => $basicPlan->id,
             'type' => 'basic',
+            'stripe_subscription_id' => 'new-subscription-id',
             'trial_ends_at' => now()->addDays(11)
         ]);
 
@@ -68,7 +130,5 @@ class HasSubscriptionsTest extends TestCase
             $this->assertFalse($user->isSubscribedTo($teamPlan));
             $this->assertFalse($user->isSubscribedTo($teamType));
         });
-
-        Carbon::setTestNow();
     }
 }

@@ -6,10 +6,11 @@
  * Time: 23:48
  */
 
-namespace TMyers\StripeBilling\Tests;
+namespace TMyers\StripeBilling\Tests\Integration;
 
 
 use TMyers\StripeBilling\Facades\StripeCustomer;
+use TMyers\StripeBilling\Tests\TestCase;
 
 class StripeCustomerTest extends TestCase
 {
