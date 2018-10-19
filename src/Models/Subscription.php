@@ -2,7 +2,9 @@
 
 namespace TMyers\StripeBilling\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use TMyers\StripeBilling\Facades\StripeSubscription;
 
 class Subscription extends Model
 {
@@ -21,6 +23,49 @@ class Subscription extends Model
         'created_at',
         'updated_at',
     ];
+
+    /*
+    |--------------------------------------------------------------------------
+    | Actions
+    |--------------------------------------------------------------------------
+    */
+
+    public function cancelAtPeriodEnd(): self
+    {
+        $stripeSubscription = StripeSubscription::retrieve($this->stripe_subscription_id);
+
+        $stripeSubscription->cancel_at_period_end = true;
+
+        $stripeSubscription->save();
+
+        if ($this->onTrial()) {
+            $this->ends_at = $this->trial_ends_at;
+        } else {
+            $this->ends_at = Carbon::createFromTimestamp(
+                $stripeSubscription->current_period_end
+            );
+        }
+
+        $this->save();
+
+        return $this;
+    }
+
+    public function cancelNow(): self
+    {
+        $stripeSubscription = StripeSubscription::retrieve($this->stripe_subscription_id);
+
+        $stripeSubscription->cance();
+
+        $this->markAsCanceled();
+
+        return $this;
+    }
+
+    public function markAsCanceled()
+    {
+        $this->fill(['ends_at' => Carbon::now()])->save();
+    }
 
     /*
     |--------------------------------------------------------------------------

@@ -21,6 +21,7 @@ Check subscription
 // Check if user is already subscribed to plan
 // Accepts Plan object, PlanType object, string (code_name of plan_type or plan) e.g. basic, basic_yearly_90
 $user->isSubscribedTo($plan);
+```
 
 Create subscription
 ```php
@@ -33,6 +34,12 @@ List subscriptions
 ```php
 $user->subscriptions;
 $user->activeSubscriptions;
+```
+
+Cancel subscriptions
+```php
+$subscription->cancelAtPeriodEnd();
+$subscription->cancelNow();
 ```
 
 

@@ -6,6 +6,7 @@ namespace TMyers\StripeBilling;
 use TMyers\StripeBilling\Exceptions\AlreadySubscribed;
 use TMyers\StripeBilling\Facades\StripeCustomer;
 use TMyers\StripeBilling\Models\Plan;
+use TMyers\StripeBilling\Models\Subscription;
 
 trait HasSubscriptions
 {
