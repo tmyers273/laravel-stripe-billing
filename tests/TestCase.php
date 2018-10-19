@@ -36,14 +36,12 @@ abstract class TestCase extends OrchestraTestCase
 
     protected function getEnvironmentSetup($app)
     {
-        if (getenv('USE_MYSQL') !== 'yes') {
-            $app['config']->set('database.default', 'sqlite');
-            $app['config']->set('database.connections.sqlite', [
-                'driver' => 'sqlite',
-                'database' => ':memory:',
-                'prefix' => '',
-            ]);
-        }
+        $app['config']->set('database.default', 'sqlite');
+        $app['config']->set('database.connections.sqlite', [
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'prefix' => '',
+        ]);
     }
 
     protected function setUpDatabase($app)
@@ -55,10 +53,12 @@ abstract class TestCase extends OrchestraTestCase
             $table->timestamps();
         });
 
+        include_once __DIR__.'/../database/migrations/add_stripe_id_to_owner_table.php';
         include_once __DIR__.'/../database/migrations/create_plan_types_table.php';
         include_once __DIR__.'/../database/migrations/create_plans_table.php';
         include_once __DIR__.'/../database/migrations/create_subscriptions_table.php';
 
+        (new \AddStripeIdToOwnerTable())->up();
         (new \CreatePlanTypesTable())->up();
         (new \CreatePlansTable())->up();
         (new \CreateSubscriptionsTable())->up();

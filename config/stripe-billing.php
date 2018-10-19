@@ -9,6 +9,7 @@ return [
     ],
 
     'tables' => [
+        'owner' => 'users',
         'users' => 'users',
         'subscriptions' => 'subscriptions',
         'plans' => 'plans',
