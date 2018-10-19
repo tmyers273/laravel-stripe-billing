@@ -18,8 +18,8 @@ $user->defaultCard;
 #### Subscriptions
 Check subscription
 ```php
-Check if user is already subscribed to plan
-Accepts Plan object, PlanType object, string (code_name of plan_type or plan) e.g. basic, basic_yearly_90
+// Check if user is already subscribed to plan
+// Accepts Plan object, PlanType object, string (code_name of plan_type or plan) e.g. basic, basic_yearly_90
 $user->isSubscribedTo($plan);
 
 Create subscription
