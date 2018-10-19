@@ -3,6 +3,7 @@
 namespace TMyers\StripeBilling\Tests;
 
 
+use Carbon\Carbon;
 use TMyers\StripeBilling\Models\Plan;
 use TMyers\StripeBilling\Models\Subscription;
 use TMyers\StripeBilling\Tests\Stubs\Models\User;
@@ -17,7 +18,7 @@ class HasSubscriptionsTest extends TestCase
         $monthlyPlan = $this->createMonthlyPlan();
         $teamPlan = $this->createTeamMonthlyPlan();
 
-        $subscription = $user->subscribeTo($monthlyPlan);
+        $subscription = $user->subscribeTo($monthlyPlan, $this->getTestToken());
 
         $this->assertInstanceOf(Subscription::class, $subscription);
 
@@ -35,6 +36,8 @@ class HasSubscriptionsTest extends TestCase
     /** @test */
     public function user_can_subscribe_to_basic_type_monthly_plan()
     {
+        Carbon::setTestNow(now());
+
         // Given we have a user and two plans
         $user = $this->createUser();
         $basicType = $this->createBasicPlanType();
@@ -43,7 +46,7 @@ class HasSubscriptionsTest extends TestCase
         $teamType = $this->createTeamPlanType();
         $teamPlan = $this->createTeamMonthlyPlan($teamType);
 
-        $subscription = $user->subscribeTo($basicPlan);
+        $subscription = $user->subscribeTo($basicPlan, $this->getTestToken());
 
         $this->assertInstanceOf(Subscription::class, $subscription);
 
@@ -52,6 +55,7 @@ class HasSubscriptionsTest extends TestCase
             'owner_id'=> $user->id,
             'plan_id' => $basicPlan->id,
             'type' => 'basic',
+            'trial_ends_at' => now()->addDays(11)
         ]);
 
         tap($user->fresh(), function(User $user) use ($basicType, $basicPlan, $teamType, $teamPlan) {
@@ -64,5 +68,7 @@ class HasSubscriptionsTest extends TestCase
             $this->assertFalse($user->isSubscribedTo($teamPlan));
             $this->assertFalse($user->isSubscribedTo($teamType));
         });
+
+        Carbon::setTestNow();
     }
 }

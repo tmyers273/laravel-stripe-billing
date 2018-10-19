@@ -82,6 +82,7 @@ trait PlanFactory
             'interval' => 'month',
             'stripe_plan_id' => 'basic_monthly',
             'price' => 1500,
+            'trial_days' => 11,
         ], $overrides));
     }
 

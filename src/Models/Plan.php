@@ -10,6 +10,10 @@ class Plan extends Model
 {
     protected $guarded = ['id'];
 
+    protected $casts = [
+        'trial_days' => 'integer'
+    ];
+
     public static function boot()
     {
         static::creating(function($user) {

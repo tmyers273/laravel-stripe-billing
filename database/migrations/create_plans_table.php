@@ -22,6 +22,7 @@ class CreatePlansTable extends Migration
             $table->text('description')->nullable();
             $table->string('stripe_plan_id')->nullable();
             $table->unsignedInteger('price');
+            $table->unsignedInteger('trial_days')->default(0);
             $table->boolean('active')->default(true);
             $table->softDeletes();
             $table->timestamps();

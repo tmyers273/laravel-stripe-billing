@@ -4,6 +4,7 @@ namespace TMyers\StripeBilling;
 
 
 use TMyers\StripeBilling\Exceptions\AlreadySubscribed;
+use TMyers\StripeBilling\Facades\StripeCustomer;
 use TMyers\StripeBilling\Models\Plan;
 
 trait HasSubscriptions
@@ -24,10 +25,11 @@ trait HasSubscriptions
     /**
      * @param $plan
      * @param null $token
+     * @param array $options
      * @return mixed
      * @throws AlreadySubscribed
      */
-    public function subscribeTo($plan, $token = null)
+    public function subscribeTo($plan, $token = null, array $options = [])
     {
         if (is_null($plan)) {
             throw new \InvalidArgumentException("Plan cannot be null.");
@@ -41,15 +43,9 @@ trait HasSubscriptions
             throw AlreadySubscribed::toPlan($plan);
         }
 
-        $type = $plan->planType ? $plan->planType->code_name : 'deafult';
+        $builder = new StripeSubscriptionBuilder($this, $plan);
 
-        // @TODO
-        // StripeCustomer::createCustomer($token);
-        // StripeCustomer::createSubscription();
-        return $this->subscriptions()->create([
-            'plan_id' => $plan->id,
-            'type' => $type,
-        ]);
+        return $builder->create($token, $options);
     }
 
     /*
