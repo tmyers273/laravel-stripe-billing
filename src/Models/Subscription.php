@@ -98,6 +98,6 @@ class Subscription extends Model
 
     public function user()
     {
-        return $this->belongsTo(config('stripe-billing.models.user'), 'owner_id');
+        return $this->belongsTo(config('stripe-billing.models.owner'), 'owner_id');
     }
 }

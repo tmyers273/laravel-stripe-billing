@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateSubscriptionsTable extends Migration
+class CreateCardsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,13 @@ class CreateSubscriptionsTable extends Migration
      */
     public function up()
     {
-        Schema::create('subscriptions', function (Blueprint $table) {
+        Schema::create(config('stripe-billing.tables.cards'), function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('owner_id');
-            $table->unsignedInteger('plan_id');
-            $table->string('type', 50)->default('default');
-            $table->string('stripe_subscription_id');
-            $table->timestamp('trial_ends_at')->nullable();
-            $table->timestamp('ends_at')->nullable();
+            $table->string('stripe_card_id');
+            $table->string('brand', 30);
+            $table->string('last_4', 8);
+            $table->softDeletes();
             $table->timestamps();
 
             $table
@@ -38,6 +37,6 @@ class CreateSubscriptionsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('subscriptions');
+        Schema::dropIfExists(config('stripe-billing.tables.cards'));
     }
 }

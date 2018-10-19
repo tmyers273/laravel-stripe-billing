@@ -23,6 +23,14 @@ class HasSubscriptionsIntegrationTest extends TestCase
         }
 
         parent::setUp();
+
+        Carbon::setTestNow(now()->addMinutes(5));
+    }
+
+    protected function tearDown()
+    {
+        Carbon::setTestNow();
+        parent::tearDown();
     }
 
     /** @test */
@@ -45,14 +53,24 @@ class HasSubscriptionsIntegrationTest extends TestCase
         tap($user->fresh(), function(User $user) use ($monthlyPlan, $teamPlan) {
             $this->assertTrue($user->isSubscribedTo($monthlyPlan));
             $this->assertFalse($user->isSubscribedTo($teamPlan));
+
+            // Expect new card to be created
+            $defaultCard = $user->defaultCard;
+
+            $this->assertNotNull($defaultCard->stripe_card_id);
+
+            $this->assertDatabaseHas('cards', [
+                'id' => $defaultCard->id,
+                'owner_id'=> $user->id,
+                'last_4' => 4242,
+                'brand' => 'Visa',
+            ]);
         });
     }
 
     /** @test */
     public function user_can_subscribe_to_basic_type_monthly_plan()
     {
-        Carbon::setTestNow(now());
-
         // Given we have a user and two plans
         $user = $this->createUser();
         $basicType = $this->createBasicPlanType();
@@ -82,8 +100,18 @@ class HasSubscriptionsIntegrationTest extends TestCase
             // expect not to be subscribed to other plans
             $this->assertFalse($user->isSubscribedTo($teamPlan));
             $this->assertFalse($user->isSubscribedTo($teamType));
-        });
 
-        Carbon::setTestNow();
+            // expect new card to be created
+            $defaultCard = $user->defaultCard;
+
+            $this->assertNotNull($defaultCard->stripe_card_id);
+
+            $this->assertDatabaseHas('cards', [
+                'id' => $defaultCard->id,
+                'owner_id'=> $user->id,
+                'last_4' => 4242,
+                'brand' => 'Visa',
+            ]);
+        });
     }
 }

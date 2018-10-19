@@ -43,4 +43,13 @@ class StripeCustomerGateway extends StripeGateway
     {
         return Customer::retrieve($stripeId);
     }
+
+    public function parseDefaultCard(Customer $customer): array
+    {
+        return [
+            'stripe_card_id' => $customer->sources->data[0]->id,
+            'brand' => $customer->sources->data[0]->brand,
+            'last_4' => $customer->sources->data[0]->last4,
+        ];
+    }
 }

@@ -4,6 +4,8 @@ namespace TMyers\StripeBilling\Tests;
 
 
 use Carbon\Carbon;
+use Stripe\Card;
+use Stripe\Customer;
 use TMyers\StripeBilling\Facades\StripeCustomer;
 use TMyers\StripeBilling\Facades\StripeSubscription;
 use TMyers\StripeBilling\Models\Plan;
@@ -47,6 +49,15 @@ class HasSubscriptionsTest extends TestCase
             ->with($token, $user->email, [])
             ->andReturn($customer = $this->createCustomerObject('new-customer-id'));
 
+        StripeCustomer::shouldReceive('parseDefaultCard')
+            ->once()
+            ->with($customer)
+            ->andReturn([
+                'stripe_card_id' => 'fake-card-id',
+                'brand' => 'FakeBrand',
+                'last_4' => '4242',
+            ]);
+
         StripeSubscription::shouldReceive('create')
             ->once()
             ->with($customer, [
@@ -74,6 +85,17 @@ class HasSubscriptionsTest extends TestCase
         tap($user->fresh(), function(User $user) use ($monthlyPlan, $teamPlan) {
             $this->assertTrue($user->isSubscribedTo($monthlyPlan));
             $this->assertFalse($user->isSubscribedTo($teamPlan));
+
+            // expect new card to be created
+            $defaultCard = $user->defaultCard;
+
+            $this->assertDatabaseHas('cards', [
+                'id' => $defaultCard->id,
+                'owner_id'=> $user->id,
+                'stripe_card_id' => 'fake-card-id',
+                'last_4' => 4242,
+                'brand' => 'FakeBrand',
+            ]);
         });
     }
 
@@ -94,10 +116,21 @@ class HasSubscriptionsTest extends TestCase
         // Mock
         // 1. new customer must be creaded via a fake token, and email
         // 2. new subscription must be created for the customer mock
+        $customer = $this->createCustomerObject('new-customer-id');
+
         StripeCustomer::shouldReceive('create')
             ->once()
             ->with($token, $user->email, [])
-            ->andReturn($customer = $this->createCustomerObject('new-customer-id'));
+            ->andReturn($customer);
+
+        StripeCustomer::shouldReceive('parseDefaultCard')
+            ->once()
+            ->with($customer)
+            ->andReturn([
+                'stripe_card_id' => 'fake-card-id',
+                'brand' => 'FakeBrand',
+                'last_4' => '4242',
+            ]);
 
         StripeSubscription::shouldReceive('create')
             ->once()
@@ -129,6 +162,17 @@ class HasSubscriptionsTest extends TestCase
             // expect not to be subscribed to other plans
             $this->assertFalse($user->isSubscribedTo($teamPlan));
             $this->assertFalse($user->isSubscribedTo($teamType));
+
+            // expect new card to be created
+            $defaultCard = $user->defaultCard;
+
+            $this->assertDatabaseHas('cards', [
+                'id' => $defaultCard->id,
+                'owner_id'=> $user->id,
+                'stripe_card_id' => 'fake-card-id',
+                'last_4' => 4242,
+                'brand' => 'FakeBrand',
+            ]);
         });
     }
 }

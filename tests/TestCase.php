@@ -19,7 +19,7 @@ abstract class TestCase extends OrchestraTestCase
     {
         parent::setUp();
 
-        config()->set('stripe-billing.models.user', User::class);
+        config()->set('stripe-billing.models.owner', User::class);
 
         $this->setUpDatabase($this->app);
     }
@@ -57,11 +57,13 @@ abstract class TestCase extends OrchestraTestCase
         include_once __DIR__.'/../database/migrations/create_plan_types_table.php';
         include_once __DIR__.'/../database/migrations/create_plans_table.php';
         include_once __DIR__.'/../database/migrations/create_subscriptions_table.php';
+        include_once __DIR__.'/../database/migrations/create_cards_table.php';
 
         (new \AddStripeIdToOwnerTable())->up();
         (new \CreatePlanTypesTable())->up();
         (new \CreatePlansTable())->up();
         (new \CreateSubscriptionsTable())->up();
+        (new \CreateCardsTable())->up();
     }
 
     /**
