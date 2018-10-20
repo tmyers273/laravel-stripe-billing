@@ -63,6 +63,7 @@ trait PlanFactory
             'interval' => 'month',
             'stripe_plan_id' => 'monthly',
             'price' => 2000,
+            'active' => true,
         ], $overrides));
     }
 
@@ -83,6 +84,7 @@ trait PlanFactory
             'stripe_plan_id' => 'basic_monthly',
             'price' => 1500,
             'trial_days' => 11,
+            'active' => true,
         ], $overrides));
     }
 
@@ -102,6 +104,23 @@ trait PlanFactory
             'interval' => 'month',
             'stripe_plan_id' => 'team_monthly_10',
             'price' => 4500,
+            'active' => true,
+        ], $overrides));
+    }
+
+    /**
+     * @param array $overrides
+     * @return Plan
+     */
+    public function createInactivePlan(array $overrides = []): Plan
+    {
+        return Plan::create(array_merge([
+            'name' => 'Team monthly plan for 24 users',
+            'code_name' => 'team-monthly-24',
+            'interval' => 'month',
+            'stripe_plan_id' => 'team_monthly_24',
+            'price' => 5500,
+            'active' => false,
         ], $overrides));
     }
 }

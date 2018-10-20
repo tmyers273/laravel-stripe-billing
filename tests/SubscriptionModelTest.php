@@ -4,6 +4,8 @@ namespace TMyers\StripeBilling\Tests;
 
 
 use Carbon\Carbon;
+use TMyers\StripeBilling\Exceptions\AlreadySubscribed;
+use TMyers\StripeBilling\Exceptions\PlanIsInactive;
 use TMyers\StripeBilling\Facades\StripeSubscription;
 use TMyers\StripeBilling\Models\Plan;
 use TMyers\StripeBilling\Models\Subscription;
@@ -231,7 +233,7 @@ class SubscriptionModelTest extends TestCase
             ->andReturn($stripeSubscription);
 
         // Do change plan to basic monthly plan
-        $activeSubscription->changePlanTo($basicPlan);
+        $activeSubscription->changeTo($basicPlan);
 
         $this->assertDatabaseHas('subscriptions', [
             'id' => $activeSubscription->id,
@@ -277,7 +279,7 @@ class SubscriptionModelTest extends TestCase
             ->andReturn($stripeSubscription);
 
         // Do change plan
-        $activeSubscription->changePlanTo($basicPlan);
+        $activeSubscription->changeTo($basicPlan);
 
         $this->assertDatabaseHas('subscriptions', [
             'id' => $activeSubscription->id,
@@ -296,5 +298,42 @@ class SubscriptionModelTest extends TestCase
             $this->assertTrue($subscription->isActive());
             $this->assertTrue($subscription->onTrial());
         });
+    }
+
+    /** @test */
+    public function it_will_throw_if_trying_to_change_to_plan_that_it_is_already_for()
+    {
+        $user = $this->createUser();
+        $monthlyPlan = $this->createMonthlyPlan();
+        $stripeId = 'fake-id';
+
+        // Given we have active subscription
+        $activeSubscription = $this->createActiveSubscription($user, $monthlyPlan, [
+            'stripe_subscription_id' => $stripeId,
+        ]);
+
+        $this->expectException(AlreadySubscribed::class);
+
+        // Do change again to the same plan
+        $activeSubscription->changeTo($monthlyPlan);
+    }
+    
+    /** @test */
+    public function it_will_throw_if_try_to_change_to_plan_that_is_not_active_any_more()
+    {
+        $user = $this->createUser();
+        $monthlyPlan = $this->createMonthlyPlan();
+        $inactivePlan = $this->createInactivePlan();
+        $stripeId = 'fake-id';
+
+        // Given we have active subscription
+        $activeSubscription = $this->createActiveSubscription($user, $monthlyPlan, [
+            'stripe_subscription_id' => $stripeId,
+        ]);
+
+        $this->expectException(PlanIsInactive::class);
+
+        // Do change again to the same plan
+        $activeSubscription->changeTo($inactivePlan);
     }
 }

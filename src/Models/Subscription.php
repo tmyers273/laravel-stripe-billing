@@ -4,6 +4,8 @@ namespace TMyers\StripeBilling\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use TMyers\StripeBilling\Exceptions\AlreadySubscribed;
+use TMyers\StripeBilling\Exceptions\PlanIsInactive;
 use TMyers\StripeBilling\Facades\StripeSubscription;
 
 class Subscription extends Model
@@ -73,8 +75,28 @@ class Subscription extends Model
         $this->fill(['ends_at' => Carbon::now()])->save();
     }
 
-    public function changePlanTo(Plan $plan)
+    /*
+    |--------------------------------------------------------------------------
+    | Swapping plans
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * @param Plan $plan
+     * @return $this
+     * @throws AlreadySubscribed
+     * @throws PlanIsInactive
+     */
+    public function changeTo(Plan $plan)
     {
+        if ($this->isForPlan($plan)) {
+            throw AlreadySubscribed::toPlan($plan);
+        }
+
+        if ( ! $plan->isActive()) {
+            throw PlanIsInactive::plan($plan);
+        }
+
         /** @var \Stripe\Subscription $stripeSubscription */
         $stripeSubscription = StripeSubscription::retrieve($this->stripe_subscription_id);
 

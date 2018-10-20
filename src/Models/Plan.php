@@ -6,12 +6,19 @@ namespace TMyers\StripeBilling\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Class Plan
+ * @package TMyers\StripeBilling\Models
+ * @property int $stripe_plan_id
+ * @property boolean $active
+ */
 class Plan extends Model
 {
     protected $guarded = ['id'];
 
     protected $casts = [
-        'trial_days' => 'integer'
+        'trial_days' => 'integer',
+        'active' => 'boolean',
     ];
 
     public static function boot()
@@ -30,6 +37,11 @@ class Plan extends Model
     public static function fromCodeName(string $codeName): self
     {
         return static::whereCodeName($codeName)->firstOrFail();
+    }
+
+    public function isActive(): bool
+    {
+        return !! $this->active;
     }
     
     /*
