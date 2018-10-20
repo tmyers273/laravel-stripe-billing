@@ -90,10 +90,10 @@ class Subscription extends Model
 
         $stripeSubscription->save();
 
-        $this->fill([
-            'plan_id' => $this->plan->id,
-            'type' => $this->getPlanType(),
-        ])->save();
+        $this->update([
+            'plan_id' => $plan->id,
+            'type' => $plan->planTypeAsString(),
+        ]);
 
         return $this;
     }

@@ -207,4 +207,94 @@ class SubscriptionModelTest extends TestCase
             $this->assertFalse($subscription->onTrial());
         });
     }
+
+    /** @test */
+    public function it_can_swap_plans()
+    {
+        $user = $this->createUser();
+        $monthlyPlan = $this->createMonthlyPlan();
+        $basicPlan = $this->createBasicMonthlyPlan($basicType = $this->createBasicPlanType());
+        $stripeId = 'fake-id';
+
+        // Given we have active subscription
+        $activeSubscription = $this->createActiveSubscription($user, $monthlyPlan, [
+            'stripe_subscription_id' => $stripeId,
+        ]);
+
+        // Mock
+        $stripeSubscription = m::mock('Stripe\Subscription[save]')->makePartial();
+        $stripeSubscription->shouldReceive('save')->once();
+
+        StripeSubscription::shouldReceive('retrieve')
+            ->once()
+            ->with($stripeId)
+            ->andReturn($stripeSubscription);
+
+        // Do change plan to basic monthly plan
+        $activeSubscription->changePlanTo($basicPlan);
+
+        $this->assertDatabaseHas('subscriptions', [
+            'id' => $activeSubscription->id,
+            'type' => 'basic',
+            'plan_id' => $basicPlan->id,
+        ]);
+
+        tap($activeSubscription->fresh(), function(Subscription $subscription) use ($basicPlan, $basicType) {
+            // Expect subscription to have changed plan
+            $this->assertTrue($subscription->isForPlan($basicPlan));
+            $this->assertTrue($subscription->isForPlan($basicType));
+            $this->assertTrue($subscription->isForPlan('basic'));
+
+            // Expect subscription to be active for until the end of initial trial period
+            $this->assertFalse($subscription->onGracePeriod());
+            $this->assertTrue($subscription->isActive());
+            $this->assertFalse($subscription->onTrial());
+        });
+    }
+
+    /** @test */
+    public function it_can_swap_plans_being_on_trial()
+    {
+        $user = $this->createUser();
+        $monthlyPlan = $this->createMonthlyPlan();
+        $basicPlan = $this->createBasicMonthlyPlan($basicType = $this->createBasicPlanType());
+        $stripeId = 'fake-id';
+        $trialEndsAt = 5;
+
+        // Given we have active on trial subscription
+        $activeSubscription = $this->createOnTrialSubscription($user, $monthlyPlan, [
+            'stripe_subscription_id' => $stripeId,
+            'trial_ends_at' => now()->addDays($trialEndsAt)->endOfDay(),
+        ]);
+
+        // Mock
+        $stripeSubscription = m::mock('Stripe\Subscription[save]')->makePartial();
+        $stripeSubscription->shouldReceive('save')->once();
+
+        StripeSubscription::shouldReceive('retrieve')
+            ->once()
+            ->with($stripeId)
+            ->andReturn($stripeSubscription);
+
+        // Do change plan
+        $activeSubscription->changePlanTo($basicPlan);
+
+        $this->assertDatabaseHas('subscriptions', [
+            'id' => $activeSubscription->id,
+            'type' => 'basic',
+            'plan_id' => $basicPlan->id,
+        ]);
+
+        tap($activeSubscription->fresh(), function(Subscription $subscription) use ($basicPlan, $basicType) {
+            // Expect subscription to have changed plan
+            $this->assertTrue($subscription->isForPlan($basicPlan));
+            $this->assertTrue($subscription->isForPlan($basicType));
+            $this->assertTrue($subscription->isForPlan('basic'));
+
+            // Expect subscription to be active for until the end of initial trial period
+            $this->assertFalse($subscription->onGracePeriod());
+            $this->assertTrue($subscription->isActive());
+            $this->assertTrue($subscription->onTrial());
+        });
+    }
 }
