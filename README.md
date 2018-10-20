@@ -52,6 +52,12 @@ $subscription->cancelAtPeriodEnd();
 $subscription->cancelNow();
 ```
 
+##### Resuming subscription
+Resuming subscription is possible only as long as it is on grace period
+```php
+$subscription->resume();
+```
+
 ##### Changing plan
 ```php
 // Accepts Plan object
