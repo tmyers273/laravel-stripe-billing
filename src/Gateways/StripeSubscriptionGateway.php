@@ -3,6 +3,7 @@
 namespace TMyers\StripeBilling\Gateways;
 
 
+use Carbon\Carbon;
 use Stripe\Customer;
 use Stripe\Subscription;
 
@@ -25,5 +26,16 @@ class StripeSubscriptionGateway extends StripeGateway
     public function retrieve(string $subscriptionId)
     {
         return Subscription::retrieve($subscriptionId);
+    }
+
+    /**
+     * @param Subscription $subscription
+     * @return Carbon
+     */
+    public function parseCurrentPeriodEnd(Subscription $subscription): Carbon
+    {
+        return Carbon::createFromTimestamp(
+            $subscription->current_period_end
+        );
     }
 }

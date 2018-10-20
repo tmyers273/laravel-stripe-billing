@@ -11,11 +11,12 @@ use TMyers\StripeBilling\Facades\StripeSubscription;
 use TMyers\StripeBilling\Models\Plan;
 use TMyers\StripeBilling\Models\Subscription;
 use TMyers\StripeBilling\Tests\Helpers\StripeObjectsFactory;
+use TMyers\StripeBilling\Tests\Helpers\SubscriptionFactory;
 use TMyers\StripeBilling\Tests\Stubs\Models\User;
 
 class HasSubscriptionsTest extends TestCase
 {
-    use StripeObjectsFactory;
+    use StripeObjectsFactory, SubscriptionFactory;
 
     public function setUp()
     {

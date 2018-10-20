@@ -41,9 +41,7 @@ class Subscription extends Model
         if ($this->onTrial()) {
             $this->ends_at = $this->trial_ends_at;
         } else {
-            $this->ends_at = Carbon::createFromTimestamp(
-                $stripeSubscription->current_period_end
-            );
+            $this->ends_at = StripeSubscription::parseCurrentPeriodEnd($stripeSubscription);
         }
 
         $this->save();
@@ -53,9 +51,10 @@ class Subscription extends Model
 
     public function cancelNow(): self
     {
+        /** @var \Stripe\Subscription $stripeSubscription */
         $stripeSubscription = StripeSubscription::retrieve($this->stripe_subscription_id);
 
-        $stripeSubscription->cance();
+        $stripeSubscription->cancel();
 
         $this->markAsCanceled();
 
@@ -117,6 +116,18 @@ class Subscription extends Model
     public function onGracePeriod(): bool
     {
         return $this->ends_at && $this->ends_at->isFuture();
+    }
+
+    /**
+     * @return int
+     */
+    public function daysUntilTheEndOfTheGracePeriod(): int
+    {
+        if ($this->onGracePeriod()) {
+            return $this->ends_at->diffInDays(now());
+        }
+
+        return 0;
     }
 
     /*
