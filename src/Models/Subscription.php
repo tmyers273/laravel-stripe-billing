@@ -6,8 +6,20 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use TMyers\StripeBilling\Exceptions\AlreadySubscribed;
 use TMyers\StripeBilling\Exceptions\PlanIsInactive;
+use TMyers\StripeBilling\Exceptions\StripeBillingException;
 use TMyers\StripeBilling\Facades\StripeSubscription;
 
+/**
+ * Class Subscription
+ *
+ * @package TMyers\StripeBilling\Models
+ * @property Plan $plan
+ * @property string $stripe_subscription_id
+ * @property Carbon $trial_ends_at
+ * @property Carbon $ends_at
+ * @property integer $owner_id
+ * @property integer $plan_id
+ */
 class Subscription extends Model
 {
     protected $guarded = ['id'];
@@ -16,7 +28,7 @@ class Subscription extends Model
 
     protected $casts = [
         'plan_id' => 'integer',
-        'user_id' => 'integer',
+        'owner_id' => 'integer',
     ];
 
     protected $dates = [
@@ -87,7 +99,7 @@ class Subscription extends Model
      * @throws AlreadySubscribed
      * @throws PlanIsInactive
      */
-    public function changeTo(Plan $plan)
+    public function changeTo(Plan $plan): self
     {
         if ($this->isFor($plan)) {
             throw AlreadySubscribed::toPlan($plan);
@@ -116,6 +128,38 @@ class Subscription extends Model
             'plan_id' => $plan->id,
             'type' => $plan->planTypeAsString(),
         ]);
+
+        return $this;
+    }
+
+    /**
+     * @throws StripeBillingException
+     */
+    public function resume(): self
+    {
+        if (!$this->onGracePeriod()) {
+            throw new StripeBillingException("Subscription for plan {$this->plan->name} is not on grace period");
+        }
+
+        if (!$this->plan->isActive()) {
+            throw PlanIsInactive::plan($this->plan);
+        }
+
+        /** @var \Stripe\Subscription $stripeSubscription */
+        $stripeSubscription = StripeSubscription::retrieve($this->stripe_subscription_id);
+
+        $stripeSubscription->cancel_at_period_end = false;
+        $stripeSubscription->plan = $this->plan->stripe_plan_id;
+
+        if ($this->onTrial()) {
+            $stripeSubscription->trial_end = $this->trial_ends_at->getTimestamp();
+        } else {
+            $stripeSubscription->trial_end = 'now';
+        }
+
+        $stripeSubscription->save();
+
+        $this->fill(['ends_at' => null])->save();
 
         return $this;
     }

@@ -20,12 +20,12 @@ class StripeSubscriptionGateway extends StripeGateway
     }
 
     /**
-     * @param string $subscriptionId
+     * @param string $stripeSubscriptionId
      * @return \Stripe\Subscription
      */
-    public function retrieve(string $subscriptionId)
+    public function retrieve(string $stripeSubscriptionId)
     {
-        return Subscription::retrieve($subscriptionId);
+        return Subscription::retrieve($stripeSubscriptionId);
     }
 
     /**

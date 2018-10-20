@@ -11,6 +11,11 @@ namespace TMyers\StripeBilling\Facades;
 
 use Illuminate\Support\Facades\Facade;
 
+/**
+ * Class StripeSubscription
+ * @package TMyers\StripeBilling\Facades
+ * @method static retrieve(string $stripeSubscriptionId)
+ */
 class StripeSubscription extends Facade
 {
     /**

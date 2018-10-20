@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Model;
  * @package TMyers\StripeBilling\Models
  * @property int $stripe_plan_id
  * @property boolean $active
+ * @property string $name
+ * @property string $code_name
  */
 class Plan extends Model
 {
