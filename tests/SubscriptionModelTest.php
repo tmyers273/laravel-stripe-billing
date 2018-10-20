@@ -6,6 +6,7 @@ namespace TMyers\StripeBilling\Tests;
 use Carbon\Carbon;
 use TMyers\StripeBilling\Exceptions\AlreadySubscribed;
 use TMyers\StripeBilling\Exceptions\PlanIsInactive;
+use TMyers\StripeBilling\Exceptions\StripeBillingException;
 use TMyers\StripeBilling\Facades\StripeSubscription;
 use TMyers\StripeBilling\Models\Plan;
 use TMyers\StripeBilling\Models\Subscription;
@@ -335,5 +336,63 @@ class SubscriptionModelTest extends TestCase
 
         // Do change again to the same plan
         $activeSubscription->changeTo($inactivePlan);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Resume
+    |--------------------------------------------------------------------------
+    */
+
+    public function subscription_can_be_resumed_during_grace_period()
+    {
+        $user = $this->createUser();
+        $stripeId = 'fake-id';
+        $graceSubscription = $this->createGraceSubscription($user, $this->createMonthlyPlan());
+
+        // Mock
+        $stripeSubscription = m::mock('Stripe\Subscription[save]')->makePartial();
+        $stripeSubscription->shouldReceive('save')->once();
+
+        StripeSubscription::shouldReceive('retrieve')
+            ->once()
+            ->with($stripeId)
+            ->andReturn($stripeSubscription);
+
+        $graceSubscription->resume();
+
+        $this->assertDatabaseHas('subscriptions', [
+            'id' => $graceSubscription->id,
+            'ends_at' => null,
+        ]);
+
+        tap($graceSubscription->fresh(), function(Subscription $subscription) {
+            // Expect subscription to be active for until the end of initial trial period
+            $this->assertFalse($subscription->onGracePeriod());
+            $this->assertTrue($subscription->isActive());
+            $this->assertFalse($subscription->onTrial());
+        });
+    }
+
+    /** @test */
+    public function it_will_throw_if_subscription_is_not_on_grace_period()
+    {
+        $user = $this->createUser();
+        $graceSubscription = $this->createExpiredSubscription($user, $this->createMonthlyPlan());
+
+        $this->expectException(StripeBillingException::class);
+
+        $graceSubscription->resume();
+    }
+
+    /** @test */
+    public function it_will_throw_if_plan_has_become_inactive()
+    {
+        $user = $this->createUser();
+        $graceSubscription = $this->createGraceSubscription($user, $this->createInactivePlan());
+
+        $this->expectException(PlanIsInactive::class);
+
+        $graceSubscription->resume();
     }
 }

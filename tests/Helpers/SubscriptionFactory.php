@@ -44,4 +44,20 @@ trait SubscriptionFactory
             'ends_at' => now()->addDays(17),
         ], $overrides));
     }
+
+    /**
+     * @param User $user
+     * @param Plan $plan
+     * @param array $overrides
+     * @return Subscription
+     */
+    public function createExpiredSubscription(User $user, Plan $plan, array $overrides = []): Subscription
+    {
+        return Subscription::create(array_merge([
+            'owner_id' => $user->id,
+            'plan_id' => $plan->id,
+            'stripe_subscription_id' => 'fake-stripe-id',
+            'ends_at' => now()->subDays(17),
+        ], $overrides));
+    }
 }
