@@ -9,7 +9,7 @@
 namespace TMyers\StripeBilling\Exceptions;
 
 
-class StripeGatewayException extends \Exception
+class StripeGatewayException extends StripeBillingException
 {
     protected $cardWasDeclined;
 

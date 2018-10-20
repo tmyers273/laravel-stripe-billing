@@ -89,7 +89,7 @@ class Subscription extends Model
      */
     public function changeTo(Plan $plan)
     {
-        if ($this->isForPlan($plan)) {
+        if ($this->isFor($plan)) {
             throw AlreadySubscribed::toPlan($plan);
         }
 
@@ -130,7 +130,24 @@ class Subscription extends Model
      * @param string|Plan $plan
      * @return bool
      */
-    public function isForPlan($plan): bool
+    public function isStrictlyFor($plan): bool
+    {
+        if (is_string($plan)) {
+            return $this->plan->code_name === $plan;
+        }
+
+        if ($plan instanceof Plan) {
+            return $this->plan_id === $plan->id;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string|Plan|PlanType $plan
+     * @return bool
+     */
+    public function isFor($plan): bool
     {
         if (is_string($plan)) {
             return $this->plan->code_name === $plan || optional($this->plan->planType)->code_name === $plan;

@@ -9,7 +9,7 @@
 namespace TMyers\StripeBilling\Exceptions;
 
 
-class AlreadySubscribed extends \Exception
+class AlreadySubscribed extends StripeBillingException
 {
     public static function toPlan($plan): self
     {

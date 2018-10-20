@@ -9,7 +9,7 @@
 namespace TMyers\StripeBilling;
 
 
-trait CanBeCharged
+trait Chargeable
 {
 
 }

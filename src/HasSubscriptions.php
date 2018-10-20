@@ -4,18 +4,25 @@ namespace TMyers\StripeBilling;
 
 
 use TMyers\StripeBilling\Exceptions\AlreadySubscribed;
+use TMyers\StripeBilling\Exceptions\SubscriptionNotFound;
 use TMyers\StripeBilling\Facades\StripeCustomer;
 use TMyers\StripeBilling\Models\Plan;
+use TMyers\StripeBilling\Models\PlanType;
 use TMyers\StripeBilling\Models\Subscription;
 
 trait HasSubscriptions
 {
+    /**
+     * @param Plan|PlanType|string $plan
+     * @return bool
+     */
     public function isSubscribedTo($plan): bool
     {
         $subscriptions = $this->activeSubscriptions;
 
+        /** @var Subscription $subscription */
         foreach ($subscriptions as $subscription) {
-            if ($subscription->isForPlan($plan)) {
+            if ($subscription->isFor($plan)) {
                 return true;
             }
         }
@@ -49,6 +56,24 @@ trait HasSubscriptions
         return $builder->create($token, $options);
     }
 
+    /**
+     * @param $plan
+     * @return Subscription
+     * @throws SubscriptionNotFound
+     */
+    public function getSubscriptionFor($plan): Subscription
+    {
+        $found = $this->activeSubscriptions->first(function(Subscription $subscription) use ($plan) {
+            return $subscription->isStrictlyFor($plan);
+        });
+
+        if (!$found) {
+            throw SubscriptionNotFound::forPlan($plan);
+        }
+
+        return $found;
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Relationships
@@ -68,6 +93,4 @@ trait HasSubscriptions
                 $q->whereNull('ends_at')->orWhere('ends_at', '>', now());
             });
     }
-
-
 }

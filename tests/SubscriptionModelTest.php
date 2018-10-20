@@ -243,9 +243,9 @@ class SubscriptionModelTest extends TestCase
 
         tap($activeSubscription->fresh(), function(Subscription $subscription) use ($basicPlan, $basicType) {
             // Expect subscription to have changed plan
-            $this->assertTrue($subscription->isForPlan($basicPlan));
-            $this->assertTrue($subscription->isForPlan($basicType));
-            $this->assertTrue($subscription->isForPlan('basic'));
+            $this->assertTrue($subscription->isFor($basicPlan));
+            $this->assertTrue($subscription->isFor($basicType));
+            $this->assertTrue($subscription->isFor('basic'));
 
             // Expect subscription to be active for until the end of initial trial period
             $this->assertFalse($subscription->onGracePeriod());
@@ -289,9 +289,9 @@ class SubscriptionModelTest extends TestCase
 
         tap($activeSubscription->fresh(), function(Subscription $subscription) use ($basicPlan, $basicType) {
             // Expect subscription to have changed plan
-            $this->assertTrue($subscription->isForPlan($basicPlan));
-            $this->assertTrue($subscription->isForPlan($basicType));
-            $this->assertTrue($subscription->isForPlan('basic'));
+            $this->assertTrue($subscription->isFor($basicPlan));
+            $this->assertTrue($subscription->isFor($basicType));
+            $this->assertTrue($subscription->isFor('basic'));
 
             // Expect subscription to be active for until the end of initial trial period
             $this->assertFalse($subscription->onGracePeriod());

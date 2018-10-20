@@ -21,6 +21,16 @@ $user->defaultCard;
 // Check if user is already subscribed to plan
 // Accepts Plan object, PlanType object, string (code_name of plan_type or plan) e.g. basic, basic_yearly_90
 $user->isSubscribedTo($plan);
+
+// or for subscription
+// accepts Plan|PlanType|string (code_name of plan_type or plan)
+$subscription->isFor($plan);
+```
+
+##### Retrieve subscriptions and chain methods
+```php
+$user->getSubscriptionFor($teamPlan)->isActive();
+$user->getSubscriptionFor('basic-monthly-10')->cancelNow();
 ```
 
 ##### Create subscription

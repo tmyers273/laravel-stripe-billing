@@ -6,6 +6,7 @@ namespace TMyers\StripeBilling\Tests;
 use Carbon\Carbon;
 use Stripe\Card;
 use Stripe\Customer;
+use TMyers\StripeBilling\Exceptions\SubscriptionNotFound;
 use TMyers\StripeBilling\Facades\StripeCustomer;
 use TMyers\StripeBilling\Facades\StripeSubscription;
 use TMyers\StripeBilling\Models\Plan;
@@ -175,5 +176,52 @@ class HasSubscriptionsTest extends TestCase
                 'brand' => 'FakeBrand',
             ]);
         });
+    }
+
+    /** @test */
+    public function it_can_get_subscription_for_user()
+    {
+        // Given we have a user and two plans
+        $user = $this->createUser();
+        $basicType = $this->createBasicPlanType();
+        $basicPlan = $this->createBasicMonthlyPlan($basicType);
+        $basicSubscription = $this->createActiveSubscription($user, $basicPlan);
+
+        $teamType = $this->createTeamPlanType();
+        $teamPlan = $this->createTeamMonthlyPlan($teamType);
+        $teamSubscription = $this->createActiveSubscription($user, $teamPlan);
+
+        // Expect correct subscription to be found
+        $this->assertTrue($teamSubscription->is($user->getSubscriptionFor($teamPlan)));
+        $this->assertTrue($basicSubscription->is($user->getSubscriptionFor($basicPlan)));
+
+        // by code name
+        $this->assertTrue($teamSubscription->is($user->getSubscriptionFor($teamPlan->code_name)));
+        $this->assertTrue($basicSubscription->is($user->getSubscriptionFor($basicPlan->code_name)));
+
+        // chaining
+        $this->assertTrue(
+            $user->getSubscriptionFor($teamPlan->code_name)->isActive()
+        );
+    }
+
+    /** @test */
+    public function it_will_throw_if_subscription_not_found()
+    {
+        // Given we have a user and two plans
+        $user = $this->createUser();
+        $basicType = $this->createBasicPlanType();
+        $basicPlan = $this->createBasicMonthlyPlan($basicType);
+        $basicSubscription = $this->createActiveSubscription($user, $basicPlan);
+
+        $teamType = $this->createTeamPlanType();
+        $teamPlan = $this->createTeamMonthlyPlan($teamType);
+        $teamSubscription = $this->createActiveSubscription($user, $teamPlan);
+
+        $monthlyPlan = $this->createMonthlyPlan();
+
+        $this->expectException(SubscriptionNotFound::class);
+
+        $user->getSubscriptionFor($monthlyPlan);
     }
 }

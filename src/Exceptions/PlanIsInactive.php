@@ -11,7 +11,7 @@ namespace TMyers\StripeBilling\Exceptions;
 
 use TMyers\StripeBilling\Models\Plan;
 
-class PlanIsInactive extends \Exception
+class PlanIsInactive extends StripeBillingException
 {
     public static function plan(Plan $plan): self
     {
