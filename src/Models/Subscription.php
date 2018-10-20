@@ -24,6 +24,13 @@ class Subscription extends Model
         'updated_at',
     ];
 
+    /**
+     * Indicates if the plan change should be prorated.
+     *
+     * @var bool
+     */
+    protected $prorate = true;
+
     /*
     |--------------------------------------------------------------------------
     | Actions
@@ -64,6 +71,31 @@ class Subscription extends Model
     public function markAsCanceled()
     {
         $this->fill(['ends_at' => Carbon::now()])->save();
+    }
+
+    public function changePlanTo(Plan $plan)
+    {
+        /** @var \Stripe\Subscription $stripeSubscription */
+        $stripeSubscription = StripeSubscription::retrieve($this->stripe_subscription_id);
+
+        $stripeSubscription->plan = $plan->stripe_plan_id;
+
+        if ($this->onTrial()) {
+            $stripeSubscription->trial_end = $this->trial_ends_at->getTimestamp();
+        } else {
+            $stripeSubscription->trial_end = 'now';
+        }
+
+        $stripeSubscription->prorate = $this->prorate;
+
+        $stripeSubscription->save();
+
+        $this->fill([
+            'plan_id' => $this->plan->id,
+            'type' => $this->getPlanType(),
+        ])->save();
+
+        return $this;
     }
 
     /*

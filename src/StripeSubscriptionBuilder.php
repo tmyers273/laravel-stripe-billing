@@ -64,14 +64,9 @@ class StripeSubscriptionBuilder
         return $this->owner->subscriptions()->create([
             'plan_id' => $this->plan->id,
             'stripe_subscription_id' => $subscription->id,
-            'type' => $this->getPlanType(),
+            'type' => $this->plan->planTypeAsString(),
             'trial_ends_at' => $trialEndsAt,
         ]);
-    }
-
-    protected function getPlanType(): string
-    {
-        return $this->plan->planType ? $this->plan->planType->code_name : 'default';
     }
 
     /**

@@ -58,4 +58,9 @@ class Plan extends Model
     {
         return $this->belongsTo(config('stripe-billing.models.plan_type'));
     }
+
+    public function planTypeAsString(): string
+    {
+        return $this->planType ? $this->planType->code_name : 'default';
+    }
 }
