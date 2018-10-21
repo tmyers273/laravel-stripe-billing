@@ -37,7 +37,7 @@ trait HasSubscriptions
      * @return mixed
      * @throws AlreadySubscribed
      */
-    public function subscribeTo($plan, $token = null, array $options = [])
+    public function subscribeTo($plan, $token = null, array $options = []): Subscription
     {
         if (is_null($plan)) {
             throw new \InvalidArgumentException("Plan cannot be null.");

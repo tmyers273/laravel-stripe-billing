@@ -38,10 +38,11 @@ class StripeCustomerGateway extends StripeGateway
     /**
      * @param string $stripeId
      * @return \Stripe\StripeObject
+     * @throws StripeGatewayException
      */
     public function retrieve(string $stripeId)
     {
-        return Customer::retrieve($stripeId);
+        return Customer::retrieve($stripeId, $this->getApiKey());
     }
 
     public function parseDefaultCard(Customer $customer): array

@@ -193,6 +193,10 @@ class Subscription extends Model
      */
     public function isFor($plan): bool
     {
+        if (!$this->isActive()) {
+            return false;
+        }
+
         if (is_string($plan)) {
             return $this->plan->code_name === $plan || optional($this->plan->planType)->code_name === $plan;
         }

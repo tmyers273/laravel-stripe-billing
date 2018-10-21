@@ -13,19 +13,21 @@ class StripeSubscriptionGateway extends StripeGateway
      * @param Customer $customer
      * @param array $options
      * @return Subscription
+     * @throws \TMyers\StripeBilling\Exceptions\StripeGatewayException
      */
     public function create($customer, array $options)
     {
-        return $customer->subscriptions->create($options);
+        return $customer->subscriptions->create($options, $this->getApiKey());
     }
 
     /**
      * @param string $stripeSubscriptionId
      * @return \Stripe\Subscription
+     * @throws \TMyers\StripeBilling\Exceptions\StripeGatewayException
      */
     public function retrieve(string $stripeSubscriptionId)
     {
-        return Subscription::retrieve($stripeSubscriptionId);
+        return Subscription::retrieve($stripeSubscriptionId, $this->getApiKey());
     }
 
     /**
