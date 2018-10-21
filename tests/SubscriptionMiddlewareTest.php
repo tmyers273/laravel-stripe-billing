@@ -145,13 +145,15 @@ class SubscriptionMiddlewareTest extends TestCase
     */
 
     /** @test */
-    public function user_with_active_subscriptions_passes_validation_with_one_parameter()
+    public function user_with_active_subscriptions_passes_validation_with_parameters()
     {
         // Given we have a user, am active plan and an active subscription
         $user = $this->createUser();
         $monthlyPricingPlan = $this->createMonthlyPricingPlan();
+        $basicMonthlyPlan = $this->createBasicMonthlyPricingPlan();
 
         $this->createActiveSubscription($user, $monthlyPricingPlan);
+        $this->createOnTrialSubscription($user, $basicMonthlyPlan);
 
         // Initialize fake request
         $this->be($user);
@@ -167,7 +169,39 @@ class SubscriptionMiddlewareTest extends TestCase
         // Run middleware
         $response = $middleware->handle($request, function($r) {
             return $r;
+        }, 'monthly,basic');
+
+        // Assert middleware to call the $next Closure
+        $this->assertSame($request, $response);
+
+        // Run middleware
+        $response = $middleware->handle($request, function($r) {
+            return $r;
         }, 'monthly');
+
+        // Assert middleware to call the $next Closure
+        $this->assertSame($request, $response);
+
+        // Run middleware
+        $response = $middleware->handle($request, function($r) {
+            return $r;
+        }, 'basic');
+
+        // Assert middleware to call the $next Closure
+        $this->assertSame($request, $response);
+
+        // Run middleware
+        $response = $middleware->handle($request, function($r) {
+            return $r;
+        }, 'basic,monthly');
+
+        // Assert middleware to call the $next Closure
+        $this->assertSame($request, $response);
+
+        // Run middleware
+        $response = $middleware->handle($request, function($r) {
+            return $r;
+        }, 'basic-monthly,basic');
 
         // Assert middleware to call the $next Closure
         $this->assertSame($request, $response);
