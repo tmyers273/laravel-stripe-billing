@@ -30,7 +30,7 @@ trait HasSubscriptions
 
         /** @var Subscription $subscription */
         foreach ($subscriptions as $subscription) {
-            if ($subscription->isFor($plan)) {
+            if ($subscription->isFor($plan) && $subscription->isActive()) {
                 return true;
             }
         }
