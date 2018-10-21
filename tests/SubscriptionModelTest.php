@@ -17,8 +17,6 @@ use Mockery as m;
 
 class SubscriptionModelTest extends TestCase
 {
-    use SubscriptionFactory;
-
     protected function tearDown()
     {
         m::close();

@@ -9,11 +9,13 @@ use TMyers\StripeBilling\Models\PricingPlan;
 use TMyers\StripeBilling\Models\Plan;
 use TMyers\StripeBilling\StripeBillingServiceProvider;
 use TMyers\StripeBilling\Tests\Helpers\PlanFactory;
+use TMyers\StripeBilling\Tests\Helpers\StripeObjectsFactory;
+use TMyers\StripeBilling\Tests\Helpers\SubscriptionFactory;
 use TMyers\StripeBilling\Tests\Stubs\Models\User;
 
 abstract class TestCase extends OrchestraTestCase
 {
-    use PlanFactory;
+    use PlanFactory, SubscriptionFactory, StripeObjectsFactory;
 
     public function setUp()
     {

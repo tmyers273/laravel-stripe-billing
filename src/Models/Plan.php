@@ -5,6 +5,7 @@ namespace TMyers\StripeBilling\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 
 /**
  * Class Plan
@@ -15,6 +16,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $string
  * @property boolean $active
  * @property integer $id
+ * @property Collection $pricingPlans
+ * @property Collection $subscriptions
  */
 class Plan extends Model
 {
@@ -56,11 +59,24 @@ class Plan extends Model
     |--------------------------------------------------------------------------
     */
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
+     */
     public function subscriptions()
     {
         return $this->hasManyThrough(
             config('stripe-billing.models.subscription'),
             config('stripe-billing.models.pricing_plan')
         );
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function pricingPlans()
+    {
+        return $this
+            ->hasMany(config('stripe-billing.models.pricing_plan'), 'plan_id')
+            ->orderBy('price');
     }
 }

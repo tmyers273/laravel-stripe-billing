@@ -17,8 +17,6 @@ use TMyers\StripeBilling\Tests\Stubs\Models\User;
 
 class HasSubscriptionsTest extends TestCase
 {
-    use StripeObjectsFactory, SubscriptionFactory;
-
     public function setUp()
     {
         parent::setUp();

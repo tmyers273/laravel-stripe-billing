@@ -50,6 +50,16 @@ trait PlanFactory
     }
 
     /**
+     * @param Plan $plan
+     * @param array $attributes
+     * @return PricingPlan
+     */
+    protected function createPricingPlan(Plan $plan, array $attributes): PricingPlan
+    {
+        return $plan->pricingPlans()->create($attributes);
+    }
+
+    /**
      * @param Plan $type
      * @param array $overrides
      * @return PricingPlan
