@@ -71,4 +71,14 @@ $subscription->resume();
 $subscription->changeTo($basicMonthlyPlan);
 ```
 
+#### Middleware
+Register in HTTP `Kernel.php`
+```php
+'subscription' => \TMyers\StripeBilling\Middleware\SubscriptionMiddleware::class,
+```
+
+The middleware can take parameters like so: `subscription:basic,pro` - that means that 
+users with any of these subscriptions can pass the middleware. When used *without parameters* it will 
+just look for any active including `onTrial` or `OnGracePeriod` subscriptions 
+
 
