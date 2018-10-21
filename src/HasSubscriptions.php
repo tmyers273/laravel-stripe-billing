@@ -6,14 +6,14 @@ namespace TMyers\StripeBilling;
 use TMyers\StripeBilling\Exceptions\AlreadySubscribed;
 use TMyers\StripeBilling\Exceptions\SubscriptionNotFound;
 use TMyers\StripeBilling\Facades\StripeCustomer;
+use TMyers\StripeBilling\Models\PricingPlan;
 use TMyers\StripeBilling\Models\Plan;
-use TMyers\StripeBilling\Models\PlanType;
 use TMyers\StripeBilling\Models\Subscription;
 
 trait HasSubscriptions
 {
     /**
-     * @param Plan|PlanType|string $plan
+     * @param PricingPlan|Plan|string $plan
      * @return bool
      */
     public function isSubscribedTo($plan): bool
@@ -44,7 +44,7 @@ trait HasSubscriptions
         }
 
         if (is_string($plan)) {
-            $plan = Plan::fromCodeName($plan);
+            $plan = PricingPlan::fromCodeName($plan);
         }
 
         if ($this->isSubscribedTo($plan)) {

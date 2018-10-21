@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: denismitr
- * Date: 21.10.2018
- * Time: 15:18
- */
 
 namespace TMyers\StripeBilling\Tests\Integration;
 
@@ -36,14 +30,14 @@ class SubscriptionModelIntegrationTest extends TestCase
     {
         // Given we have a user and two plans
         $user = $this->createUser();
-        $monthlyPlan = $this->createMonthlyPlan();
-        $teamPlan = $this->createTeamMonthlyPlan();
+        $monthlyPlan = $this->createMonthlyPricingPlan();
+        $teamPlan = $this->createTeamMonthlyPricingPlan();
 
         $subscription = $user->subscribeTo($monthlyPlan, $this->getTestToken());
 
         $this->assertDatabaseHas('subscriptions', [
             'owner_id'=> $user->id,
-            'plan_id' => $monthlyPlan->id,
+            'pricing_plan_id' => $monthlyPlan->id,
         ]);
 
         // Expect user to be subscribed to monthly plan
@@ -62,7 +56,7 @@ class SubscriptionModelIntegrationTest extends TestCase
 
         $this->assertDatabaseHas('subscriptions', [
             'owner_id'=> $user->id,
-            'plan_id' => $teamPlan->id,
+            'pricing_plan_id' => $teamPlan->id,
         ]);
     }
 
@@ -71,13 +65,13 @@ class SubscriptionModelIntegrationTest extends TestCase
     {
         // Given we have a user and two plans
         $user = $this->createUser();
-        $monthlyPlan = $this->createMonthlyPlan();
+        $monthlyPlan = $this->createMonthlyPricingPlan();
 
         $subscription = $user->subscribeTo($monthlyPlan, $this->getTestToken());
 
         $this->assertDatabaseHas('subscriptions', [
             'owner_id'=> $user->id,
-            'plan_id' => $monthlyPlan->id,
+            'pricing_plan_id' => $monthlyPlan->id,
         ]);
 
         // Expect user to be subscribed to monthly plan
@@ -91,6 +85,5 @@ class SubscriptionModelIntegrationTest extends TestCase
         $this->assertFalse($user->fresh()->isSubscribedTo($monthlyPlan));
         $this->assertFalse($subscription->isFor($monthlyPlan));
         $this->assertFalse($subscription->isActive());
-
     }
 }

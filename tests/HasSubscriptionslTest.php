@@ -9,7 +9,7 @@ use Stripe\Customer;
 use TMyers\StripeBilling\Exceptions\SubscriptionNotFound;
 use TMyers\StripeBilling\Facades\StripeCustomer;
 use TMyers\StripeBilling\Facades\StripeSubscription;
-use TMyers\StripeBilling\Models\Plan;
+use TMyers\StripeBilling\Models\PricingPlan;
 use TMyers\StripeBilling\Models\Subscription;
 use TMyers\StripeBilling\Tests\Helpers\StripeObjectsFactory;
 use TMyers\StripeBilling\Tests\Helpers\SubscriptionFactory;
@@ -37,8 +37,8 @@ class HasSubscriptionsTest extends TestCase
     {
         // Given we have a user and two simple plans
         $user = $this->createUser();
-        $monthlyPlan = $this->createMonthlyPlan();
-        $teamPlan = $this->createTeamMonthlyPlan();
+        $monthlyPlan = $this->createMonthlyPricingPlan();
+        $teamPlan = $this->createTeamMonthlyPricingPlan();
 
         // Fake token
         $token = 'fake-credit-card-token';
@@ -80,7 +80,7 @@ class HasSubscriptionsTest extends TestCase
 
         $this->assertDatabaseHas('subscriptions', [
             'owner_id'=> $user->id,
-            'plan_id' => $monthlyPlan->id,
+            'pricing_plan_id' => $monthlyPlan->id,
             'stripe_subscription_id' => 'new-subscription-id',
         ]);
 
@@ -106,11 +106,11 @@ class HasSubscriptionsTest extends TestCase
     {
         // Given we have a user and two plans
         $user = $this->createUser();
-        $basicType = $this->createBasicPlanType();
-        $basicPlan = $this->createBasicMonthlyPlan($basicType);
+        $basicType = $this->createBasicPlan();
+        $basicPlan = $this->createBasicMonthlyPricingPlan($basicType);
 
-        $teamType = $this->createTeamPlanType();
-        $teamPlan = $this->createTeamMonthlyPlan($teamType);
+        $teamType = $this->createTeamPlan();
+        $teamPlan = $this->createTeamMonthlyPricingPlan($teamType);
 
         // Fake token
         $token = 'fake-credit-card-token';
@@ -149,7 +149,7 @@ class HasSubscriptionsTest extends TestCase
         // expect subscription to be created
         $this->assertDatabaseHas('subscriptions', [
             'owner_id'=> $user->id,
-            'plan_id' => $basicPlan->id,
+            'pricing_plan_id' => $basicPlan->id,
             'type' => 'basic',
             'stripe_subscription_id' => 'new-subscription-id',
             'trial_ends_at' => now()->addDays(11)
@@ -183,12 +183,12 @@ class HasSubscriptionsTest extends TestCase
     {
         // Given we have a user and two plans
         $user = $this->createUser();
-        $basicType = $this->createBasicPlanType();
-        $basicPlan = $this->createBasicMonthlyPlan($basicType);
+        $basicType = $this->createBasicPlan();
+        $basicPlan = $this->createBasicMonthlyPricingPlan($basicType);
         $basicSubscription = $this->createActiveSubscription($user, $basicPlan);
 
-        $teamType = $this->createTeamPlanType();
-        $teamPlan = $this->createTeamMonthlyPlan($teamType);
+        $teamType = $this->createTeamPlan();
+        $teamPlan = $this->createTeamMonthlyPricingPlan($teamType);
         $teamSubscription = $this->createActiveSubscription($user, $teamPlan);
 
         // Expect correct subscription to be found
@@ -210,15 +210,15 @@ class HasSubscriptionsTest extends TestCase
     {
         // Given we have a user and two plans
         $user = $this->createUser();
-        $basicType = $this->createBasicPlanType();
-        $basicPlan = $this->createBasicMonthlyPlan($basicType);
+        $basicType = $this->createBasicPlan();
+        $basicPlan = $this->createBasicMonthlyPricingPlan($basicType);
         $basicSubscription = $this->createActiveSubscription($user, $basicPlan);
 
-        $teamType = $this->createTeamPlanType();
-        $teamPlan = $this->createTeamMonthlyPlan($teamType);
+        $teamType = $this->createTeamPlan();
+        $teamPlan = $this->createTeamMonthlyPricingPlan($teamType);
         $teamSubscription = $this->createActiveSubscription($user, $teamPlan);
 
-        $monthlyPlan = $this->createMonthlyPlan();
+        $monthlyPlan = $this->createMonthlyPricingPlan();
 
         $this->expectException(SubscriptionNotFound::class);
 

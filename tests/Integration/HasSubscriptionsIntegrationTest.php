@@ -38,8 +38,8 @@ class HasSubscriptionsIntegrationTest extends TestCase
     {
         // Given we have a user and two plans
         $user = $this->createUser();
-        $monthlyPlan = $this->createMonthlyPlan();
-        $teamPlan = $this->createTeamMonthlyPlan();
+        $monthlyPlan = $this->createMonthlyPricingPlan();
+        $teamPlan = $this->createTeamMonthlyPricingPlan();
 
         $subscription = $user->subscribeTo($monthlyPlan, $this->getTestToken());
 
@@ -47,7 +47,7 @@ class HasSubscriptionsIntegrationTest extends TestCase
 
         $this->assertDatabaseHas('subscriptions', [
             'owner_id'=> $user->id,
-            'plan_id' => $monthlyPlan->id,
+            'pricing_plan_id' => $monthlyPlan->id,
         ]);
 
         tap($user->fresh(), function(User $user) use ($monthlyPlan, $teamPlan) {
@@ -73,11 +73,11 @@ class HasSubscriptionsIntegrationTest extends TestCase
     {
         // Given we have a user and two plans
         $user = $this->createUser();
-        $basicType = $this->createBasicPlanType();
-        $basicPlan = $this->createBasicMonthlyPlan($basicType);
+        $basicType = $this->createBasicPlan();
+        $basicPlan = $this->createBasicMonthlyPricingPlan($basicType);
 
-        $teamType = $this->createTeamPlanType();
-        $teamPlan = $this->createTeamMonthlyPlan($teamType);
+        $teamType = $this->createTeamPlan();
+        $teamPlan = $this->createTeamMonthlyPricingPlan($teamType);
 
         $subscription = $user->subscribeTo($basicPlan, $this->getTestToken());
 
@@ -86,7 +86,7 @@ class HasSubscriptionsIntegrationTest extends TestCase
         // expect subscription to be created
         $this->assertDatabaseHas('subscriptions', [
             'owner_id'=> $user->id,
-            'plan_id' => $basicPlan->id,
+            'pricing_plan_id' => $basicPlan->id,
             'type' => 'basic',
             'trial_ends_at' => now()->addDays(11)
         ]);

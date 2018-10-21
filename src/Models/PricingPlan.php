@@ -3,12 +3,28 @@
 namespace TMyers\StripeBilling\Models;
 
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
-class PlanType extends Model
+/**
+ * Class PricingPlan
+ * @package TMyers\StripeBilling\Models
+ * @property Plan $plan
+ * @property int $stripe_plan_id
+ * @property boolean $active
+ * @property string $name
+ * @property string $code_name
+ * @property integer $trial_days
+ */
+class PricingPlan extends Model
 {
     protected $guarded = ['id'];
+
+    protected $casts = [
+        'trial_days' => 'integer',
+        'active' => 'boolean',
+    ];
 
     public static function boot()
     {
@@ -21,11 +37,16 @@ class PlanType extends Model
 
     /**
      * @param string $codeName
-     * @return PlanType
+     * @return PricingPlan
      */
     public static function fromCodeName(string $codeName): self
     {
         return static::whereCodeName($codeName)->firstOrFail();
+    }
+
+    public function isActive(): bool
+    {
+        return !! $this->active;
     }
     
     /*
@@ -39,16 +60,6 @@ class PlanType extends Model
         return $builder->whereActive(true);
     }
 
-    public function scopeForIndividualUsers(Builder $builder)
-    {
-        return $builder->whereTeamsEnabled(false);
-    }
-
-    public function scopeForTeams(Builder $builder)
-    {
-        return $builder->whereTeamsEnabled(true);
-    }
-
     /*
     |--------------------------------------------------------------------------
     | Relationships
@@ -57,9 +68,16 @@ class PlanType extends Model
 
     public function subscriptions()
     {
-        return $this->hasManyThrough(
-            config('stripe-billing.models.subscription'),
-            config('stripe-billing.models.plan')
-        );
+        return $this->hasMany(config('stripe-billing.models.subscription'));
+    }
+
+    public function plan()
+    {
+        return $this->belongsTo(config('stripe-billing.models.plan'));
+    }
+
+    public function planAsString(): string
+    {
+        return $this->plan ? $this->plan->code_name : 'default';
     }
 }

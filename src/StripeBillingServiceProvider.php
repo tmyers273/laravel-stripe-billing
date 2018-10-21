@@ -26,22 +26,22 @@ class StripeBillingServiceProvider extends ServiceProvider
 
         if ( ! class_exists('AddStripeIdToOwnerTable')) {
             $this->publishes([
-                __DIR__ . '/../database/migrations/add_stripe_id_to_owner_table.php' =>
-                    database_path('migrations/' . date('Y_m_d_His', time()) . '_1_add_stripe_id_to_owner_table.php'),
-            ], 'migrations');
-        }
-
-        if ( ! class_exists('CreatePlanTypesTable')) {
-            $this->publishes([
-                __DIR__ . '/../database/migrations/create_plan_types_table.php' =>
-                    database_path('migrations/' . date('Y_m_d_His', time()) . '_2_create_plan_types_table.php'),
+                __DIR__ . '/../database/migrations/add_stripe_and_default_card_ids_to_owner_table.php' =>
+                    database_path('migrations/' . date('Y_m_d_His', time()) . '_1_add_stripe_and_default_card_ids_to_owner_table.php'),
             ], 'migrations');
         }
 
         if ( ! class_exists('CreatePlansTable')) {
             $this->publishes([
                 __DIR__ . '/../database/migrations/create_plans_table.php' =>
-                    database_path('migrations/' . date('Y_m_d_His', time()) . '_3_create_plans_table.php'),
+                    database_path('migrations/' . date('Y_m_d_His', time()) . '_2_create_plans_table.php'),
+            ], 'migrations');
+        }
+
+        if ( ! class_exists('CreatePricingPlansTable')) {
+            $this->publishes([
+                __DIR__ . '/../database/migrations/create_pricing_plans_table.php' =>
+                    database_path('migrations/' . date('Y_m_d_His', time()) . '_3_create_pricing_plans_table.php'),
             ], 'migrations');
         }
 

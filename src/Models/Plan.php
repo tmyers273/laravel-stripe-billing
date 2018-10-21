@@ -9,19 +9,10 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * Class Plan
  * @package TMyers\StripeBilling\Models
- * @property int $stripe_plan_id
- * @property boolean $active
- * @property string $name
- * @property string $code_name
  */
 class Plan extends Model
 {
     protected $guarded = ['id'];
-
-    protected $casts = [
-        'trial_days' => 'integer',
-        'active' => 'boolean',
-    ];
 
     public static function boot()
     {
@@ -40,11 +31,6 @@ class Plan extends Model
     {
         return static::whereCodeName($codeName)->firstOrFail();
     }
-
-    public function isActive(): bool
-    {
-        return !! $this->active;
-    }
     
     /*
     |--------------------------------------------------------------------------
@@ -57,6 +43,16 @@ class Plan extends Model
         return $builder->whereActive(true);
     }
 
+    public function scopeForIndividualUsers(Builder $builder)
+    {
+        return $builder->whereTeamsEnabled(false);
+    }
+
+    public function scopeForTeams(Builder $builder)
+    {
+        return $builder->whereTeamsEnabled(true);
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Relationships
@@ -65,16 +61,9 @@ class Plan extends Model
 
     public function subscriptions()
     {
-        return $this->hasMany(config('stripe-billing.models.subscription'));
-    }
-
-    public function planType()
-    {
-        return $this->belongsTo(config('stripe-billing.models.plan_type'));
-    }
-
-    public function planTypeAsString(): string
-    {
-        return $this->planType ? $this->planType->code_name : 'default';
+        return $this->hasManyThrough(
+            config('stripe-billing.models.subscription'),
+            config('stripe-billing.models.plan')
+        );
     }
 }

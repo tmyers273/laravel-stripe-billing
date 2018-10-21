@@ -13,21 +13,21 @@ use TMyers\StripeBilling\Facades\StripeSubscription;
  * Class Subscription
  *
  * @package TMyers\StripeBilling\Models
- * @property Plan $plan
+ * @property PricingPlan $pricingPlan
  * @property string $stripe_subscription_id
  * @property Carbon $trial_ends_at
  * @property Carbon $ends_at
  * @property integer $owner_id
- * @property integer $plan_id
+ * @property integer $pricing_plan_id
  */
 class Subscription extends Model
 {
     protected $guarded = ['id'];
 
-    protected $with = ['plan', 'plan.planType'];
+    protected $with = ['pricingPlan', 'pricingPlan.plan'];
 
     protected $casts = [
-        'plan_id' => 'integer',
+        'pricing_plan_id' => 'integer',
         'owner_id' => 'integer',
     ];
 
@@ -94,12 +94,12 @@ class Subscription extends Model
     */
 
     /**
-     * @param Plan $plan
+     * @param PricingPlan $plan
      * @return $this
      * @throws AlreadySubscribed
      * @throws PlanIsInactive
      */
-    public function changeTo(Plan $plan): self
+    public function changeTo(PricingPlan $plan): self
     {
         if ($this->isFor($plan)) {
             throw AlreadySubscribed::toPlan($plan);
@@ -125,8 +125,8 @@ class Subscription extends Model
         $stripeSubscription->save();
 
         $this->update([
-            'plan_id' => $plan->id,
-            'type' => $plan->planTypeAsString(),
+            'pricing_plan_id' => $plan->id,
+            'type' => $plan->planAsString(),
         ]);
 
         return $this;
@@ -138,18 +138,18 @@ class Subscription extends Model
     public function resume(): self
     {
         if (!$this->onGracePeriod()) {
-            throw new StripeBillingException("Subscription for plan {$this->plan->name} is not on grace period");
+            throw new StripeBillingException("Subscription for plan {$this->pricingPlan->name} is not on grace period");
         }
 
-        if (!$this->plan->isActive()) {
-            throw PlanIsInactive::plan($this->plan);
+        if (!$this->pricingPlan->isActive()) {
+            throw PlanIsInactive::plan($this->pricingPlan);
         }
 
         /** @var \Stripe\Subscription $stripeSubscription */
         $stripeSubscription = StripeSubscription::retrieve($this->stripe_subscription_id);
 
         $stripeSubscription->cancel_at_period_end = false;
-        $stripeSubscription->plan = $this->plan->stripe_plan_id;
+        $stripeSubscription->plan = $this->pricingPlan->stripe_plan_id;
 
         if ($this->onTrial()) {
             $stripeSubscription->trial_end = $this->trial_ends_at->getTimestamp();
@@ -171,24 +171,24 @@ class Subscription extends Model
     */
 
     /**
-     * @param string|Plan $plan
+     * @param string|PricingPlan $plan
      * @return bool
      */
     public function isStrictlyFor($plan): bool
     {
         if (is_string($plan)) {
-            return $this->plan->code_name === $plan;
+            return $this->pricingPlan->code_name === $plan;
         }
 
-        if ($plan instanceof Plan) {
-            return $this->plan_id === $plan->id;
+        if ($plan instanceof PricingPlan) {
+            return $this->pricing_plan_id === $plan->id;
         }
 
         return false;
     }
 
     /**
-     * @param string|Plan|PlanType $plan
+     * @param string|PricingPlan|Plan $plan
      * @return bool
      */
     public function isFor($plan): bool
@@ -198,15 +198,15 @@ class Subscription extends Model
         }
 
         if (is_string($plan)) {
-            return $this->plan->code_name === $plan || optional($this->plan->planType)->code_name === $plan;
+            return $this->pricingPlan->code_name === $plan || optional($this->pricingPlan->plan)->code_name === $plan;
+        }
+
+        if ($plan instanceof PricingPlan) {
+            return $this->pricing_plan_id === $plan->id;
         }
 
         if ($plan instanceof Plan) {
-            return $this->plan_id === $plan->id;
-        }
-
-        if ($plan instanceof PlanType) {
-            return optional($this->plan->planType)->id === $plan->id;
+            return optional($this->pricingPlan->plan)->id === $plan->id;
         }
 
         return false;
@@ -266,9 +266,9 @@ class Subscription extends Model
     |--------------------------------------------------------------------------
     */
 
-    public function plan()
+    public function pricingPlan()
     {
-        return $this->belongsTo(config('stripe-billing.models.plan'), 'plan_id');
+        return $this->belongsTo(config('stripe-billing.models.pricing_plan'), 'pricing_plan_id');
     }
 
     public function user()
