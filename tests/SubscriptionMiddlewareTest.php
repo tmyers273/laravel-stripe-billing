@@ -133,8 +133,43 @@ class SubscriptionMiddlewareTest extends TestCase
         $middleware = new SubscriptionMiddleware();
 
         // Run middleware
-        $response = $middleware->handle($request, function($r) {
+        $middleware->handle($request, function($r) {
             return $r;
         });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | With parameters
+    |--------------------------------------------------------------------------
+    */
+
+    /** @test */
+    public function user_with_active_subscriptions_passes_validation_with_one_parameter()
+    {
+        // Given we have a user, am active plan and an active subscription
+        $user = $this->createUser();
+        $monthlyPricingPlan = $this->createMonthlyPricingPlan();
+
+        $this->createActiveSubscription($user, $monthlyPricingPlan);
+
+        // Initialize fake request
+        $this->be($user);
+
+        $request = Request::create('/only/for/subscribed/users', 'GET');
+
+        $request->setUserResolver(function() {
+            return auth()->user();
+        });
+
+        $middleware = new SubscriptionMiddleware();
+
+        // Run middleware
+        $response = $middleware->handle($request, function($r) {
+            return $r;
+        }, 'monthly');
+
+        // Assert middleware to call the $next Closure
+        $this->assertSame($request, $response);
     }
 }

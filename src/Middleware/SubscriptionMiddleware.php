@@ -17,8 +17,8 @@ class SubscriptionMiddleware
         $plans = is_string($plans) ? explode(',', $plans) : [];
 
         foreach ($plans as $plan) {
-            if ($user->isSubscribedFor($plan)) {
-                return $request($next);
+            if ($user->isSubscribedTo($plan)) {
+                return $next($request);
             }
         }
 
