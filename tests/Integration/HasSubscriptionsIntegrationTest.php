@@ -39,7 +39,7 @@ class HasSubscriptionsIntegrationTest extends TestCase
         // Given we have a user and two plans
         $user = $this->createUser();
         $monthlyPlan = $this->createMonthlyPricingPlan();
-        $teamPlan = $this->createTeamMonthlyPricingPlan();
+        $teamMonthlyPricingPlan = $this->createTeamMonthlyPricingPlan();
 
         $subscription = $user->subscribeTo($monthlyPlan, $this->getTestToken());
 
@@ -50,9 +50,9 @@ class HasSubscriptionsIntegrationTest extends TestCase
             'pricing_plan_id' => $monthlyPlan->id,
         ]);
 
-        tap($user->fresh(), function(User $user) use ($monthlyPlan, $teamPlan) {
+        tap($user->fresh(), function(User $user) use ($monthlyPlan, $teamMonthlyPricingPlan) {
             $this->assertTrue($user->isSubscribedTo($monthlyPlan));
-            $this->assertFalse($user->isSubscribedTo($teamPlan));
+            $this->assertFalse($user->isSubscribedTo($teamMonthlyPricingPlan));
 
             // Expect new card to be created
             $defaultCard = $user->defaultCard;
@@ -73,32 +73,32 @@ class HasSubscriptionsIntegrationTest extends TestCase
     {
         // Given we have a user and two plans
         $user = $this->createUser();
-        $basicType = $this->createBasicPlan();
-        $basicPlan = $this->createBasicMonthlyPricingPlan($basicType);
+        $basicPlan = $this->createBasicPlan();
+        $basicMonthlyPricingPlan = $this->createBasicMonthlyPricingPlan($basicPlan);
 
         $teamType = $this->createTeamPlan();
-        $teamPlan = $this->createTeamMonthlyPricingPlan($teamType);
+        $teamMonthlyPricingPlan = $this->createTeamMonthlyPricingPlan($teamType);
 
-        $subscription = $user->subscribeTo($basicPlan, $this->getTestToken());
+        $subscription = $user->subscribeTo($basicMonthlyPricingPlan, $this->getTestToken());
 
         $this->assertInstanceOf(Subscription::class, $subscription);
 
         // expect subscription to be created
         $this->assertDatabaseHas('subscriptions', [
             'owner_id'=> $user->id,
-            'pricing_plan_id' => $basicPlan->id,
+            'pricing_plan_id' => $basicMonthlyPricingPlan->id,
             'type' => 'basic',
             'trial_ends_at' => now()->addDays(11)
         ]);
 
-        tap($user->fresh(), function(User $user) use ($basicType, $basicPlan, $teamType, $teamPlan) {
+        tap($user->fresh(), function(User $user) use ($basicPlan, $basicMonthlyPricingPlan, $teamType, $teamMonthlyPricingPlan) {
             // expect to be subscribed to basic plan
+            $this->assertTrue($user->isSubscribedTo($basicMonthlyPricingPlan));
             $this->assertTrue($user->isSubscribedTo($basicPlan));
-            $this->assertTrue($user->isSubscribedTo($basicType));
             $this->assertTrue($user->isSubscribedTo('basic'));
 
             // expect not to be subscribed to other plans
-            $this->assertFalse($user->isSubscribedTo($teamPlan));
+            $this->assertFalse($user->isSubscribedTo($teamMonthlyPricingPlan));
             $this->assertFalse($user->isSubscribedTo($teamType));
 
             // expect new card to be created
