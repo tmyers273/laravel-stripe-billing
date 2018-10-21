@@ -26,6 +26,9 @@ $user->defaultCard;
 // Accepts PricingPlan object, Plan object, string (name of Plan or PricingPlan) e.g. basic, basic_yearly_90
 $user->isSubscribedTo($plan);
 
+// true or false
+$user->hasActiveSubscriptions();
+
 // or for subscription
 // accepts PricingPlan|Plan|string (name of Plan or PricingPlan)
 $subscription->isFor($plan);
