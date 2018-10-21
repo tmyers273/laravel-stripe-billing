@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: denismitr
- * Date: 20.10.2018
- * Time: 14:07
- */
 
 namespace TMyers\StripeBilling\Tests\Helpers;
 

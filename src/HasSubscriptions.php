@@ -82,6 +82,14 @@ trait HasSubscriptions
         return $found;
     }
 
+    /**
+     * @return bool
+     */
+    public function hasActiveSubscriptions(): bool
+    {
+        return $this->activeSubscriptions->count() > 0;
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Relationships
