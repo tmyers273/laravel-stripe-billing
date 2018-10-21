@@ -15,8 +15,8 @@ trait PlanFactory
     protected function createFreePlan(array $overrides = []): Plan
     {
         return Plan::create(array_merge([
-            'name' => 'Free plan',
-            'code_name' => 'free',
+            'description' => 'Free plan',
+            'name' => 'free',
             'is_free' => true,
         ], $overrides));
     }
@@ -28,8 +28,8 @@ trait PlanFactory
     protected function createBasicPlan(array $overrides = []): Plan
     {
         return Plan::create(array_merge([
-            'name' => 'Basic plan',
-            'code_name' => 'basic',
+            'description' => 'Basic plan',
+            'name' => 'basic',
             'is_free' => false,
         ], $overrides));
     }
@@ -41,8 +41,8 @@ trait PlanFactory
     protected function createTeamPlan(array $overrides = []): Plan
     {
         return Plan::create(array_merge([
-            'name' => 'Team plan',
-            'code_name' => 'team',
+            'description' => 'Team plan',
+            'name' => 'team',
             'teams_enabled' => true,
             'is_free' => false,
             'team_users_limit' => 10,
@@ -58,8 +58,8 @@ trait PlanFactory
     {
         return PricingPlan::create(array_merge([
             'plan_id' => null,
-            'name' => 'Monthly plan',
-            'code_name' => 'monthly',
+            'description' => 'Monthly plan',
+            'name' => 'monthly',
             'interval' => 'month',
             'stripe_plan_id' => 'monthly',
             'price' => 2000,
@@ -78,8 +78,8 @@ trait PlanFactory
 
         return PricingPlan::create(array_merge([
             'plan_id' => $plan->id,
-            'name' => 'Basic monthly plan',
-            'code_name' => 'basic-monthly',
+            'description' => 'Basic monthly plan',
+            'name' => 'basic-monthly',
             'interval' => 'month',
             'stripe_plan_id' => 'basic_monthly',
             'price' => 1500,
@@ -99,8 +99,8 @@ trait PlanFactory
 
         return PricingPlan::create(array_merge([
             'plan_id' => $plan->id,
-            'name' => 'Team monthly plan for 10 users',
-            'code_name' => 'team-monthly-10',
+            'description' => 'Team monthly plan for 10 users',
+            'name' => 'team-monthly-10',
             'interval' => 'month',
             'stripe_plan_id' => 'team_monthly_10',
             'price' => 4500,
@@ -115,8 +115,8 @@ trait PlanFactory
     public function createInactivePricingPlan(array $overrides = []): PricingPlan
     {
         return PricingPlan::create(array_merge([
-            'name' => 'Team monthly plan for 24 users',
-            'code_name' => 'team-monthly-24',
+            'description' => 'Team monthly plan for 24 users',
+            'name' => 'team-monthly-24',
             'interval' => 'month',
             'stripe_plan_id' => 'team_monthly_24',
             'price' => 5500,

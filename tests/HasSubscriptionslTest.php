@@ -196,12 +196,12 @@ class HasSubscriptionsTest extends TestCase
         $this->assertTrue($basicSubscription->is($user->getSubscriptionFor($basicMonthlyPricingPlan)));
 
         // by code name
-        $this->assertTrue($teamSubscription->is($user->getSubscriptionFor($teamPlan->code_name)));
-        $this->assertTrue($basicSubscription->is($user->getSubscriptionFor($basicMonthlyPricingPlan->code_name)));
+        $this->assertTrue($teamSubscription->is($user->getSubscriptionFor($teamPlan->name)));
+        $this->assertTrue($basicSubscription->is($user->getSubscriptionFor($basicMonthlyPricingPlan->name)));
 
         // chaining
         $this->assertTrue(
-            $user->getSubscriptionFor($teamPlan->code_name)->isActive()
+            $user->getSubscriptionFor($teamPlan->name)->isActive()
         );
     }
 

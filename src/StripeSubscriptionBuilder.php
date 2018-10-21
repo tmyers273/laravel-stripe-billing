@@ -64,7 +64,7 @@ class StripeSubscriptionBuilder
         return $this->owner->subscriptions()->create([
             'pricing_plan_id' => $this->pricingPlan->id,
             'stripe_subscription_id' => $subscription->id,
-            'type' => $this->pricingPlan->planAsString(),
+            'type' => $this->pricingPlan->asPlanString(),
             'trial_ends_at' => $trialEndsAt,
         ]);
     }

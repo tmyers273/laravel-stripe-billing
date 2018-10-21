@@ -9,12 +9,17 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class PricingPlan
+ *
  * @package TMyers\StripeBilling\Models
+ *
  * @property Plan $plan
+ * @property integer $id
  * @property int $stripe_plan_id
  * @property boolean $active
  * @property string $name
- * @property string $code_name
+ * @property string $description
+ * @property string $interval
+ * @property integer $price
  * @property integer $trial_days
  */
 class PricingPlan extends Model
@@ -26,22 +31,13 @@ class PricingPlan extends Model
         'active' => 'boolean',
     ];
 
-    public static function boot()
-    {
-        static::creating(function($user) {
-            if (empty($user->code_name)) {
-                $user->code_name = str_slug($user->name);
-            }
-        });
-    }
-
     /**
-     * @param string $codeName
+     * @param string $name
      * @return PricingPlan
      */
-    public static function fromCodeName(string $codeName): self
+    public static function findByName(string $name): self
     {
-        return static::whereCodeName($codeName)->firstOrFail();
+        return static::whereName($name)->firstOrFail();
     }
 
     public function isActive(): bool
@@ -71,13 +67,19 @@ class PricingPlan extends Model
         return $this->hasMany(config('stripe-billing.models.subscription'));
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function plan()
     {
         return $this->belongsTo(config('stripe-billing.models.plan'));
     }
 
-    public function planAsString(): string
+    /**
+     * @return string
+     */
+    public function asPlanString(): string
     {
-        return $this->plan ? $this->plan->code_name : 'default';
+        return $this->plan ? $this->plan->name : 'default';
     }
 }

@@ -15,9 +15,9 @@ class CreatePlansTable extends Migration
     {
         Schema::create('plans', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name');
-            $table->string('code_name', 50);
-            $table->text('description')->nullable();
+            $table->string('name', 50);
+            $table->string('description');
+            $table->text('detailed_description')->nullable();
             $table->boolean('is_free');
             $table->boolean('active')->default(true);
             $table->boolean('teams_enabled')->default(false);
@@ -25,8 +25,8 @@ class CreatePlansTable extends Migration
             $table->softDeletes();
             $table->timestamps();
 
-            $table->unique('code_name');
-            $table->index('code_name');
+            $table->unique('name');
+            $table->index('name');
         });
     }
 

@@ -8,28 +8,25 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Plan
+ *
  * @package TMyers\StripeBilling\Models
+ *
+ * @property string $name
+ * @property string $string
+ * @property boolean $active
+ * @property integer $id
  */
 class Plan extends Model
 {
     protected $guarded = ['id'];
 
-    public static function boot()
-    {
-        static::creating(function($user) {
-            if (empty($user->code_name)) {
-                $user->code_name = str_slug($user->name);
-            }
-        });
-    }
-
     /**
-     * @param string $codeName
+     * @param string $name
      * @return Plan
      */
-    public static function fromCodeName(string $codeName): self
+    public static function findByName(string $name): self
     {
-        return static::whereCodeName($codeName)->firstOrFail();
+        return static::whereName($name)->firstOrFail();
     }
     
     /*
@@ -63,7 +60,7 @@ class Plan extends Model
     {
         return $this->hasManyThrough(
             config('stripe-billing.models.subscription'),
-            config('stripe-billing.models.plan')
+            config('stripe-billing.models.pricing_plan')
         );
     }
 }

@@ -126,7 +126,7 @@ class Subscription extends Model
 
         $this->update([
             'pricing_plan_id' => $plan->id,
-            'type' => $plan->planAsString(),
+            'type' => $plan->asPlanString(),
         ]);
 
         return $this;
@@ -171,17 +171,17 @@ class Subscription extends Model
     */
 
     /**
-     * @param string|PricingPlan $plan
+     * @param string|PricingPlan $pricingPlan
      * @return bool
      */
-    public function isStrictlyFor($plan): bool
+    public function isStrictlyFor($pricingPlan): bool
     {
-        if (is_string($plan)) {
-            return $this->pricingPlan->code_name === $plan;
+        if (is_string($pricingPlan)) {
+            return $this->pricingPlan->name === $pricingPlan;
         }
 
-        if ($plan instanceof PricingPlan) {
-            return $this->pricing_plan_id === $plan->id;
+        if ($pricingPlan instanceof PricingPlan) {
+            return $this->pricing_plan_id === $pricingPlan->id;
         }
 
         return false;
@@ -198,7 +198,7 @@ class Subscription extends Model
         }
 
         if (is_string($plan)) {
-            return $this->pricingPlan->code_name === $plan || optional($this->pricingPlan->plan)->code_name === $plan;
+            return $this->pricingPlan->name === $plan || optional($this->pricingPlan->plan)->name === $plan;
         }
 
         if ($plan instanceof PricingPlan) {

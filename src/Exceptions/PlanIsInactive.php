@@ -16,7 +16,7 @@ class PlanIsInactive extends StripeBillingException
     public static function plan(PricingPlan $plan): self
     {
         return new static(
-            "PricingPlan {$plan->name} with code name {$plan->code_name} and stripe id {$plan->stripe_plan_id} is not active anymore"
+            "PricingPlan {$plan->name} with stripe id {$plan->stripe_plan_id} is not active anymore"
         );
     }
 }
