@@ -9,6 +9,7 @@ use TMyers\StripeBilling\Exceptions\PlanIsInactive;
 use TMyers\StripeBilling\Exceptions\StripeBillingException;
 use TMyers\StripeBilling\Facades\StripeSubscription;
 use TMyers\StripeBilling\Models\Plan;
+use TMyers\StripeBilling\Models\PricingPlan;
 use TMyers\StripeBilling\Models\Subscription;
 use TMyers\StripeBilling\Tests\Helpers\SubscriptionFactory;
 use TMyers\StripeBilling\Tests\Stubs\Models\User;
@@ -28,16 +29,17 @@ class SubscriptionModelTest extends TestCase
     public function it_belongs_to_user()
     {
         $user = $this->createUser();
-        $plan = $this->createBasicMonthlyPlan();
+        $plan = $this->createBasicMonthlyPricingPlan();
 
         $subscription = Subscription::create([
             'owner_id' => $user->id,
-            'plan_id' => $plan->id,
+            'pricing_plan_id' => $plan->id,
             'stripe_subscription_id' => 'fake-stripe-id',
         ]);
 
         $this->assertInstanceOf(User::class, $subscription->user);
-        $this->assertInstanceOf(Plan::class, $subscription->plan);
+        $this->assertInstanceOf(PricingPlan::class, $subscription->pricingPlan);
+        $this->assertInstanceOf(Plan::class, $subscription->pricingPlan->plan);
     }
     
     /*
@@ -50,7 +52,7 @@ class SubscriptionModelTest extends TestCase
     public function it_can_verify_on_trial_period()
     {
         $user = $this->createUser();
-        $plan = $this->createMonthlyPlan();
+        $plan = $this->createMonthlyPricingPlan();
 
         // Given we have active on trial subscription
         $onTrialSubscription = $this->createOnTrialSubscription($user, $plan);
@@ -74,7 +76,7 @@ class SubscriptionModelTest extends TestCase
     public function it_can_verify_on_grace_period()
     {
         $user = $this->createUser();
-        $plan = $this->createMonthlyPlan();
+        $plan = $this->createMonthlyPricingPlan();
 
         // Given we have subscription with is under the grace period
         $graceSubscription = $this->createGraceSubscription($user, $plan);
@@ -90,7 +92,7 @@ class SubscriptionModelTest extends TestCase
     public function it_can_verify_on_grace_period_is_over()
     {
         $user = $this->createUser();
-        $plan = $this->createMonthlyPlan();
+        $plan = $this->createMonthlyPricingPlan();
 
         // Given we have subscription with is over the grace period
         $graceSubscription = $this->createGraceSubscription($user, $plan, ['ends_at' => now()->subDays(4)]);
@@ -112,7 +114,7 @@ class SubscriptionModelTest extends TestCase
     public function active_subscription_can_be_cancelled_at_period_end()
     {
         $user = $this->createUser();
-        $plan = $this->createMonthlyPlan();
+        $plan = $this->createMonthlyPricingPlan();
         $stripeId = 'fake-id';
 
         // Given we have active subscription
@@ -147,7 +149,7 @@ class SubscriptionModelTest extends TestCase
     public function active_on_trial_subscription_can_be_cancelled_at_period_end()
     {
         $user = $this->createUser();
-        $plan = $this->createMonthlyPlan();
+        $plan = $this->createMonthlyPricingPlan();
         $stripeId = 'fake-id';
         $trialEndsAt = 5;
 
@@ -183,7 +185,7 @@ class SubscriptionModelTest extends TestCase
     public function subscription_can_be_cancelled_immediately()
     {
         $user = $this->createUser();
-        $plan = $this->createMonthlyPlan();
+        $plan = $this->createMonthlyPricingPlan();
         $stripeId = 'fake-id';
 
         // Given we have active subscription
@@ -215,8 +217,8 @@ class SubscriptionModelTest extends TestCase
     public function it_can_swap_plans()
     {
         $user = $this->createUser();
-        $monthlyPlan = $this->createMonthlyPlan();
-        $basicPlan = $this->createBasicMonthlyPlan($basicType = $this->createBasicPlanType());
+        $monthlyPlan = $this->createMonthlyPricingPlan();
+        $basicPlan = $this->createBasicMonthlyPricingPlan($basicType = $this->createBasicPlan());
         $stripeId = 'fake-id';
 
         // Given we have active subscription
@@ -239,7 +241,7 @@ class SubscriptionModelTest extends TestCase
         $this->assertDatabaseHas('subscriptions', [
             'id' => $activeSubscription->id,
             'type' => 'basic',
-            'plan_id' => $basicPlan->id,
+            'pricing_plan_id' => $basicPlan->id,
         ]);
 
         tap($activeSubscription->fresh(), function(Subscription $subscription) use ($basicPlan, $basicType) {
@@ -259,8 +261,8 @@ class SubscriptionModelTest extends TestCase
     public function it_can_swap_plans_being_on_trial()
     {
         $user = $this->createUser();
-        $monthlyPlan = $this->createMonthlyPlan();
-        $basicPlan = $this->createBasicMonthlyPlan($basicType = $this->createBasicPlanType());
+        $monthlyPlan = $this->createMonthlyPricingPlan();
+        $basicPlan = $this->createBasicMonthlyPricingPlan($basicType = $this->createBasicPlan());
         $stripeId = 'fake-id';
         $trialEndsAt = 5;
 
@@ -285,7 +287,7 @@ class SubscriptionModelTest extends TestCase
         $this->assertDatabaseHas('subscriptions', [
             'id' => $activeSubscription->id,
             'type' => 'basic',
-            'plan_id' => $basicPlan->id,
+            'pricing_plan_id' => $basicPlan->id,
         ]);
 
         tap($activeSubscription->fresh(), function(Subscription $subscription) use ($basicPlan, $basicType) {
@@ -305,7 +307,7 @@ class SubscriptionModelTest extends TestCase
     public function it_will_throw_if_trying_to_change_to_plan_that_it_is_already_for()
     {
         $user = $this->createUser();
-        $monthlyPlan = $this->createMonthlyPlan();
+        $monthlyPlan = $this->createMonthlyPricingPlan();
         $stripeId = 'fake-id';
 
         // Given we have active subscription
@@ -323,8 +325,8 @@ class SubscriptionModelTest extends TestCase
     public function it_will_throw_if_try_to_change_to_plan_that_is_not_active_any_more()
     {
         $user = $this->createUser();
-        $monthlyPlan = $this->createMonthlyPlan();
-        $inactivePlan = $this->createInactivePlan();
+        $monthlyPlan = $this->createMonthlyPricingPlan();
+        $inactivePlan = $this->createInactivePricingPlan();
         $stripeId = 'fake-id';
 
         // Given we have active subscription
@@ -348,7 +350,7 @@ class SubscriptionModelTest extends TestCase
     {
         $user = $this->createUser();
         $stripeId = 'fake-id';
-        $graceSubscription = $this->createGraceSubscription($user, $this->createMonthlyPlan());
+        $graceSubscription = $this->createGraceSubscription($user, $this->createMonthlyPricingPlan());
 
         // Mock
         $stripeSubscription = m::mock('Stripe\Subscription[save]')->makePartial();
@@ -378,7 +380,7 @@ class SubscriptionModelTest extends TestCase
     public function it_will_throw_if_subscription_is_not_on_grace_period()
     {
         $user = $this->createUser();
-        $graceSubscription = $this->createExpiredSubscription($user, $this->createMonthlyPlan());
+        $graceSubscription = $this->createExpiredSubscription($user, $this->createMonthlyPricingPlan());
 
         $this->expectException(StripeBillingException::class);
 
@@ -389,7 +391,7 @@ class SubscriptionModelTest extends TestCase
     public function it_will_throw_if_plan_has_become_inactive()
     {
         $user = $this->createUser();
-        $graceSubscription = $this->createGraceSubscription($user, $this->createInactivePlan());
+        $graceSubscription = $this->createGraceSubscription($user, $this->createInactivePricingPlan());
 
         $this->expectException(PlanIsInactive::class);
 

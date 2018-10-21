@@ -13,7 +13,7 @@ use Carbon\Carbon;
 use Stripe\Customer;
 use TMyers\StripeBilling\Facades\StripeCustomer;
 use TMyers\StripeBilling\Facades\StripeSubscription;
-use TMyers\StripeBilling\Models\Plan;
+use TMyers\StripeBilling\Models\PricingPlan;
 use TMyers\StripeBilling\Models\Subscription;
 
 class StripeSubscriptionBuilder
@@ -21,9 +21,9 @@ class StripeSubscriptionBuilder
     protected $owner;
 
     /**
-     * @var Plan
+     * @var PricingPlan
      */
-    protected $plan;
+    protected $pricingPlan;
 
     /**
      * @var bool
@@ -34,13 +34,13 @@ class StripeSubscriptionBuilder
      * StripeSubscriptionBuilder constructor.
      *
      * @param $owner
-     * @param Plan $plan
+     * @param PricingPlan $pricingPlan
      */
-    public function __construct($owner, Plan $plan)
+    public function __construct($owner, PricingPlan $pricingPlan)
     {
         $this->owner = $owner;
-        $this->plan = $plan;
-        $this->skipTrial = $this->plan->trial_days === 0;
+        $this->pricingPlan = $pricingPlan;
+        $this->skipTrial = $this->pricingPlan->trial_days === 0;
     }
 
     /**
@@ -62,9 +62,9 @@ class StripeSubscriptionBuilder
         }
 
         return $this->owner->subscriptions()->create([
-            'plan_id' => $this->plan->id,
+            'pricing_plan_id' => $this->pricingPlan->id,
             'stripe_subscription_id' => $subscription->id,
-            'type' => $this->plan->planTypeAsString(),
+            'type' => $this->pricingPlan->asPlanString(),
             'trial_ends_at' => $trialEndsAt,
         ]);
     }
@@ -86,7 +86,7 @@ class StripeSubscriptionBuilder
      */
     public function getTrialExpiresAt()
     {
-        return Carbon::now()->addDays($this->plan->trial_days);
+        return Carbon::now()->addDays($this->pricingPlan->trial_days);
     }
 
     /**
@@ -95,7 +95,7 @@ class StripeSubscriptionBuilder
     protected function getSubscriptionOptions(): array
     {
         return array_filter([
-            'plan' => $this->plan->stripe_plan_id,
+            'plan' => $this->pricingPlan->stripe_plan_id,
             'trial_end' => $this->getTrialEnd(),
         ]);
     }

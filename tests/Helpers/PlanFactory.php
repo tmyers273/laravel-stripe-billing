@@ -3,46 +3,46 @@
 namespace TMyers\StripeBilling\Tests\Helpers;
 
 
+use TMyers\StripeBilling\Models\PricingPlan;
 use TMyers\StripeBilling\Models\Plan;
-use TMyers\StripeBilling\Models\PlanType;
 
 trait PlanFactory
 {
     /**
      * @param array $overrides
-     * @return PlanType
+     * @return Plan
      */
-    protected function createFreePlanType(array $overrides = []): PlanType
+    protected function createFreePlan(array $overrides = []): Plan
     {
-        return PlanType::create(array_merge([
-            'name' => 'Free plan',
-            'code_name' => 'free',
+        return Plan::create(array_merge([
+            'description' => 'Free plan',
+            'name' => 'free',
             'is_free' => true,
         ], $overrides));
     }
 
     /**
      * @param array $overrides
-     * @return PlanType
+     * @return Plan
      */
-    protected function createBasicPlanType(array $overrides = []): PlanType
+    protected function createBasicPlan(array $overrides = []): Plan
     {
-        return PlanType::create(array_merge([
-            'name' => 'Basic plan',
-            'code_name' => 'basic',
+        return Plan::create(array_merge([
+            'description' => 'Basic plan',
+            'name' => 'basic',
             'is_free' => false,
         ], $overrides));
     }
 
     /**
      * @param array $overrides
-     * @return PlanType
+     * @return Plan
      */
-    protected function createTeamPlanType(array $overrides = []): PlanType
+    protected function createTeamPlan(array $overrides = []): Plan
     {
-        return PlanType::create(array_merge([
-            'name' => 'Team plan',
-            'code_name' => 'team',
+        return Plan::create(array_merge([
+            'description' => 'Team plan',
+            'name' => 'team',
             'teams_enabled' => true,
             'is_free' => false,
             'team_users_limit' => 10,
@@ -50,16 +50,16 @@ trait PlanFactory
     }
 
     /**
-     * @param PlanType $type
+     * @param Plan $type
      * @param array $overrides
-     * @return Plan
+     * @return PricingPlan
      */
-    protected function createMonthlyPlan(array $overrides = []): Plan
+    protected function createMonthlyPricingPlan(array $overrides = []): PricingPlan
     {
-        return Plan::create(array_merge([
-            'plan_type_id' => null,
-            'name' => 'Monthly plan',
-            'code_name' => 'monthly',
+        return PricingPlan::create(array_merge([
+            'plan_id' => null,
+            'description' => 'Monthly plan',
+            'name' => 'monthly',
             'interval' => 'month',
             'stripe_plan_id' => 'monthly',
             'price' => 2000,
@@ -68,18 +68,18 @@ trait PlanFactory
     }
 
     /**
-     * @param PlanType $type
+     * @param Plan|null $plan
      * @param array $overrides
-     * @return Plan
+     * @return PricingPlan
      */
-    protected function createBasicMonthlyPlan(PlanType $type = null, array $overrides = []): Plan
+    protected function createBasicMonthlyPricingPlan(Plan $plan = null, array $overrides = []): PricingPlan
     {
-        $type = $type ?: $this->createBasicPlanType();
+        $plan = $plan ?: $this->createBasicPlan();
 
-        return Plan::create(array_merge([
-            'plan_type_id' => $type->id,
-            'name' => 'Basic monthly plan',
-            'code_name' => 'basic-monthly',
+        return PricingPlan::create(array_merge([
+            'plan_id' => $plan->id,
+            'description' => 'Basic monthly plan',
+            'name' => 'basic-monthly',
             'interval' => 'month',
             'stripe_plan_id' => 'basic_monthly',
             'price' => 1500,
@@ -89,18 +89,18 @@ trait PlanFactory
     }
 
     /**
-     * @param PlanType $type
+     * @param Plan|null $plan
      * @param array $overrides
-     * @return Plan
+     * @return PricingPlan
      */
-    protected function createTeamMonthlyPlan(PlanType $type = null, array $overrides = []): Plan
+    protected function createTeamMonthlyPricingPlan(Plan $plan = null, array $overrides = []): PricingPlan
     {
-        $type = $type ?: $this->createTeamPlanType();
+        $plan = $plan ?: $this->createTeamPlan();
 
-        return Plan::create(array_merge([
-            'plan_type_id' => $type->id,
-            'name' => 'Team monthly plan for 10 users',
-            'code_name' => 'team-monthly-10',
+        return PricingPlan::create(array_merge([
+            'plan_id' => $plan->id,
+            'description' => 'Team monthly plan for 10 users',
+            'name' => 'team-monthly-10',
             'interval' => 'month',
             'stripe_plan_id' => 'team_monthly_10',
             'price' => 4500,
@@ -110,13 +110,13 @@ trait PlanFactory
 
     /**
      * @param array $overrides
-     * @return Plan
+     * @return PricingPlan
      */
-    public function createInactivePlan(array $overrides = []): Plan
+    public function createInactivePricingPlan(array $overrides = []): PricingPlan
     {
-        return Plan::create(array_merge([
-            'name' => 'Team monthly plan for 24 users',
-            'code_name' => 'team-monthly-24',
+        return PricingPlan::create(array_merge([
+            'description' => 'Team monthly plan for 24 users',
+            'name' => 'team-monthly-24',
             'interval' => 'month',
             'stripe_plan_id' => 'team_monthly_24',
             'price' => 5500,

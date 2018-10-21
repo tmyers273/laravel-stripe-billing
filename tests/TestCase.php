@@ -5,8 +5,8 @@ namespace TMyers\StripeBilling\Tests;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
+use TMyers\StripeBilling\Models\PricingPlan;
 use TMyers\StripeBilling\Models\Plan;
-use TMyers\StripeBilling\Models\PlanType;
 use TMyers\StripeBilling\StripeBillingServiceProvider;
 use TMyers\StripeBilling\Tests\Helpers\PlanFactory;
 use TMyers\StripeBilling\Tests\Stubs\Models\User;
@@ -53,15 +53,15 @@ abstract class TestCase extends OrchestraTestCase
             $table->timestamps();
         });
 
-        include_once __DIR__.'/../database/migrations/add_stripe_id_to_owner_table.php';
-        include_once __DIR__.'/../database/migrations/create_plan_types_table.php';
-        include_once __DIR__.'/../database/migrations/create_plans_table.php';
+        include_once __DIR__ . '/../database/migrations/add_stripe_and_default_card_ids_to_owner_table.php';
+        include_once __DIR__ . '/../database/migrations/create_plans_table.php';
+        include_once __DIR__ . '/../database/migrations/create_pricing_plans_table.php';
         include_once __DIR__.'/../database/migrations/create_subscriptions_table.php';
         include_once __DIR__.'/../database/migrations/create_cards_table.php';
 
         (new \AddStripeIdToOwnerTable())->up();
-        (new \CreatePlanTypesTable())->up();
         (new \CreatePlansTable())->up();
+        (new \CreatePricingPlansTable())->up();
         (new \CreateSubscriptionsTable())->up();
         (new \CreateCardsTable())->up();
     }

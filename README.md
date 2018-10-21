@@ -3,6 +3,10 @@
 ### Usage
 Add `Billable` trait to the User model.
 
+### Plans
+* Plan model represents plan access/priviledges parameters
+* PricingPlan model optionally belongs to Plan model and represents price parameters   
+
 ### API
 
 #### Stripe customer
@@ -19,11 +23,11 @@ $user->defaultCard;
 ##### Check subscription
 ```php
 // Check if user is already subscribed to plan
-// Accepts Plan object, PlanType object, string (code_name of plan_type or plan) e.g. basic, basic_yearly_90
+// Accepts PricingPlan object, Plan object, string (name of Plan or PricingPlan) e.g. basic, basic_yearly_90
 $user->isSubscribedTo($plan);
 
 // or for subscription
-// accepts Plan|PlanType|string (code_name of plan_type or plan)
+// accepts PricingPlan|Plan|string (name of Plan or PricingPlan)
 $subscription->isFor($plan);
 ```
 
@@ -35,7 +39,7 @@ $user->getSubscriptionFor('basic-monthly-10')->cancelNow();
 
 ##### Create subscription
 ```php
-// Accepts Plan object or string representing Plan code_name e.g. pro_monthly_10
+// Accepts Plan object or string representing Plan name e.g. pro_monthly_10
 $user->subscribeTo($plan); // for already existing stripe customer
 $user->subscribeTo($plan, $token); // for user without created customer
 ```
