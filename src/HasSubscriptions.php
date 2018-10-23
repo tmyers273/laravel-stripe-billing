@@ -5,6 +5,7 @@ namespace TMyers\StripeBilling;
 
 use Illuminate\Support\Collection;
 use TMyers\StripeBilling\Exceptions\AlreadySubscribed;
+use TMyers\StripeBilling\Exceptions\CardException;
 use TMyers\StripeBilling\Exceptions\SubscriptionNotFound;
 use TMyers\StripeBilling\Facades\StripeCustomer;
 use TMyers\StripeBilling\Models\PricingPlan;
@@ -89,6 +90,8 @@ trait HasSubscriptions
     {
         return $this->activeSubscriptions->count() > 0;
     }
+
+
 
     /*
     |--------------------------------------------------------------------------

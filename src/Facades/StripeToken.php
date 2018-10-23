@@ -12,11 +12,11 @@ namespace TMyers\StripeBilling\Facades;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * Class StripeCustomer
- * @package TMyers\StripeBilling\Facades\
- * @method  static retrieve($stripeId)
+ * Class StripeToken
+ * @package TMyers\StripeBilling\Facades
+ * @method static retrieve($token)
  */
-class StripeCustomer extends Facade
+class StripeToken extends Facade
 {
     /**
      * Get the registered name of the component.
@@ -27,6 +27,6 @@ class StripeCustomer extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return 'stripe-customer-gateway';
+        return 'stripe-token-gateway';
     }
 }
