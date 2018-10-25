@@ -9,8 +9,10 @@
 namespace TMyers\StripeBilling\Tests\Helpers;
 
 
+use Stripe\Card;
 use Stripe\Customer;
 use Stripe\Subscription;
+use Stripe\Token;
 
 trait StripeObjectsFactory
 {
@@ -22,6 +24,26 @@ trait StripeObjectsFactory
     public function createCustomerObject($id, array $opts = []): Customer
     {
         return new Customer($id, $opts);
+    }
+
+    /**
+     * @param $id
+     * @param array $opts
+     * @return Token
+     */
+    public function createTokenObject($id, array $opts = []): Token
+    {
+        return new Token($id, $opts);
+    }
+
+    /**
+     * @param $id
+     * @param array $opts
+     * @return Token
+     */
+    public function createCardObject($id, array $opts = []): Card
+    {
+        return new Card($id, $opts);
     }
 
     /**

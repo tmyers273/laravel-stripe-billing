@@ -9,11 +9,15 @@
 namespace TMyers\StripeBilling\Tests;
 
 
+use Stripe\Card;
+use Stripe\Customer;
 use TMyers\StripeBilling\Facades\StripeCustomer;
+use TMyers\StripeBilling\Facades\StripeToken;
 
 class ChargeableTest extends TestCase
 {
     const FAKE_CUSTOMER_100 = 'fake-customer-100';
+    const FAKE_TOKEN_1 = 'fake-token-1';
 
     /**
      * @test
@@ -21,8 +25,9 @@ class ChargeableTest extends TestCase
      */
     public function a_card_can_be_added_to_user()
     {
+        // Given we have a user without any card
         $user = $this->createUser();
-        $token = $this->createTestToken();
+        $token = self::FAKE_TOKEN_1;
 
         StripeCustomer::shouldReceive('create')
             ->once()
@@ -36,7 +41,7 @@ class ChargeableTest extends TestCase
                 'last_4' => '4242',
             ]);
 
-        $card = $user->addCard($token);
+        $card = $user->addCardFromToken($token);
 
         $this->assertDatabaseHas('cards', [
             'id' => $card->id,
@@ -49,6 +54,43 @@ class ChargeableTest extends TestCase
             'id' => $user->id,
             'default_card_id' => $card->id,
             'stripe_id' => self::FAKE_CUSTOMER_100,
+        ]);
+    }
+
+    /** @test */
+    public function user_with_default_card_can_add_another_card()
+    {
+        // Given we have a user with an active default card
+        list($user, $card) = $this->createUserWithDefaultCard();
+        $token = self::FAKE_TOKEN_1;
+
+        // Mock
+        StripeCustomer::shouldReceive('retrieve')->once()->with($user->stripe_id)
+            ->andReturn($customer = $this->createCustomerObject(self::FAKE_CUSTOMER_100));
+
+        StripeToken::shouldReceive('retrieve')->once()->with(self::FAKE_TOKEN_1)
+            ->andReturn($stripeToken = $this->createTokenObject(self::FAKE_TOKEN_1, ['type' => "card"]));
+
+        StripeToken::shouldReceive('isDefaultSource')->once()->with($stripeToken, $customer)->andReturn(false);
+
+        StripeToken::shouldReceive('createSource')->once()->with($stripeToken, $token)
+            ->andReturn(new class extends Card {
+                public $id = 'fake-card-id';
+                public $brand = 'Visa';
+                public $last4 = '4242';
+            });
+
+        StripeCustomer::shouldReceive('retrieve')->once()->with($user->stripe_id)
+            ->andReturn(new class extends Customer {
+                public function save($opts = null) {}
+            });
+
+        $card = $user->addCardFromToken($token);
+
+        $this->assertDatabaseHas('cards', [
+            'id' => $card->id,
+            'owner_id' => $user->id,
+            'stripe_card_id' => 'fake-card-id',
         ]);
     }
 }

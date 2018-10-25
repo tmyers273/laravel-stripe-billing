@@ -5,6 +5,7 @@ namespace TMyers\StripeBilling\Tests;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
+use TMyers\StripeBilling\Models\Card;
 use TMyers\StripeBilling\Models\PricingPlan;
 use TMyers\StripeBilling\Models\Plan;
 use TMyers\StripeBilling\StripeBillingServiceProvider;
@@ -78,6 +79,29 @@ abstract class TestCase extends OrchestraTestCase
             'name' => 'Denis',
             'email' => 'denis.mitr@gmail.com'
         ], $overrides));
+    }
+
+    /**
+     * @param array $userOverrides
+     * @param array $cardOverrides
+     * @return array
+     */
+    protected function createUserWithDefaultCard(array $userOverrides = [], array $cardOverrides = []): array
+    {
+        $user = User::create(array_merge([
+            'name' => 'Denis',
+            'email' => 'denis.mitr@gmail.com',
+            'stripe_id' => 'fake-stripe-id',
+        ], $userOverrides));
+
+        $card  = Card::create(array_merge([
+            'owner_id' => $user->id,
+            'brand' => 'Visa',
+            'last_4' => '4242',
+            'stripe_card_id' => 'fake-card-id',
+        ], $cardOverrides));
+
+        return [$user, $card];
     }
 
     protected function createTestToken(): string

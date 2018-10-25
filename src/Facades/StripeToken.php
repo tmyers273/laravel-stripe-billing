@@ -10,11 +10,15 @@ namespace TMyers\StripeBilling\Facades;
 
 
 use Illuminate\Support\Facades\Facade;
+use Stripe\Customer;
+use Stripe\Token;
 
 /**
  * Class StripeToken
  * @package TMyers\StripeBilling\Facades
  * @method static retrieve($token)
+ * @method static createSource(Token $stripeToken, $token)
+ * @method static isDefaultSource(Token $stripeToken, Customer $stripeCustomer): bool
  */
 class StripeToken extends Facade
 {

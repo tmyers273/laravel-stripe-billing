@@ -42,7 +42,7 @@ trait Chargeable
      * @return Card
      * @throws CardException
      */
-    public function addCard($token)
+    public function addCardFromToken($token)
     {
         if (!$this->stripe_id) {
             list($customer, $card) = $this->createCustomerWithDefaultCardFromToken($token);
@@ -53,11 +53,11 @@ trait Chargeable
         $stripeCustomer = StripeCustomer::retrieve($this->stripe_id);
         $stripeToken = StripeToken::retrieve($token);
 
-        if ($stripeToken[$stripeToken->type]->id === $stripeCustomer->default_source) {
+        if (StripeToken::isDefaultSource($stripeToken, $stripeCustomer)) {
             return;
         }
 
-        $stripeCard = $stripeToken->sources->create(['source' => $token]);
+        $stripeCard = StripeToken::createSource($stripeToken, $token);
 
         $card = Card::create([
             'owner_id' => $this->id,
