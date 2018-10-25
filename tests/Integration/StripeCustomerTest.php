@@ -26,7 +26,7 @@ class StripeCustomerTest extends TestCase
     /** @test */
     public function it_can_create_a_customer()
     {
-        $customer = StripeCustomer::create($this->getTestToken(), 'tester@test.com');
+        $customer = StripeCustomer::create($this->createTestToken(), 'tester@test.com');
 
         $this->assertNotNull($customer->id);
     }

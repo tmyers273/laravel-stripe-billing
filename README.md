@@ -1,25 +1,21 @@
 # Laravel Stripe Billing
 
-### Usage
+## Usage
 Add `Billable` trait to the User model.
 
-### Plans
+## Plans
 * Plan model represents plan access/priviledges parameters
 * PricingPlan model optionally belongs to Plan model and represents price parameters   
 
-### API
+## Public API
 
 #### Stripe customer
 ```php
 // Create a customer from token (new default card will be created)
 $user->retrieveOrCreateStripeCustomer($token);
 ```
-#### Default card
-```php
-$user->defaultCard;
-```
 
-#### Subscriptions
+### Subscriptions
 ##### Check subscription
 ```php
 // Check if user is already subscribed to plan
@@ -69,6 +65,13 @@ $subscription->resume();
 ```php
 // Accepts Plan object
 $subscription->changeTo($basicMonthlyPlan);
+```
+
+## Charges and credit cards
+
+#### Default card
+```php
+$user->defaultCard;
 ```
 
 #### Middleware

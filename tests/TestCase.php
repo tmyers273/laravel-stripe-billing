@@ -80,7 +80,7 @@ abstract class TestCase extends OrchestraTestCase
         ], $overrides));
     }
 
-    protected function getTestToken(): string
+    protected function createTestToken(): string
     {
         return \Stripe\Token::create([
             'card' => [

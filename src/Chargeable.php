@@ -44,12 +44,15 @@ trait Chargeable
      */
     public function addCard($token)
     {
+        if (!$this->stripe_id) {
+            list($customer, $card) = $this->createCustomerWithDefaultCardFromToken($token);
+
+            return $card;
+        }
+
         $stripeCustomer = StripeCustomer::retrieve($this->stripe_id);
         $stripeToken = StripeToken::retrieve($token);
 
-        // If the given token already has the card as their default source, we can just
-        // bail out of the method now. We don't need to keep adding the same card to
-        // a model's account every time we go through this particular method call.
         if ($stripeToken[$stripeToken->type]->id === $stripeCustomer->default_source) {
             return;
         }
@@ -71,10 +74,10 @@ trait Chargeable
     }
 
     /**
-     * @param $card
+     * @param Card $card
      * @throws CardException
      */
-    public function setDefaultCard($card)
+    public function setDefaultCard(Card $card)
     {
         if ($card->owner_id !== $this->id) {
             throw new CardException("Card does not belong to that owner.");

@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Facade;
  * Class StripeCustomer
  * @package TMyers\StripeBilling\Facades\
  * @method  static retrieve($stripeId)
+ * @method static parseDefaultCard($customer)
  */
 class StripeCustomer extends Facade
 {

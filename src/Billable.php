@@ -26,19 +26,31 @@ trait Billable
     public function retrieveOrCreateStripeCustomer($token = null, array $options = [])
     {
         if (! $this->stripe_id) {
-            $customer = StripeCustomer::create($token, $this->email, $options);
-
-            $this->update([
-                'stripe_id' => $customer->id,
-            ]);
-
-            $this->addNewDefaultCard(
-                StripeCustomer::parseDefaultCard($customer)
-            );
+            list($customer, $card) = $this->createCustomerWithDefaultCardFromToken($token, $options);
 
             return $customer;
         }
 
         return StripeCustomer::retrieve($this->stripe_id);
+    }
+
+    /**
+     * @param $token
+     * @param array $options
+     * @return array
+     */
+    public function createCustomerWithDefaultCardFromToken($token, array $options = []): array
+    {
+        $customer = StripeCustomer::create($token, $this->email, $options);
+
+        $this->update([
+            'stripe_id' => $customer->id,
+        ]);
+
+        $card = $this->addNewDefaultCard(
+            StripeCustomer::parseDefaultCard($customer)
+        );
+
+        return [$customer, $card];
     }
 }
