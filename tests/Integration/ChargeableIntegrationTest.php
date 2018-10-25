@@ -92,4 +92,27 @@ class ChargeableIntegrationTest extends TestCase
              );
         });
     }
+
+    /**
+     * @test
+     * @throws \TMyers\StripeBilling\Exceptions\CardException
+     */
+    public function two_cards_can_be_swapped()
+    {
+        // Given we have a user without any card
+        $user = $this->createUser();
+
+        $defaultCard = $user->addCardFromToken($this->createTestToken());
+        $anotherCard = $user->addCardFromToken($this->createTestToken());
+
+        $user->setDefaultCard($anotherCard);
+
+        tap($user->fresh(), function(User $user) use ($anotherCard) {
+            $this->assertNotNull($user->default_card_id);
+            $this->assertTrue($user->hasDefaultCard());
+
+            $this->assertTrue($user->defaultCard->is($anotherCard));
+            $this->assertCount(2, $user->cards);
+        });
+    }
 }

@@ -13,6 +13,7 @@ use Stripe\Card;
 use Stripe\Customer;
 use TMyers\StripeBilling\Facades\StripeCustomer;
 use TMyers\StripeBilling\Facades\StripeToken;
+use TMyers\StripeBilling\Tests\Stubs\Models\User;
 
 class ChargeableTest extends TestCase
 {
@@ -42,6 +43,11 @@ class ChargeableTest extends TestCase
             ]);
 
         $card = $user->addCardFromToken($token);
+
+        tap($user->fresh(), function(User $user) use ($card) {
+            $this->assertTrue($user->hasDefaultCard());
+            $this->assertTrue($user->defaultCard->is($card));
+        });
 
         $this->assertDatabaseHas('cards', [
             'id' => $card->id,
@@ -86,6 +92,11 @@ class ChargeableTest extends TestCase
             });
 
         $card = $user->addCardFromToken($token);
+
+        tap($user->fresh(), function(User $user) use ($card) {
+            $this->assertTrue($user->hasDefaultCard());
+            $this->assertTrue($user->defaultCard->is($card));
+        });
 
         $this->assertDatabaseHas('cards', [
             'id' => $card->id,

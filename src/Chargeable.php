@@ -119,8 +119,7 @@ trait Chargeable
     {
         return $this->belongsTo(
             config('stripe-billing.models.card'),
-            'default_card_id',
-            'owner_id'
+            'default_card_id'
         );
     }
 }
