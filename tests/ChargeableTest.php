@@ -73,7 +73,7 @@ class ChargeableTest extends TestCase
 
         StripeToken::shouldReceive('isDefaultSource')->once()->with($stripeToken, $customer)->andReturn(false);
 
-        StripeToken::shouldReceive('createSource')->once()->with($stripeToken, $token)
+        StripeToken::shouldReceive('createSource')->once()->with($customer, $token)
             ->andReturn(new class extends Card {
                 public $id = 'fake-card-id';
                 public $brand = 'Visa';

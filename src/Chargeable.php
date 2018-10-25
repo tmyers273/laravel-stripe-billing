@@ -57,7 +57,7 @@ trait Chargeable
             return;
         }
 
-        $stripeCard = StripeToken::createSource($stripeToken, $token);
+        $stripeCard = StripeToken::createSource($stripeCustomer, $token);
 
         $card = Card::create([
             'owner_id' => $this->id,
@@ -91,6 +91,11 @@ trait Chargeable
         $this->forceFill([
             'default_card_id' => $card->id,
         ])->save();
+    }
+
+    public function hasDefaultCard(): bool
+    {
+        return ! is_null($this->default_card_id);
     }
     
     /*

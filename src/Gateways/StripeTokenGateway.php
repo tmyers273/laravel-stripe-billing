@@ -26,13 +26,13 @@ class StripeTokenGateway extends StripeGateway
     }
 
     /**
-     * @param Token $stripeToken
+     * @param Customer $customer
      * @param $token
      * @return Card
      */
-    public function createSource(Token $stripeToken, $token): Card
+    public function createSource(Customer $customer, $token): Card
     {
-        return $stripeToken->sources->create(['source' => $token]);
+        return $customer->sources->create(['source' => $token]);
     }
 
     public function isDefaultSource(Token $stripeToken, Customer $stripeCustomer): bool
