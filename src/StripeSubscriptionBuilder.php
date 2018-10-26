@@ -36,7 +36,7 @@ class StripeSubscriptionBuilder
      * @param $owner
      * @param PricingPlan $pricingPlan
      */
-    public function __construct($owner, PricingPlan $pricingPlan)
+    public function __construct($owner, $pricingPlan)
     {
         $this->owner = $owner;
         $this->pricingPlan = $pricingPlan;
@@ -48,7 +48,7 @@ class StripeSubscriptionBuilder
      * @param array $options
      * @return Subscription
      */
-    public function create($token = null, array $options = []): Subscription
+    public function create($token = null, array $options = [])
     {
         $subscription = StripeSubscription::create(
             $this->owner->retrieveOrCreateStripeCustomer($token, $options),
