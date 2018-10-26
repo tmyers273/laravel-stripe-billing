@@ -101,7 +101,7 @@ trait Chargeable
             throw CardException::wrongType($card, $this->getCardClass());
         }
 
-        if ($card->isOwnedBy($this)) {
+        if (!$card->isOwnedBy($this)) {
             throw CardException::notOwnedBy($this);
         }
 
@@ -117,6 +117,12 @@ trait Chargeable
         if ($stripeCustomer->default_source === $card->id) {
             $stripeCustomer->default_source = null;
             $stripeCustomer->save();
+        }
+
+        if ($this->hasDefaultCard($card)) {
+            $this->forceFill([
+                'default_card_id' => null,
+            ])->save();
         }
 
         $card->delete();

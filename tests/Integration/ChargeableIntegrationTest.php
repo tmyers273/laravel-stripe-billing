@@ -145,4 +145,70 @@ class ChargeableIntegrationTest extends TestCase
         // Do try giving one user a card of another user
         $firstUser->setCardAsDefault($anotherCard);
     }
+    
+    /*
+    |--------------------------------------------------------------------------
+    | Card removal
+    |--------------------------------------------------------------------------
+    */
+    
+    /** @test */
+    public function default_card_can_be_removed()
+    {
+        // Given we have a user without any card
+        $user = $this->createUser();
+
+        // Do add a card to the user
+        $card = $user->addCardFromToken($this->createTestToken());
+
+        tap($user->fresh(), function(User $user) use ($card) {
+            // Do remove the card
+            $user->removeCard($card);
+
+            // Expect user not to have a card any more
+            $this->assertFalse($user->hasDefaultCard());
+            $this->assertCount(0, $user->cards);
+            $this->assertNull($user->defaultCard);
+        });
+
+        // Expect changes in the DB
+        $this->assertDatabaseHas('users', ['default_card_id' => null]);
+        $this->assertDatabaseMissing('cards', ['id' => $card->id]);
+
+        // Expect user not to have a source any more
+        $this->assertCount(0, $user->retrieveStripeCustomer()->sources->data);
+    }
+
+    /**
+     * @test
+     * @throws CardException
+     */
+    public function additional_card_can_be_removed_without_affecting_default_one()
+    {
+        // Given we have a user without any card
+        $user = $this->createUser();
+
+        // Do add a card to the user
+        $defaultCard = $user->addCardFromToken($this->createTestToken());
+        $anotherCard = $user->addCardFromToken($this->createTestToken());
+
+        // Do remove the card
+        $user->removeCard($anotherCard);
+
+        tap($user->fresh(), function(User $user) use ($anotherCard, $defaultCard) {
+            // Expect user to still have default card
+            $this->assertTrue($user->hasDefaultCard());
+            $this->assertTrue($user->hasDefaultCard($defaultCard));
+
+            $this->assertCount(1, $user->cards);
+        });
+
+        // Expect changes in the DB
+        $this->assertDatabaseHas('users', ['default_card_id' => $defaultCard->id]);
+        $this->assertDatabaseMissing('cards', ['id' => $anotherCard->id]);
+        $this->assertDatabaseHas('cards', ['id' => $defaultCard->id]);
+
+        // Expect user not to have a source any more
+        $this->assertCount(1, $user->retrieveStripeCustomer()->sources->data);
+    }
 }
