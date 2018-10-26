@@ -5,9 +5,7 @@ namespace TMyers\StripeBilling;
 
 use Illuminate\Support\Collection;
 use TMyers\StripeBilling\Exceptions\AlreadySubscribed;
-use TMyers\StripeBilling\Exceptions\CardException;
 use TMyers\StripeBilling\Exceptions\SubscriptionNotFound;
-use TMyers\StripeBilling\Facades\StripeCustomer;
 use TMyers\StripeBilling\Models\PricingPlan;
 use TMyers\StripeBilling\Models\Plan;
 use TMyers\StripeBilling\Models\Subscription;
@@ -53,7 +51,8 @@ trait HasSubscriptions
         }
 
         if (is_string($plan)) {
-            $plan = PricingPlan::findByName($plan);
+            $pricingPlanClass = $this->getPricingPlanClass();
+            $plan = $pricingPlanClass::findByName($plan);
         }
 
         if ($this->isSubscribedTo($plan)) {
@@ -70,9 +69,9 @@ trait HasSubscriptions
      * @return Subscription
      * @throws SubscriptionNotFound
      */
-    public function getSubscriptionFor($plan): Subscription
+    public function getSubscriptionFor($plan)
     {
-        $found = $this->activeSubscriptions->first(function(Subscription $subscription) use ($plan) {
+        $found = $this->activeSubscriptions->first(function($subscription) use ($plan) {
             return $subscription->isStrictlyFor($plan);
         });
 
@@ -89,6 +88,11 @@ trait HasSubscriptions
     public function hasActiveSubscriptions(): bool
     {
         return $this->activeSubscriptions->count() > 0;
+    }
+
+    public function getPricingPlanClass(): string
+    {
+        return config('stripe-billing.models.pricing_plan');
     }
 
 
