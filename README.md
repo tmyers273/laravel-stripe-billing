@@ -104,6 +104,12 @@ if that particular card is the default one for the user:
 $user->hasDefaultCard($card); //true or false
 ```
 
+#### Card helper methods
+```php
+$card->isOwnedBy($user); // true or false
+$card->isDefault(); // true or false
+```
+
 #### Middleware
 Register in HTTP `Kernel.php`
 ```php
