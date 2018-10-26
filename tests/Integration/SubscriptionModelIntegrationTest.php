@@ -17,6 +17,14 @@ class SubscriptionModelIntegrationTest extends TestCase
         }
 
         parent::setUp();
+
+//        Carbon::setTestNow(now()->addMinutes(5));
+    }
+
+    protected function tearDown()
+    {
+//        Carbon::setTestNow();
+        parent::tearDown();
     }
 
     /*
@@ -33,7 +41,7 @@ class SubscriptionModelIntegrationTest extends TestCase
         $monthlyPlan = $this->createMonthlyPricingPlan();
         $teamPlan = $this->createTeamMonthlyPricingPlan();
 
-        $subscription = $user->subscribeTo($monthlyPlan, $this->getTestToken());
+        $subscription = $user->subscribeTo($monthlyPlan, $this->createTestToken());
 
         $this->assertDatabaseHas('subscriptions', [
             'owner_id'=> $user->id,
@@ -75,7 +83,7 @@ class SubscriptionModelIntegrationTest extends TestCase
         $user = $this->createUser();
         $monthlyPlan = $this->createMonthlyPricingPlan();
 
-        $subscription = $user->subscribeTo($monthlyPlan, $this->getTestToken());
+        $subscription = $user->subscribeTo($monthlyPlan, $this->createTestToken());
 
         $this->assertDatabaseHas('subscriptions', [
             'owner_id'=> $user->id,
@@ -109,7 +117,7 @@ class SubscriptionModelIntegrationTest extends TestCase
         $user = $this->createUser();
         $monthlyPlan = $this->createMonthlyPricingPlan();
 
-        $subscription = $user->subscribeTo($monthlyPlan, $this->getTestToken());
+        $subscription = $user->subscribeTo($monthlyPlan, $this->createTestToken());
 
         $this->assertDatabaseHas('subscriptions', [
             'owner_id'=> $user->id,
@@ -150,7 +158,7 @@ class SubscriptionModelIntegrationTest extends TestCase
         $user = $this->createUser();
         $monthlyPlan = $this->createMonthlyPricingPlan();
 
-        $subscription = $user->subscribeTo($monthlyPlan, $this->getTestToken());
+        $subscription = $user->subscribeTo($monthlyPlan, $this->createTestToken());
 
         $this->assertDatabaseHas('subscriptions', [
             'owner_id'=> $user->id,

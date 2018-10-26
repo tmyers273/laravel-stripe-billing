@@ -41,7 +41,7 @@ class HasSubscriptionsIntegrationTest extends TestCase
         $monthlyPlan = $this->createMonthlyPricingPlan();
         $teamMonthlyPricingPlan = $this->createTeamMonthlyPricingPlan();
 
-        $subscription = $user->subscribeTo($monthlyPlan, $this->getTestToken());
+        $subscription = $user->subscribeTo($monthlyPlan, $this->createTestToken());
 
         $this->assertInstanceOf(Subscription::class, $subscription);
 
@@ -79,7 +79,7 @@ class HasSubscriptionsIntegrationTest extends TestCase
         $teamType = $this->createTeamPlan();
         $teamMonthlyPricingPlan = $this->createTeamMonthlyPricingPlan($teamType);
 
-        $subscription = $user->subscribeTo($basicMonthlyPricingPlan, $this->getTestToken());
+        $subscription = $user->subscribeTo($basicMonthlyPricingPlan, $this->createTestToken());
 
         $this->assertInstanceOf(Subscription::class, $subscription);
 

@@ -5,17 +5,19 @@ namespace TMyers\StripeBilling\Tests;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
+use TMyers\StripeBilling\Models\Card;
 use TMyers\StripeBilling\Models\PricingPlan;
 use TMyers\StripeBilling\Models\Plan;
 use TMyers\StripeBilling\StripeBillingServiceProvider;
 use TMyers\StripeBilling\Tests\Helpers\PlanFactory;
 use TMyers\StripeBilling\Tests\Helpers\StripeObjectsFactory;
 use TMyers\StripeBilling\Tests\Helpers\SubscriptionFactory;
+use TMyers\StripeBilling\Tests\Helpers\UserAndCardFactory;
 use TMyers\StripeBilling\Tests\Stubs\Models\User;
 
 abstract class TestCase extends OrchestraTestCase
 {
-    use PlanFactory, SubscriptionFactory, StripeObjectsFactory;
+    use UserAndCardFactory, PlanFactory, SubscriptionFactory, StripeObjectsFactory;
 
     public function setUp()
     {
@@ -68,27 +70,7 @@ abstract class TestCase extends OrchestraTestCase
         (new \CreateCardsTable())->up();
     }
 
-    /**
-     * @param array $overrides
-     * @return User
-     */
-    protected function createUser(array $overrides = []): User
-    {
-        return User::create(array_merge([
-            'name' => 'Denis',
-            'email' => 'denis.mitr@gmail.com'
-        ], $overrides));
-    }
 
-    protected function getTestToken(): string
-    {
-        return \Stripe\Token::create([
-            'card' => [
-                'number' => '4242424242424242',
-                'exp_month' => 5,
-                'exp_year' => 2020,
-                'cvc' => '123',
-            ],
-        ], ['api_key' => getenv('STRIPE_SECRET')])->id;
-    }
+
+
 }

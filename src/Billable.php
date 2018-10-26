@@ -16,7 +16,7 @@ use TMyers\StripeBilling\Models\Card;
 
 trait Billable
 {
-    use HasSubscriptions;
+    use HasSubscriptions, Chargeable;
 
     /**
      * @param null $token
@@ -26,15 +26,7 @@ trait Billable
     public function retrieveOrCreateStripeCustomer($token = null, array $options = [])
     {
         if (! $this->stripe_id) {
-            $customer = StripeCustomer::create($token, $this->email, $options);
-
-            $this->update([
-                'stripe_id' => $customer->id,
-            ]);
-
-            $this->addNewDefaultCard(
-                StripeCustomer::parseDefaultCard($customer)
-            );
+            list($customer, $card) = $this->createCustomerWithDefaultCardFromToken($token, $options);
 
             return $customer;
         }
@@ -43,36 +35,22 @@ trait Billable
     }
 
     /**
-     * @param string $stripeCardId
-     * @param string $brand
-     * @param string $last4
-     * @return Card
+     * @param $token
+     * @param array $options
+     * @return array
      */
-    public function addNewDefaultCard(array $data): Card
+    public function createCustomerWithDefaultCardFromToken($token, array $options = []): array
     {
-        $card = Card::create([
-            'owner_id' => $this->id,
-            'stripe_card_id' => $data['stripe_card_id'],
-            'brand' => $data['brand'],
-            'last_4' => $data['last_4'],
-        ]);
+        $customer = StripeCustomer::create($token, $this->email, $options);
 
         $this->update([
-            'default_card_id' => $card->id,
+            'stripe_id' => $customer->id,
         ]);
 
-        return $card;
-    }
-
-    /**
-     * @return BelongsTo
-     */
-    public function defaultCard()
-    {
-        return $this->belongsTo(
-            config('stripe-billing.models.card'),
-            'default_card_id',
-            'owner_id'
+        $card = $this->addNewDefaultCard(
+            StripeCustomer::parseDefaultCard($customer)
         );
+
+        return [$customer, $card];
     }
 }
