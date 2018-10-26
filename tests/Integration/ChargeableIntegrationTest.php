@@ -125,16 +125,24 @@ class ChargeableIntegrationTest extends TestCase
     public function it_will_throw_on_wrong_card_for_a_wrong_user()
     {
         // Given we have 2 different users each with a card
-        $user = $this->createUser();
+        $firstUser = $this->createUser();
         $anotherUser = $this->createUser();
 
-        $defaultCard = $user->addCardFromToken($this->createTestToken());
+        $firstCard = $firstUser->addCardFromToken($this->createTestToken());
         $anotherCard = $anotherUser->addCardFromToken($this->createTestToken());
+
+        // First card belongs to the first user
+        $this->assertTrue($firstCard->isOwnedBy($firstUser));
+        $this->assertFalse($firstCard->isOwnedBy($anotherUser));
+
+        // Second card belongs to the second user
+        $this->assertTrue($anotherCard->isOwnedBy($anotherUser));
+        $this->assertFalse($anotherCard->isOwnedBy($firstUser));
 
         // Expect card exception
         $this->expectException(CardException::class);
 
         // Do try giving one user a card of another user
-        $user->setCardAsDefault($anotherCard);
+        $firstUser->setCardAsDefault($anotherCard);
     }
 }

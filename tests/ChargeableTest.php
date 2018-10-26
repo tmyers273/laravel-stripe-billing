@@ -102,6 +102,7 @@ class ChargeableTest extends TestCase
 
         $secondCard = $user->addCardFromToken($token);
 
+        // Expect user to have $secondCard as default
         tap($user->fresh(), function(User $user) use ($secondCard, $firstCard) {
             $this->assertTrue($user->hasDefaultCard());
             $this->assertTrue($user->hasDefaultCard($secondCard));
@@ -116,6 +117,14 @@ class ChargeableTest extends TestCase
             'brand' => 'Master Card',
             'last_4' => '1111',
         ]);
+
+        // Expect both cards to be owned by user
+        $this->assertTrue($firstCard->isOwnedBy($user));
+        $this->assertTrue($secondCard->isOwnedBy($user));
+
+        // Expect secondCard to be default
+        $this->assertFalse($firstCard->isDefault());
+        $this->assertTrue($secondCard->isDefault());
     }
     
     /** @test */
@@ -151,5 +160,13 @@ class ChargeableTest extends TestCase
             $this->assertFalse($user->hasDefaultCard($defaultCard));
             $this->assertTrue($user->defaultCard->is($anotherCard));
         });
+
+        // Expect both cards to be owned by user
+        $this->assertTrue($defaultCard->isOwnedBy($user));
+        $this->assertTrue($anotherCard->isOwnedBy($user));
+
+        // Expect anotherCard to be default
+        $this->assertFalse($defaultCard->isDefault());
+        $this->assertTrue($anotherCard->isDefault());
     }
 }
