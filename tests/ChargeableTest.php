@@ -140,7 +140,7 @@ class ChargeableTest extends TestCase
         ]);
 
         // Mock
-        $customer = m::mock('Stripe\Card[save]');
+        $customer = m::mock('Stripe\Customer[save]');
 
         StripeCustomer::shouldReceive('retrieve')->once()->with($user->stripe_id)
             ->andReturn($customer);

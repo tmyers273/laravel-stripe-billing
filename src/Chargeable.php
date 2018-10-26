@@ -46,7 +46,7 @@ trait Chargeable
             return $card;
         }
 
-        $stripeCustomer = StripeCustomer::retrieve($this->stripe_id);
+        $stripeCustomer = $this->retrieveStripeCustomer();
         $stripeToken = StripeToken::retrieve($token);
 
         if (StripeToken::isDefaultSource($stripeToken, $stripeCustomer)) {
@@ -77,11 +77,11 @@ trait Chargeable
      */
     public function setCardAsDefault($card)
     {
-        if ($card->owner_id !== $this->id) {
+        if (!$card->isOwnedBy($this)) {
             throw new CardException("Card does not belong to that owner.");
         }
 
-        $stripeCustomer = StripeCustomer::retrieve($this->stripe_id);
+        $stripeCustomer = $this->retrieveStripeCustomer();
 
         $stripeCustomer->default_source = $card->stripe_card_id;
         $stripeCustomer->save();
@@ -89,6 +89,37 @@ trait Chargeable
         $this->forceFill([
             'default_card_id' => $card->id,
         ])->save();
+    }
+
+    /**
+     * @param $card
+     * @throws CardException
+     */
+    public function removeCard($card)
+    {
+        if (!is_a($card, $this->getCardClass(), true)) {
+            throw CardException::wrongType($card, $this->getCardClass());
+        }
+
+        if ($card->isOwnedBy($this)) {
+            throw CardException::notOwnedBy($this);
+        }
+
+        $stripeCustomer = $this->retrieveStripeCustomer();
+
+        /** @var \Stripe\Card $stripeCard */
+        foreach ($stripeCustomer->sources->data as $stripeCard) {
+            if ($stripeCard->id === $card->stripe_card_id) {
+                $stripeCard->delete();
+            }
+        }
+
+        if ($stripeCustomer->default_source === $card->id) {
+            $stripeCustomer->default_source = null;
+            $stripeCustomer->save();
+        }
+
+        $card->delete();
     }
 
     /**

@@ -1,16 +1,9 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: denismitr
- * Date: 19.10.2018
- * Time: 18:55
- */
 
 namespace TMyers\StripeBilling;
 
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Stripe\Customer;
 use TMyers\StripeBilling\Facades\StripeCustomer;
 use TMyers\StripeBilling\Models\Card;
 
@@ -19,9 +12,17 @@ trait Billable
     use HasSubscriptions, Chargeable;
 
     /**
+     * @return \Stripe\Customer
+     */
+    public function retrieveStripeCustomer(): \Stripe\Customer
+    {
+        return StripeCustomer::retrieve($this->stripe_id);
+    }
+
+    /**
      * @param null $token
      * @param array $options
-     * @return Customer
+     * @return \Stripe\Customer
      */
     public function retrieveOrCreateStripeCustomer($token = null, array $options = [])
     {
@@ -31,7 +32,7 @@ trait Billable
             return $customer;
         }
 
-        return StripeCustomer::retrieve($this->stripe_id);
+        return $this->retrieveStripeCustomer();
     }
 
     /**
