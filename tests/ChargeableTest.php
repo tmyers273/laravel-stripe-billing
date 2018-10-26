@@ -14,11 +14,18 @@ use Stripe\Customer;
 use TMyers\StripeBilling\Facades\StripeCustomer;
 use TMyers\StripeBilling\Facades\StripeToken;
 use TMyers\StripeBilling\Tests\Stubs\Models\User;
+use Mockery as m;
 
 class ChargeableTest extends TestCase
 {
     const FAKE_CUSTOMER_100 = 'fake-customer-100';
     const FAKE_TOKEN_1 = 'fake-token-1';
+
+    protected function tearDown()
+    {
+        m::close();
+        parent::tearDown();
+    }
 
     /**
      * @test
@@ -81,15 +88,16 @@ class ChargeableTest extends TestCase
 
         StripeToken::shouldReceive('createSource')->once()->with($customer, $token)
             ->andReturn(new class extends Card {
-                public $id = 'fake-card-id';
-                public $brand = 'Visa';
-                public $last4 = '4242';
+                public $id = 'another-fake-card-id';
+                public $brand = 'Master Card';
+                public $last4 = '1111';
             });
 
+        $customerMock = m::mock('Stripe\Customer[save]');
+        $customerMock->shouldReceive('save')->once();
+
         StripeCustomer::shouldReceive('retrieve')->once()->with($user->stripe_id)
-            ->andReturn(new class extends Customer {
-                public function save($opts = null) {}
-            });
+            ->andReturn($customerMock);
 
         $card = $user->addCardFromToken($token);
 
@@ -101,7 +109,42 @@ class ChargeableTest extends TestCase
         $this->assertDatabaseHas('cards', [
             'id' => $card->id,
             'owner_id' => $user->id,
-            'stripe_card_id' => 'fake-card-id',
+            'stripe_card_id' => 'another-fake-card-id',
+            'brand' => 'Master Card',
+            'last_4' => '1111',
         ]);
+    }
+    
+    /** @test */
+    public function user_with_different_cards_can_swap_them()
+    {
+        // Given we have a user with an active default card and another card
+        list($user, $defaultCard) = $this->createUserWithDefaultCard();
+
+        $anotherCard = $this->createCardForUser($user, [
+            'brand' => 'Master Card',
+            'last_4' => '1111',
+            'stripe_card_id' => 'another-fake-card-id',
+        ]);
+
+        // Mock
+        $customer = m::mock('Stripe\Card[save]');
+
+        StripeCustomer::shouldReceive('retrieve')->once()->with($user->stripe_id)
+            ->andReturn($customer);
+
+        $customer->shouldReceive('save')->once();
+
+        $user->setCardAsDefault($anotherCard);
+
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'default_card_id' => $anotherCard->id,
+        ]);
+
+        tap($user->fresh(), function(User $user) use ($anotherCard) {
+            $this->assertTrue($user->hasDefaultCard());
+            $this->assertTrue($user->defaultCard->is($anotherCard));
+        });
     }
 }

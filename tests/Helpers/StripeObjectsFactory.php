@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: denismitr
- * Date: 19.10.2018
- * Time: 18:29
- */
 
 namespace TMyers\StripeBilling\Tests\Helpers;
 
@@ -54,5 +48,17 @@ trait StripeObjectsFactory
     public function createSubscriptionObject($id, array $opts = []): Subscription
     {
         return new Subscription($id, $opts);
+    }
+
+    protected function createTestToken(): string
+    {
+        return \Stripe\Token::create([
+            'card' => [
+                'number' => '4242424242424242',
+                'exp_month' => 5,
+                'exp_year' => 2020,
+                'cvc' => '123',
+            ],
+        ], ['api_key' => getenv('STRIPE_SECRET')])->id;
     }
 }
