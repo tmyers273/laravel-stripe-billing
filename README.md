@@ -74,6 +74,30 @@ $subscription->changeTo($basicMonthlyPlan);
 $user->defaultCard;
 ```
 
+#### Add card from token
+```php
+$card = $user->addCardFromToken($token);
+```
+This will create a stripe customer if user does not have one assigned yet. The default source of the
+new Stripe customer will be used to create the default credit card for the user, which will be used by 
+default for future transactions.
+
+If Stripe customer already exists for the user and the user already has a default card, the new card will be
+added as a new source for the users's Stripe Customer and a new Card record will be created in the local database. 
+
+#### Set another card as default
+```php
+$user->setCardAsDefault($card);
+```
+
+That method by default takes `\TMyers\StripeBilling\Models\Card::class` as an argument and makes the card 
+the default card for that user. User's corresponding Stripe Customer's default source also gets updated.
+
+#### Check if user already has a default card assigned
+```php
+$user->hasDefaultCard();
+```
+
 #### Middleware
 Register in HTTP `Kernel.php`
 ```php

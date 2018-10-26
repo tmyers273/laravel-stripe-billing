@@ -36,7 +36,7 @@ trait Chargeable
      * @return Card
      * @throws CardException
      */
-    public function addCardFromToken($token)
+    public function addCardFromToken(string $token)
     {
         if (!$this->stripe_id) {
             list($customer, $card) = $this->createCustomerWithDefaultCardFromToken($token);
@@ -71,7 +71,7 @@ trait Chargeable
      * @param Card $card
      * @throws CardException
      */
-    public function setCardAsDefault(Card $card)
+    public function setCardAsDefault($card)
     {
         if ($card->owner_id !== $this->id) {
             throw new CardException("Card does not belong to that owner.");
