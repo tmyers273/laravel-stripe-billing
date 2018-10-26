@@ -104,6 +104,11 @@ if that particular card is the default one for the user:
 $user->hasDefaultCard($card); //true or false
 ```
 
+#### Remove card
+```php
+$user->removeCard($card);
+```
+
 #### Card helper methods
 ```php
 $card->isOwnedBy($user); // true or false
