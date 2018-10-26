@@ -4,6 +4,7 @@ namespace TMyers\StripeBilling\Tests\Integration;
 
 
 use Carbon\Carbon;
+use TMyers\StripeBilling\Exceptions\CardException;
 use TMyers\StripeBilling\Models\Card;
 use TMyers\StripeBilling\Tests\Stubs\Models\User;
 use TMyers\StripeBilling\Tests\TestCase;
@@ -107,12 +108,33 @@ class ChargeableIntegrationTest extends TestCase
 
         $user->setCardAsDefault($anotherCard);
 
-        tap($user->fresh(), function(User $user) use ($anotherCard) {
+        tap($user->fresh(), function(User $user) use ($anotherCard, $defaultCard) {
             $this->assertNotNull($user->default_card_id);
             $this->assertTrue($user->hasDefaultCard());
 
             $this->assertTrue($user->defaultCard->is($anotherCard));
+            $this->assertFalse($user->defaultCard->is($defaultCard));
             $this->assertCount(2, $user->cards);
         });
+    }
+
+    /**
+     * @test
+     * @throws \TMyers\StripeBilling\Exceptions\CardException
+     */
+    public function it_will_throw_on_wrong_card_for_a_wrong_user()
+    {
+        // Given we have 2 different users each with a card
+        $user = $this->createUser();
+        $anotherUser = $this->createUser();
+
+        $defaultCard = $user->addCardFromToken($this->createTestToken());
+        $anotherCard = $anotherUser->addCardFromToken($this->createTestToken());
+
+        // Expect card exception
+        $this->expectException(CardException::class);
+
+        // Do try giving one user a card of another user
+        $user->setCardAsDefault($anotherCard);
     }
 }
