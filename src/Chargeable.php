@@ -17,7 +17,9 @@ trait Chargeable
      */
     public function addNewDefaultCard(array $data): Card
     {
-        $card = Card::create([
+        $cardClass = $this->getCardClass();
+
+        $card = $cardClass::create([
             'owner_id' => $this->id,
             'stripe_card_id' => $data['stripe_card_id'],
             'brand' => $data['brand'],
@@ -53,7 +55,9 @@ trait Chargeable
 
         $stripeCard = StripeToken::createSource($stripeCustomer, $token);
 
-        $card = Card::create([
+        $cardClass = $this->getCardClass();
+
+        $card = $cardClass::create([
             'owner_id' => $this->id,
             'stripe_card_id' => $stripeCard->id,
             'brand' => $stripeCard->brand,
@@ -94,11 +98,19 @@ trait Chargeable
     public function hasDefaultCard($card = null): bool
     {
         if ($card) {
-            return is_a($card, config('stripe-billing.models.card'), true) &&
+            return is_a($card, $this->getCardClass(), true) &&
                 (int) $this->default_card_id === $card->id;
         }
 
         return ! is_null($this->default_card_id);
+    }
+
+    /**
+     * @return string
+     */
+    protected function getCardClass(): string
+    {
+        return config('stripe-billing.models.card');
     }
     
     /*
