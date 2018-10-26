@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: denismitr
- * Date: 18.10.2018
- * Time: 16:19
- */
 
 namespace TMyers\StripeBilling;
 
@@ -67,7 +61,7 @@ trait Chargeable
         ]);
 
         if (!$this->default_card_id) {
-            $this->setDefaultCard($card);
+            $this->setCardAsDefault($card);
         }
 
         return $card;
@@ -77,7 +71,7 @@ trait Chargeable
      * @param Card $card
      * @throws CardException
      */
-    public function setDefaultCard(Card $card)
+    public function setCardAsDefault(Card $card)
     {
         if ($card->owner_id !== $this->id) {
             throw new CardException("Card does not belong to that owner.");

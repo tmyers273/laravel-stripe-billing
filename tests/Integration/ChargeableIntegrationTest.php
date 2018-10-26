@@ -105,7 +105,7 @@ class ChargeableIntegrationTest extends TestCase
         $defaultCard = $user->addCardFromToken($this->createTestToken());
         $anotherCard = $user->addCardFromToken($this->createTestToken());
 
-        $user->setDefaultCard($anotherCard);
+        $user->setCardAsDefault($anotherCard);
 
         tap($user->fresh(), function(User $user) use ($anotherCard) {
             $this->assertNotNull($user->default_card_id);
