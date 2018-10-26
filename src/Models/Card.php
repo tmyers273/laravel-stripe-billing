@@ -15,6 +15,10 @@ class Card extends Model
 {
     protected $guarded = ['id'];
 
+    protected $casts = [
+        'owner_id' => 'integer'
+    ];
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */

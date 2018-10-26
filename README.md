@@ -95,7 +95,13 @@ the default card for that user. User's corresponding Stripe Customer's default s
 
 #### Check if user already has a default card assigned
 ```php
-$user->hasDefaultCard();
+$user->hasDefaultCard(); //true or false
+```
+Or you can pass an instance of `\TMyers\StripeBilling\Models\Card::class` to verify 
+if that particular card is the default one for the user:
+
+```php
+$user->hasDefaultCard($card); //true or false
 ```
 
 #### Middleware

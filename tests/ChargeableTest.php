@@ -53,6 +53,7 @@ class ChargeableTest extends TestCase
 
         tap($user->fresh(), function(User $user) use ($card) {
             $this->assertTrue($user->hasDefaultCard());
+            $this->assertTrue($user->hasDefaultCard($card));
             $this->assertTrue($user->defaultCard->is($card));
         });
 
@@ -74,7 +75,7 @@ class ChargeableTest extends TestCase
     public function user_with_default_card_can_add_another_card()
     {
         // Given we have a user with an active default card
-        list($user, $card) = $this->createUserWithDefaultCard();
+        list($user, $firstCard) = $this->createUserWithDefaultCard();
         $token = self::FAKE_TOKEN_1;
 
         // Mock
@@ -99,15 +100,17 @@ class ChargeableTest extends TestCase
         StripeCustomer::shouldReceive('retrieve')->once()->with($user->stripe_id)
             ->andReturn($customerMock);
 
-        $card = $user->addCardFromToken($token);
+        $secondCard = $user->addCardFromToken($token);
 
-        tap($user->fresh(), function(User $user) use ($card) {
+        tap($user->fresh(), function(User $user) use ($secondCard, $firstCard) {
             $this->assertTrue($user->hasDefaultCard());
-            $this->assertTrue($user->defaultCard->is($card));
+            $this->assertTrue($user->hasDefaultCard($secondCard));
+            $this->assertFalse($user->hasDefaultCard($firstCard));
+            $this->assertTrue($user->defaultCard->is($secondCard));
         });
 
         $this->assertDatabaseHas('cards', [
-            'id' => $card->id,
+            'id' => $secondCard->id,
             'owner_id' => $user->id,
             'stripe_card_id' => 'another-fake-card-id',
             'brand' => 'Master Card',
@@ -142,8 +145,10 @@ class ChargeableTest extends TestCase
             'default_card_id' => $anotherCard->id,
         ]);
 
-        tap($user->fresh(), function(User $user) use ($anotherCard) {
+        tap($user->fresh(), function(User $user) use ($anotherCard, $defaultCard) {
             $this->assertTrue($user->hasDefaultCard());
+            $this->assertTrue($user->hasDefaultCard($anotherCard));
+            $this->assertFalse($user->hasDefaultCard($defaultCard));
             $this->assertTrue($user->defaultCard->is($anotherCard));
         });
     }

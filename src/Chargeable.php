@@ -87,8 +87,17 @@ trait Chargeable
         ])->save();
     }
 
-    public function hasDefaultCard(): bool
+    /**
+     * @param Card|null $card
+     * @return bool
+     */
+    public function hasDefaultCard($card = null): bool
     {
+        if ($card) {
+            return is_a($card, config('stripe-billing.models.card'), true) &&
+                (int) $this->default_card_id === $card->id;
+        }
+
         return ! is_null($this->default_card_id);
     }
     
