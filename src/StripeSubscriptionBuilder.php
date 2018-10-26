@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: denismitr
- * Date: 19.10.2018
- * Time: 16:40
- */
 
 namespace TMyers\StripeBilling;
 

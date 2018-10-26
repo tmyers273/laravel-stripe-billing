@@ -15,7 +15,7 @@ trait Chargeable
      * @param array $data
      * @return Card
      */
-    public function addNewDefaultCard(array $data): Card
+    public function addNewDefaultCard(array $data)
     {
         $cardClass = $this->getCardClass();
 

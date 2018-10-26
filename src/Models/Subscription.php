@@ -99,8 +99,14 @@ class Subscription extends Model
      * @throws AlreadySubscribed
      * @throws PlanIsInactive
      */
-    public function changeTo(PricingPlan $plan): self
+    public function changeTo($plan): self
     {
+        if (!is_a($plan, config('stripe-billing.models.pricing_plan'), true)) {
+            throw new \InvalidArgumentException(
+                "Plan must be an instance of " . config('stripe-billing.models.pricing_plan')
+            );
+        }
+
         if ($this->isFor($plan)) {
             throw AlreadySubscribed::toPlan($plan);
         }
@@ -176,11 +182,11 @@ class Subscription extends Model
      */
     public function isStrictlyFor($pricingPlan): bool
     {
-        if (is_string($pricingPlan)) {
+        if ( is_string($pricingPlan))  {
             return $this->pricingPlan->name === $pricingPlan;
         }
 
-        if ($pricingPlan instanceof PricingPlan) {
+        if ( is_a($pricingPlan, config('stripe-billing.models.pricing_plan'), true) ) {
             return $this->pricing_plan_id === $pricingPlan->id;
         }
 
@@ -201,11 +207,11 @@ class Subscription extends Model
             return $this->pricingPlan->name === $plan || optional($this->pricingPlan->plan)->name === $plan;
         }
 
-        if ($plan instanceof PricingPlan) {
+        if ( is_a($plan, config('stripe-billing.models.pricing_plan'), true) ) {
             return $this->pricing_plan_id === $plan->id;
         }
 
-        if ($plan instanceof Plan) {
+        if ( is_a($plan, config('stripe-billing.models.plan'), true) ) {
             return optional($this->pricingPlan->plan)->id === $plan->id;
         }
 
