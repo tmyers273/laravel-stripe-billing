@@ -5,6 +5,7 @@ namespace TMyers\StripeBilling;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use TMyers\StripeBilling\Exceptions\CardException;
+use TMyers\StripeBilling\Facades\StripeCharge;
 use TMyers\StripeBilling\Facades\StripeCustomer;
 use TMyers\StripeBilling\Facades\StripeToken;
 use TMyers\StripeBilling\Models\Card;
@@ -148,6 +149,36 @@ trait Chargeable
     protected function getCardClass(): string
     {
         return config('stripe-billing.models.card');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Single charges
+    |--------------------------------------------------------------------------
+    */
+
+    /**
+     * @param int $amount
+     * @param array $params
+     * @return mixed
+     */
+    public function charge(int $amount, array $params = [])
+    {
+        $params = array_merge($params, [
+            'currency' => 'usd',
+        ]);
+
+        $params['amount'] = $amount;
+
+        if (!array_key_exists('source', $params) && $this->stripe_id) {
+            $params['customer'] = $this->stripe_id;
+        }
+
+        if (! array_key_exists('source', $params) && ! array_key_exists('customer', $params)) {
+            throw new \InvalidArgumentException('No payment source provided.');
+        }
+
+        return StripeCharge::charge($params);
     }
     
     /*
