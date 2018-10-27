@@ -5,6 +5,7 @@ namespace TMyers\StripeBilling;
 
 use Illuminate\Support\ServiceProvider;
 use TMyers\StripeBilling\Facades\StripeSubscription;
+use TMyers\StripeBilling\Gateways\StripeCardGateway;
 use TMyers\StripeBilling\Gateways\StripeChargeGateway;
 use TMyers\StripeBilling\Gateways\StripeCustomerGateway;
 use TMyers\StripeBilling\Gateways\StripeSubscriptionGateway;

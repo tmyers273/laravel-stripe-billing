@@ -1,15 +1,10 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: denismitr
- * Date: 19.10.2018
- * Time: 19:52
- */
 
 namespace TMyers\StripeBilling\Models;
 
 
 use Illuminate\Database\Eloquent\Model;
+use TMyers\StripeBilling\Facades\StripeCard;
 
 /**
  * Class Card

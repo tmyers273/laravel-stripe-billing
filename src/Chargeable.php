@@ -190,14 +190,24 @@ trait Chargeable
     public function chargeCard(int $amount, $card, array $params = [])
     {
         if (is_a($card, StripeBilling::getCardModel(), true)) {
+            $params['customer'] = $card->owner->stripe_id;
             $params['source'] = $card->stripe_card_id;
-        } else if (is_a($card, \Stripe\Card::class, true)) {
-            $params['source'] = $card->id;
         } else {
             throw CardException::wrongType($card);
         }
 
         return $this->charge($amount, $params);
+    }
+
+    /**
+     * @param int $amount
+     * @param string $token
+     * @param array $params
+     * @return mixed
+     */
+    public function chargeByToken(int $amount, string $token, array $params = [])
+    {
+        return $this->charge($amount, array_merge($params, ['source' => $token]));
     }
     
     /*

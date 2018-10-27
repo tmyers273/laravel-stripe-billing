@@ -4,8 +4,10 @@ namespace TMyers\StripeBilling\Tests\Integration;
 
 
 use Carbon\Carbon;
+use Stripe\Charge;
 use TMyers\StripeBilling\Exceptions\CardException;
 use TMyers\StripeBilling\Models\Card;
+use TMyers\StripeBilling\StripeBilling;
 use TMyers\StripeBilling\Tests\Stubs\Models\User;
 use TMyers\StripeBilling\Tests\TestCase;
 
@@ -188,11 +190,11 @@ class ChargeableIntegrationTest extends TestCase
         // Given we have a user without any card
         $user = $this->createUser();
 
-        // Do add a card to the user
+        // Do add two cards to the user
         $defaultCard = $user->addCardFromToken($this->createTestToken());
         $anotherCard = $user->addCardFromToken($this->createTestToken());
 
-        // Do remove the card
+        // Do remove one card
         $user->removeCard($anotherCard);
 
         tap($user->fresh(), function(User $user) use ($anotherCard, $defaultCard) {
@@ -210,5 +212,59 @@ class ChargeableIntegrationTest extends TestCase
 
         // Expect user not to have a source any more
         $this->assertCount(1, $user->retrieveStripeCustomer()->sources->data);
+    }
+
+    /** @test */
+    public function single_charge_cab_be_made_with_a_token()
+    {
+        StripeBilling::setCurrency('gbp');
+
+        // Given we have a user without any card
+        $user = $this->createUser();
+
+        $charge = $user->charge(1200, ['source' => $this->createTestToken()]);
+
+        $this->assertInstanceOf(Charge::class, $charge);
+        $this->assertEquals(1200, $charge->amount);
+        $this->assertEquals('gbp', $charge->currency);
+        $this->assertEquals('succeeded', $charge->status);
+    }
+
+    /** @test */
+    public function single_charge_cab_be_made_with_a_token_via_a_special_method()
+    {
+        StripeBilling::setCurrency('usd');
+
+        // Given we have a user without any card
+        $user = $this->createUser();
+
+        $charge = $user->chargeByToken(1799, $this->createTestToken());
+
+        $this->assertInstanceOf(Charge::class, $charge);
+        $this->assertEquals(1799, $charge->amount);
+        $this->assertEquals('usd', $charge->currency);
+        $this->assertEquals('succeeded', $charge->status);
+    }
+
+    /**
+     * @test
+     * @throws CardException
+     */
+    public function single_charge_can_be_made_via_a_credit_card()
+    {
+        StripeBilling::setCurrency('usd');
+
+        // Given we have a user without any card
+        $user = $this->createUser();
+
+        // Do add a card to the user
+        $card = $user->addCardFromToken($this->createTestToken());
+
+        $charge = $user->chargeCard(2366, $card);
+
+        $this->assertInstanceOf(Charge::class, $charge);
+        $this->assertEquals(2366, $charge->amount);
+        $this->assertEquals('usd', $charge->currency);
+        $this->assertEquals('succeeded', $charge->status);
     }
 }
