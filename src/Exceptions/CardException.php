@@ -13,11 +13,12 @@ class CardException extends \Exception
         return new static("Card is not owned by the owner with ID {$id} and type {$type}");
     }
 
-    public static function wrongType($card, string $correctType)
+    public static function wrongType($card, $correctType = null)
     {
         $type = get_class($card);
+        $correctType = is_string($correctType) ? "Expected type {$correctType}." : "";
 
-        return new static("Expected card to be of type {$correctType}, instead got {$type}");
+        return new static("Type {$type} is not allowed. " . $correctType);
 
     }
 }

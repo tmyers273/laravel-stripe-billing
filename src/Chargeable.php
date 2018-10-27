@@ -165,7 +165,7 @@ trait Chargeable
     public function charge(int $amount, array $params = [])
     {
         $params = array_merge($params, [
-            'currency' => 'usd',
+            'currency' => StripeBilling::getCurrency(),
         ]);
 
         $params['amount'] = $amount;
@@ -179,6 +179,25 @@ trait Chargeable
         }
 
         return StripeCharge::charge($params);
+    }
+
+    /**
+     * @param int $amount
+     * @param $card
+     * @param array $params
+     * @return mixed
+     */
+    public function chargeCard(int $amount, $card, array $params = [])
+    {
+        if (is_a($card, StripeBilling::getCardModel(), true)) {
+            $params['source'] = $card->stripe_card_id;
+        } else if (is_a($card, \Stripe\Card::class, true)) {
+            $params['source'] = $card->id;
+        } else {
+            throw CardException::wrongType($card);
+        }
+
+        return $this->charge($amount, $params);
     }
     
     /*
