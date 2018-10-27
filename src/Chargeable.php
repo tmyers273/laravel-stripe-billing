@@ -107,12 +107,7 @@ trait Chargeable
 
         $stripeCustomer = $this->retrieveStripeCustomer();
 
-        /** @var \Stripe\Card $stripeCard */
-        foreach ($stripeCustomer->sources->data as $stripeCard) {
-            if ($stripeCard->id === $card->stripe_card_id) {
-                $stripeCard->delete();
-            }
-        }
+        StripeCustomer::deleteSource($stripeCustomer, $card->stripe_card_id);
 
         if ($stripeCustomer->default_source === $card->id) {
             $stripeCustomer->default_source = null;

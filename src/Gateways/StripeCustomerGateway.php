@@ -71,6 +71,20 @@ class StripeCustomerGateway extends StripeGateway
 
     /**
      * @param Customer $customer
+     * @param string $sourceId
+     */
+    public function deleteSource(Customer $customer, string $sourceId)
+    {
+        /** @var \Stripe\Card $stripeCard */
+        foreach ($customer->sources->data as $stripeCard) {
+            if ($stripeCard->id === $sourceId) {
+                $stripeCard->delete();
+            }
+        }
+    }
+
+    /**
+     * @param Customer $customer
      * @return array
      */
     public function parseDefaultCard(Customer $customer): array

@@ -13,6 +13,7 @@ use Stripe\Customer;
  * @method static parseDefaultCard($customer): array
  * @method static isDefaultSource(Customer $stripeCustomer, string $token): bool
  * @method static createSource(Customer $customer, string $token): \Stripe\Card
+ * @method static deleteSource(Customer $customer, string $sourceId)
  */
 class StripeCustomer extends Facade
 {

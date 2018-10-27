@@ -5,6 +5,8 @@ namespace TMyers\StripeBilling\Tests;
 
 use Stripe\Card;
 use Stripe\Customer;
+use Stripe\Stripe;
+use TMyers\StripeBilling\Exceptions\CardException;
 use TMyers\StripeBilling\Facades\StripeCustomer;
 use TMyers\StripeBilling\Facades\StripeToken;
 use TMyers\StripeBilling\Tests\Stubs\Models\User;
