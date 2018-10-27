@@ -213,6 +213,12 @@ class ChargeableIntegrationTest extends TestCase
         // Expect user not to have a source any more
         $this->assertCount(1, $user->retrieveStripeCustomer()->sources->data);
     }
+    
+    /*
+    |--------------------------------------------------------------------------
+    | Single charges
+    |--------------------------------------------------------------------------
+    */
 
     /** @test */
     public function single_charge_cab_be_made_with_a_token()
@@ -258,6 +264,28 @@ class ChargeableIntegrationTest extends TestCase
         $user = $this->createUser();
 
         // Do add a card to the user
+        $card = $user->addCardFromToken($this->createTestToken());
+
+        $charge = $user->chargeCard(2366, $card);
+
+        $this->assertInstanceOf(Charge::class, $charge);
+        $this->assertEquals(2366, $charge->amount);
+        $this->assertEquals('usd', $charge->currency);
+        $this->assertEquals('succeeded', $charge->status);
+    }
+
+    /**
+     * @test
+     * @throws CardException
+     */
+    public function single_charge_can_be_made_via_default_card()
+    {
+        StripeBilling::setCurrency('usd');
+
+        // Given we have a user without any card
+        $user = $this->createUser();
+
+        // Do add a default card to the user
         $card = $user->addCardFromToken($this->createTestToken());
 
         $charge = $user->chargeCard(2366, $card);

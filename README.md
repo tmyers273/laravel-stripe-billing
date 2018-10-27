@@ -115,6 +115,29 @@ $card->isOwnedBy($user); // true or false
 $card->isDefault(); // true or false
 ```
 
+### Single charges
+When user already has a default card assigned:
+```php
+$user->charge(2500); // Charge 25$
+```
+
+#### Charge by token
+```php
+$user->chargeByToken(1799, 'some token from stripe.js'); // Charge 17.99$
+```
+
+#### Charge via non-default card
+```php
+/**
+* @param int $amount
+* @param Card $card
+* @param array $params
+* @return mixed
+*/
+$user->chargeCard(1799, $card); // Charge 17.99$
+```
+
+
 #### Middleware
 Register in HTTP `Kernel.php`
 ```php

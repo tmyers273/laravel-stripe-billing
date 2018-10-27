@@ -18,9 +18,9 @@ trait Chargeable
      */
     public function addNewDefaultCard(array $data)
     {
-        $cardClass = $this->getCardClass();
+        $cardModel = StripeBilling::getCardModel();
 
-        $card = $cardClass::create([
+        $card = $cardModel::create([
             'owner_id' => $this->id,
             'stripe_card_id' => $data['stripe_card_id'],
             'brand' => $data['brand'],
@@ -56,9 +56,9 @@ trait Chargeable
 
         $stripeCard = StripeToken::createSource($stripeCustomer, $token);
 
-        $cardClass = $this->getCardClass();
+        $cardModel = StripeBilling::getCardModel();
 
-        $card = $cardClass::create([
+        $card = $cardModel::create([
             'owner_id' => $this->id,
             'stripe_card_id' => $stripeCard->id,
             'brand' => $stripeCard->brand,
@@ -98,8 +98,8 @@ trait Chargeable
      */
     public function removeCard($card)
     {
-        if (!is_a($card, $this->getCardClass(), true)) {
-            throw CardException::wrongType($card, $this->getCardClass());
+        if (!is_a($card, StripeBilling::getCardModel(), true)) {
+            throw CardException::wrongType($card, StripeBilling::getCardModel());
         }
 
         if (!$card->isOwnedBy($this)) {
@@ -136,7 +136,7 @@ trait Chargeable
     public function hasDefaultCard($card = null): bool
     {
         if ($card) {
-            return is_a($card, $this->getCardClass(), true) &&
+            return is_a($card, StripeBilling::getCardModel(), true) &&
                 (int) $this->default_card_id === $card->id;
         }
 
