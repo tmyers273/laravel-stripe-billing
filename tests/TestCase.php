@@ -57,13 +57,13 @@ abstract class TestCase extends OrchestraTestCase
             $table->timestamps();
         });
 
-        include_once __DIR__ . '/../database/migrations/add_stripe_and_default_card_ids_to_owner_table.php';
+        include_once __DIR__ . '/../database/migrations/add_stripe_billing_columns_to_owner_table.php';
         include_once __DIR__ . '/../database/migrations/create_plans_table.php';
         include_once __DIR__ . '/../database/migrations/create_pricing_plans_table.php';
         include_once __DIR__.'/../database/migrations/create_subscriptions_table.php';
         include_once __DIR__.'/../database/migrations/create_cards_table.php';
 
-        (new \AddStripeIdToOwnerTable())->up();
+        (new \AddStripeBillingColumnsToOwnerTable())->up();
         (new \CreatePlansTable())->up();
         (new \CreatePricingPlansTable())->up();
         (new \CreateSubscriptionsTable())->up();

@@ -24,10 +24,10 @@ class StripeBillingServiceProvider extends ServiceProvider
             'stripe-billing'
         );
 
-        if ( ! class_exists('AddStripeIdToOwnerTable')) {
+        if ( ! class_exists('AddStripeBillingColumnsToOwnerTable')) {
             $this->publishes([
-                __DIR__ . '/../database/migrations/add_stripe_and_default_card_ids_to_owner_table.php' =>
-                    database_path('migrations/' . date('Y_m_d_His', time()) . '_1_add_stripe_and_default_card_ids_to_owner_table.php'),
+                __DIR__ . '/../database/migrations/add_stripe_billing_columns_to_owner_table.php' =>
+                    database_path('migrations/' . date('Y_m_d_His', time()) . '_1_add_stripe_billing_columns_to_owner_table.php'),
             ], 'migrations');
         }
 
