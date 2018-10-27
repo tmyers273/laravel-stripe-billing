@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: denismitr
- * Date: 25.10.2018
- * Time: 16:15
- */
 
 namespace TMyers\StripeBilling\Tests;
 
@@ -82,12 +76,10 @@ class ChargeableTest extends TestCase
         StripeCustomer::shouldReceive('retrieve')->once()->with($user->stripe_id)
             ->andReturn($customer = $this->createCustomerObject(self::FAKE_CUSTOMER_100));
 
-        StripeToken::shouldReceive('retrieve')->once()->with(self::FAKE_TOKEN_1)
-            ->andReturn($stripeToken = $this->createTokenObject(self::FAKE_TOKEN_1, ['type' => "card"]));
+        StripeCustomer::shouldReceive('isDefaultSource')->once()
+            ->with($customer, $token)->andReturn(false);
 
-        StripeToken::shouldReceive('isDefaultSource')->once()->with($stripeToken, $customer)->andReturn(false);
-
-        StripeToken::shouldReceive('createSource')->once()->with($customer, $token)
+        StripeCustomer::shouldReceive('createSource')->once()->with($customer, $token)
             ->andReturn(new class extends Card {
                 public $id = 'another-fake-card-id';
                 public $brand = 'Master Card';

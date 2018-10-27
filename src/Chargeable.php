@@ -48,13 +48,12 @@ trait Chargeable
         }
 
         $stripeCustomer = $this->retrieveStripeCustomer();
-        $stripeToken = StripeToken::retrieve($token);
 
-        if (StripeToken::isDefaultSource($stripeToken, $stripeCustomer)) {
+        if (StripeCustomer::isDefaultSource($stripeCustomer, $token)) {
             return;
         }
 
-        $stripeCard = StripeToken::createSource($stripeCustomer, $token);
+        $stripeCard = StripeCustomer::createSource($stripeCustomer, $token);
 
         $cardModel = StripeBilling::getCardModel();
 

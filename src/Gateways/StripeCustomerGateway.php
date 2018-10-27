@@ -3,8 +3,9 @@
 namespace TMyers\StripeBilling\Gateways;
 
 
+use Stripe\Card;
 use Stripe\Customer;
-use Stripe\Error\Card;
+use Stripe\Token;
 use TMyers\StripeBilling\Exceptions\StripeGatewayException;
 
 class StripeCustomerGateway extends StripeGateway
@@ -25,7 +26,7 @@ class StripeCustomerGateway extends StripeGateway
             ]);
 
             $customer = Customer::create($options, $this->getApiKey());
-        } catch (Card $e) {
+        } catch (\Stripe\Error\Card $e) {
             throw StripeGatewayException::cardDeclined($e);
         } catch (\Throwable $t) {
             throw new StripeGatewayException($t->getMessage(), $t->getCode(), $t);
@@ -45,6 +46,33 @@ class StripeCustomerGateway extends StripeGateway
         return Customer::retrieve($stripeId, $this->getApiKey());
     }
 
+    /**
+     * @param Customer $customer
+     * @param $token
+     * @return Card
+     */
+    public function createSource(Customer $customer, string $token): Card
+    {
+        return $customer->sources->create(['source' => $token]);
+    }
+
+    /**
+     * @param Customer $stripeCustomer
+     * @param string $token
+     * @return bool
+     * @throws StripeGatewayException
+     */
+    public function isDefaultSource(Customer $stripeCustomer, string $token): bool
+    {
+        $stripeToken = Token::retrieve($token, ['api_key' => $this->getApiKey()]);
+
+        return $stripeToken[$stripeToken->type]->id === $stripeCustomer->default_source;
+    }
+
+    /**
+     * @param Customer $customer
+     * @return array
+     */
     public function parseDefaultCard(Customer $customer): array
     {
         return [

@@ -4,12 +4,9 @@ namespace TMyers\StripeBilling;
 
 
 use Illuminate\Support\ServiceProvider;
-use TMyers\StripeBilling\Facades\StripeSubscription;
-use TMyers\StripeBilling\Gateways\StripeCardGateway;
 use TMyers\StripeBilling\Gateways\StripeChargeGateway;
 use TMyers\StripeBilling\Gateways\StripeCustomerGateway;
 use TMyers\StripeBilling\Gateways\StripeSubscriptionGateway;
-use TMyers\StripeBilling\Gateways\StripeTokenGateway;
 
 class StripeBillingServiceProvider extends ServiceProvider
 {
@@ -61,10 +58,6 @@ class StripeBillingServiceProvider extends ServiceProvider
 
         $this->app->bind('stripe-subscription-gateway', function() {
             return new StripeSubscriptionGateway();
-        });
-
-        $this->app->bind('stripe-token-gateway', function() {
-            return new StripeTokenGateway();
         });
 
         $this->app->bind('stripe-charge-gateway', function() {
