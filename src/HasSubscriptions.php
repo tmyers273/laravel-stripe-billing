@@ -4,6 +4,8 @@ namespace TMyers\StripeBilling;
 
 
 use Illuminate\Support\Collection;
+use Stripe\Coupon;
+use Stripe\Customer;
 use TMyers\StripeBilling\Exceptions\AlreadySubscribed;
 use TMyers\StripeBilling\Exceptions\SubscriptionNotFound;
 use TMyers\StripeBilling\Models\PricingPlan;
@@ -51,8 +53,8 @@ trait HasSubscriptions
         }
 
         if (is_string($plan)) {
-            $pricingPlanClass = $this->getPricingPlanClass();
-            $plan = $pricingPlanClass::findByName($plan);
+            $pricingPlanModel = StripeBilling::getPricingPlanModel();
+            $plan = $pricingPlanModel::findByName($plan);
         }
 
         if ($this->isSubscribedTo($plan)) {
@@ -83,18 +85,27 @@ trait HasSubscriptions
     }
 
     /**
+     * @param string|Coupon $coupon
+     * @return Customer
+     */
+    public function applyCoupon($coupon): Customer
+    {
+        $customer = $this->retrieveStripeCustomer();
+
+        $customer->coupon = $coupon;
+
+        $customer->save();
+
+        return $customer;
+    }
+
+    /**
      * @return bool
      */
     public function hasActiveSubscriptions(): bool
     {
         return $this->activeSubscriptions->count() > 0;
     }
-
-    public function getPricingPlanClass(): string
-    {
-        return config('stripe-billing.models.pricing_plan');
-    }
-
 
 
     /*
@@ -105,13 +116,13 @@ trait HasSubscriptions
 
     public function subscriptions()
     {
-        return $this->hasMany(config('stripe-billing.models.subscription'), 'owner_id');
+        return $this->hasMany(StripeBilling::getSubscriptionModel(), 'owner_id');
     }
 
     public function activeSubscriptions()
     {
         return $this
-            ->hasMany(config('stripe-billing.models.subscription'), 'owner_id')
+            ->hasMany(StripeBilling::getSubscriptionModel(), 'owner_id')
             ->where(function($q) {
                 $q->whereNull('ends_at')->orWhere('ends_at', '>', now());
             });

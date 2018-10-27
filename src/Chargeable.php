@@ -215,7 +215,7 @@ trait Chargeable
      */
     public function cards()
     {
-        return $this->hasMany(config('stripe-billing.models.card'), 'owner_id');
+        return $this->hasMany(StripeBilling::getCardModel(), 'owner_id');
     }
 
     /**
@@ -224,7 +224,7 @@ trait Chargeable
     public function defaultCard()
     {
         return $this->belongsTo(
-            config('stripe-billing.models.card'),
+            StripeBilling::getCardModel(),
             'default_card_id'
         );
     }

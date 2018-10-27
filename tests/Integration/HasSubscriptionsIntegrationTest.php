@@ -10,7 +10,9 @@ namespace TMyers\StripeBilling\Tests\Integration;
 
 
 use Illuminate\Support\Carbon;
+use Stripe\Coupon;
 use TMyers\StripeBilling\Models\Subscription;
+use TMyers\StripeBilling\StripeBilling;
 use TMyers\StripeBilling\Tests\Stubs\Models\User;
 use TMyers\StripeBilling\Tests\TestCase;
 
