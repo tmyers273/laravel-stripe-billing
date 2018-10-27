@@ -154,6 +154,11 @@ $user->chargeByToken(1799, 'some token from stripe.js'); // Charge 17.99$
 $user->chargeCard(1799, $card); // Charge 17.99$
 ```
 
+### Coupons
+Coupon can be either a Stripe/Coupon or a string coupon ID of an existing coupon
+```php
+$user->applyCoupon($coupon);
+```
 
 #### Middleware
 Register in HTTP `Kernel.php`
