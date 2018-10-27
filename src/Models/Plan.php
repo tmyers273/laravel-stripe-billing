@@ -6,6 +6,7 @@ namespace TMyers\StripeBilling\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use TMyers\StripeBilling\StripeBilling;
 
 /**
  * Class Plan
@@ -65,8 +66,8 @@ class Plan extends Model
     public function subscriptions()
     {
         return $this->hasManyThrough(
-            config('stripe-billing.models.subscription'),
-            config('stripe-billing.models.pricing_plan')
+            StripeBilling::getSubscriptionModel(),
+            StripeBilling::getPricingPlanModel()
         );
     }
 

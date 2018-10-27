@@ -1,13 +1,9 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: denismitr
- * Date: 27.10.2018
- * Time: 14:11
- */
 
 namespace TMyers\StripeBilling;
 
+
+use TMyers\StripeBilling\Exceptions\StripeBillingException;
 
 class StripeBilling
 {
@@ -15,6 +11,11 @@ class StripeBilling
      * @var string
      */
     protected static $currency = 'usd';
+
+    /**
+     * @var string|null
+     */
+    protected static $apiKey;
 
     /**
      * @return string
@@ -46,5 +47,74 @@ class StripeBilling
     public static function getCardModel(): string
     {
         return config('stripe-billing.models.card');
+    }
+
+    /**
+     * @return string
+     */
+    public static function getSubscriptionModel(): string
+    {
+        return config('stripe-billing.models.subscription');
+    }
+
+    /**
+     * @return string
+     */
+    public static function getPlanModel(): string
+    {
+        return config('stripe-billing.models.plan');
+    }
+
+    /**
+     * @return string
+     */
+    public static function getPricingPlanModel(): string
+    {
+        return config('stripe-billing.models.pricing_plan');
+    }
+
+    /**
+     * @param string $apiKey
+     */
+    public static function setApiKey(string $apiKey)
+    {
+        static::$apiKey = $apiKey;
+    }
+
+    /**
+     * @return array|false|\Illuminate\Config\Repository|mixed|null|string
+     * @throws StripeBillingException
+     */
+    public static function getApiKey()
+    {
+        if (static::$apiKey) {
+            return static::$apiKey;
+        }
+
+        if ($key = getenv('STRIPE_SECRET')) {
+            return $key;
+        }
+
+        if ($key = config('services.stripe.secret')) {
+            return $key;
+        }
+
+        throw new StripeBillingException("Api key not set.");
+    }
+
+    /**
+     * @return mixed|null
+     * @throws StripeBillingException
+     */
+    public static function createTestToken()
+    {
+        return \Stripe\Token::create([
+            'card' => [
+                'number' => '4242424242424242',
+                'exp_month' => 5,
+                'exp_year' => 2025,
+                'cvc' => '123',
+            ],
+        ], ['api_key' => static::getApiKey()])->id;
     }
 }

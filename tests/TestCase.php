@@ -69,8 +69,4 @@ abstract class TestCase extends OrchestraTestCase
         (new \CreateSubscriptionsTable())->up();
         (new \CreateCardsTable())->up();
     }
-
-
-
-
 }

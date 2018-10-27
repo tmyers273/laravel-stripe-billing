@@ -3,16 +3,33 @@
 ## Usage
 Add `Billable` trait to the User model.
 
-## Plans
-* Plan model represents plan access/priviledges parameters
-* PricingPlan model optionally belongs to Plan model and represents price parameters   
+### Stripe Secret
+In order to use this package you must posses a **Stripe Secret Key**.
+It must be stored as an environment variable `STRIPE_SECRET`
+
+### Models
+- Plan
+- PricingPlan
+- Subscription
+- Card
+
+Plan model represents plan access/priviledges parameters
+PricingPlan model optionally belongs to Plan model and represents price parameters   
 
 ## Public API
+
+### StripeBilling static helper
+```php
+StripeBilling::createTestToken();
+StripeBilling::setApiKey($apiKey);
+StripeBilling::setCurrency($currency);
+```
 
 #### Stripe customer
 ```php
 // Create a customer from token (new default card will be created)
 $user->retrieveOrCreateStripeCustomer($token);
+$user->retrieveStripeCustomer($token);
 ```
 
 ### Subscriptions

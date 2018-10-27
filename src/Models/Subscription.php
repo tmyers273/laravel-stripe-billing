@@ -8,6 +8,7 @@ use TMyers\StripeBilling\Exceptions\AlreadySubscribed;
 use TMyers\StripeBilling\Exceptions\PlanIsInactive;
 use TMyers\StripeBilling\Exceptions\StripeBillingException;
 use TMyers\StripeBilling\Facades\StripeSubscription;
+use TMyers\StripeBilling\StripeBilling;
 
 /**
  * Class Subscription
@@ -101,9 +102,9 @@ class Subscription extends Model
      */
     public function changeTo($plan): self
     {
-        if (!is_a($plan, config('stripe-billing.models.pricing_plan'), true)) {
+        if (!is_a($plan, StripeBilling::getPricingPlanModel(), true)) {
             throw new \InvalidArgumentException(
-                "Plan must be an instance of " . config('stripe-billing.models.pricing_plan')
+                "Plan must be an instance of " . StripeBilling::getPricingPlanModel()
             );
         }
 
@@ -144,7 +145,9 @@ class Subscription extends Model
     public function resume(): self
     {
         if (!$this->onGracePeriod()) {
-            throw new StripeBillingException("Subscription for plan {$this->pricingPlan->name} is not on grace period");
+            throw new StripeBillingException(
+                "Subscription for plan {$this->pricingPlan->name} is not on grace period"
+            );
         }
 
         if (!$this->pricingPlan->isActive()) {
@@ -186,7 +189,7 @@ class Subscription extends Model
             return $this->pricingPlan->name === $pricingPlan;
         }
 
-        if ( is_a($pricingPlan, config('stripe-billing.models.pricing_plan'), true) ) {
+        if ( is_a($pricingPlan, StripeBilling::getPricingPlanModel(), true) ) {
             return $this->pricing_plan_id === $pricingPlan->id;
         }
 
@@ -207,11 +210,11 @@ class Subscription extends Model
             return $this->pricingPlan->name === $plan || optional($this->pricingPlan->plan)->name === $plan;
         }
 
-        if ( is_a($plan, config('stripe-billing.models.pricing_plan'), true) ) {
+        if ( is_a($plan, StripeBilling::getPricingPlanModel(), true) ) {
             return $this->pricing_plan_id === $plan->id;
         }
 
-        if ( is_a($plan, config('stripe-billing.models.plan'), true) ) {
+        if ( is_a($plan, StripeBilling::getPlanModel(), true) ) {
             return optional($this->pricingPlan->plan)->id === $plan->id;
         }
 
@@ -274,11 +277,11 @@ class Subscription extends Model
 
     public function pricingPlan()
     {
-        return $this->belongsTo(config('stripe-billing.models.pricing_plan'), 'pricing_plan_id');
+        return $this->belongsTo(StripeBilling::getPricingPlanModel(), 'pricing_plan_id');
     }
 
     public function user()
     {
-        return $this->belongsTo(config('stripe-billing.models.owner'), 'owner_id');
+        return $this->belongsTo(StripeBilling::getOwnerModel(), 'owner_id');
     }
 }

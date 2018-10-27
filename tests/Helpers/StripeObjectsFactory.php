@@ -7,6 +7,7 @@ use Stripe\Card;
 use Stripe\Customer;
 use Stripe\Subscription;
 use Stripe\Token;
+use TMyers\StripeBilling\StripeBilling;
 
 trait StripeObjectsFactory
 {
@@ -50,15 +51,12 @@ trait StripeObjectsFactory
         return new Subscription($id, $opts);
     }
 
+    /**
+     * @return string
+     * @throws \TMyers\StripeBilling\Exceptions\StripeBillingException
+     */
     protected function createTestToken(): string
     {
-        return \Stripe\Token::create([
-            'card' => [
-                'number' => '4242424242424242',
-                'exp_month' => 5,
-                'exp_year' => 2020,
-                'cvc' => '123',
-            ],
-        ], ['api_key' => getenv('STRIPE_SECRET')])->id;
+        return StripeBilling::createTestToken();
     }
 }

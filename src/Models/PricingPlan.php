@@ -6,6 +6,7 @@ namespace TMyers\StripeBilling\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use TMyers\StripeBilling\StripeBilling;
 
 /**
  * Class PricingPlan
@@ -64,7 +65,9 @@ class PricingPlan extends Model
 
     public function subscriptions()
     {
-        return $this->hasMany(config('stripe-billing.models.subscription'));
+        return $this->hasMany(
+            StripeBilling::getSubscriptionModel()
+        );
     }
 
     /**
@@ -72,7 +75,9 @@ class PricingPlan extends Model
      */
     public function plan()
     {
-        return $this->belongsTo(config('stripe-billing.models.plan'));
+        return $this->belongsTo(
+            StripeBilling::getPlanModel()
+        );
     }
 
     /**

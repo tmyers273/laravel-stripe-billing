@@ -4,7 +4,7 @@ namespace TMyers\StripeBilling\Models;
 
 
 use Illuminate\Database\Eloquent\Model;
-use TMyers\StripeBilling\Facades\StripeCard;
+use TMyers\StripeBilling\StripeBilling;
 
 /**
  * Class Card
@@ -30,7 +30,7 @@ class Card extends Model
      */
     public function isOwnedBy($owner): bool
     {
-        if (!is_a($owner, config('stripe-billing.models.owner'), true)) {
+        if (!is_a($owner, StripeBilling::getOwnerModel(), true)) {
             return false;
         }
 
@@ -50,6 +50,6 @@ class Card extends Model
      */
     public function owner()
     {
-        return $this->belongsTo(config('stripe-billing.models.owner'), 'owner_id');
+        return $this->belongsTo(StripeBilling::getOwnerModel(), 'owner_id');
     }
 }
