@@ -44,9 +44,9 @@ trait Billable
     {
         $customer = StripeCustomer::create($token, $this->email, $options);
 
-        $this->update([
+        $this->forceFill([
             'stripe_id' => $customer->id,
-        ]);
+        ])->save();
 
         $card = $this->addNewDefaultCard(
             StripeCustomer::parseDefaultCard($customer)

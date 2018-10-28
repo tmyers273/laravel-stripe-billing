@@ -27,9 +27,9 @@ trait Chargeable
             'last_4' => $data['last_4'],
         ]);
 
-        $this->update([
+        $this->forceFill([
             'default_card_id' => $card->id,
-        ]);
+        ])->save();
 
         return $card;
     }
