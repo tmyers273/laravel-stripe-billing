@@ -22,6 +22,8 @@ After package is installed via composer, run the following command:
 `php artisan vendor:publish`
 and then pick ` Provider: TMyers\StripeBilling\StripeBillingServiceProvider` from the displayed list.
 
+Afterwards run the migrations:
+```php artisan migrate```
 ## Usage
 Add `Billable` trait to the User model.
 
