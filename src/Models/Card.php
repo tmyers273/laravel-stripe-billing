@@ -30,7 +30,7 @@ class Card extends Model
      */
     public function isOwnedBy($owner): bool
     {
-        if (!is_a($owner, StripeBilling::getOwnerModel(), true)) {
+        if (!is_a($owner, StripeBilling::getOwnerModel())) {
             return false;
         }
 

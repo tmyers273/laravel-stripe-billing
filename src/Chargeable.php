@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use TMyers\StripeBilling\Exceptions\CardException;
 use TMyers\StripeBilling\Facades\StripeCharge;
 use TMyers\StripeBilling\Facades\StripeCustomer;
-use TMyers\StripeBilling\Facades\StripeToken;
 use TMyers\StripeBilling\Models\Card;
 
 trait Chargeable
@@ -97,7 +96,7 @@ trait Chargeable
      */
     public function removeCard($card)
     {
-        if (!is_a($card, StripeBilling::getCardModel(), true)) {
+        if (!is_a($card, StripeBilling::getCardModel())) {
             throw CardException::wrongType($card, StripeBilling::getCardModel());
         }
 
@@ -130,7 +129,7 @@ trait Chargeable
     public function hasDefaultCard($card = null): bool
     {
         if ($card) {
-            return is_a($card, StripeBilling::getCardModel(), true) &&
+            return is_a($card, StripeBilling::getCardModel()) &&
                 (int) $this->default_card_id === $card->id;
         }
 
@@ -183,7 +182,7 @@ trait Chargeable
      */
     public function chargeCard(int $amount, $card, array $params = [])
     {
-        if (is_a($card, StripeBilling::getCardModel(), true)) {
+        if (is_a($card, StripeBilling::getCardModel())) {
             $params['customer'] = $card->owner->stripe_id;
             $params['source'] = $card->stripe_card_id;
         } else {

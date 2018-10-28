@@ -102,7 +102,7 @@ class Subscription extends Model
      */
     public function changeTo($plan): self
     {
-        if (!is_a($plan, StripeBilling::getPricingPlanModel(), true)) {
+        if ( ! is_a($plan, StripeBilling::getPricingPlanModel()) ) {
             throw new \InvalidArgumentException(
                 "Plan must be an instance of " . StripeBilling::getPricingPlanModel()
             );
@@ -189,7 +189,7 @@ class Subscription extends Model
             return $this->pricingPlan->name === $pricingPlan;
         }
 
-        if ( is_a($pricingPlan, StripeBilling::getPricingPlanModel(), true) ) {
+        if ( is_a($pricingPlan, StripeBilling::getPricingPlanModel()) ) {
             return $this->pricing_plan_id === $pricingPlan->id;
         }
 
@@ -210,11 +210,11 @@ class Subscription extends Model
             return $this->pricingPlan->name === $plan || optional($this->pricingPlan->plan)->name === $plan;
         }
 
-        if ( is_a($plan, StripeBilling::getPricingPlanModel(), true) ) {
+        if ( is_a($plan, StripeBilling::getPricingPlanModel()) ) {
             return $this->pricing_plan_id === $plan->id;
         }
 
-        if ( is_a($plan, StripeBilling::getPlanModel(), true) ) {
+        if ( is_a($plan, StripeBilling::getPlanModel()) ) {
             return optional($this->pricingPlan->plan)->id === $plan->id;
         }
 
