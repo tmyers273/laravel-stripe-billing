@@ -1,5 +1,27 @@
 # Laravel Stripe Billing
 
+## Installation
+**Coming soon!**
+
+But for now:
+```json
+{
+    "repositories": [
+        {
+          "type": "vcs",
+          "url": "https://github.com/tmyers273/laravel-stripe-billing"
+        }
+    ],
+    "require": {
+      "tmyers273/laravel-stripe-billing": "dev-master"
+    }
+}
+```
+
+After package is installed via composer, run the following command:
+`php artisan vendor:publish`
+and then pick ` Provider: TMyers\StripeBilling\StripeBillingServiceProvider` from the displayed list.
+
 ## Usage
 Add `Billable` trait to the User model.
 
