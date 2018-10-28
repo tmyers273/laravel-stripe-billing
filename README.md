@@ -4,19 +4,8 @@
 **Coming soon!**
 
 But for now:
-```json
-{
-    "repositories": [
-        {
-          "type": "vcs",
-          "url": "https://github.com/tmyers273/laravel-stripe-billing"
-        }
-    ],
-    "require": {
-      "tmyers273/laravel-stripe-billing": "dev-master"
-    }
-}
-```
+
+`composer require tmyers273/laravel-stripe-billing`
 
 After package is installed via composer, run the following command:
 `php artisan vendor:publish`
