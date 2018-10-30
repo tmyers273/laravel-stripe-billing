@@ -7,6 +7,7 @@ use Illuminate\Support\Collection;
 use Stripe\Coupon;
 use Stripe\Customer;
 use TMyers\StripeBilling\Exceptions\AlreadySubscribed;
+use TMyers\StripeBilling\Exceptions\OnlyOneActiveSubscriptionIsAllowed;
 use TMyers\StripeBilling\Exceptions\SubscriptionNotFound;
 use TMyers\StripeBilling\Models\PricingPlan;
 use TMyers\StripeBilling\Models\Plan;
@@ -63,11 +64,16 @@ trait HasSubscriptions
      * @param array $options
      * @return mixed
      * @throws AlreadySubscribed
+     * @throws OnlyOneActiveSubscriptionIsAllowed
      */
     public function subscribeTo($plan, $token = null, array $options = []): Subscription
     {
         if (is_null($plan)) {
             throw new \InvalidArgumentException("Plan cannot be null.");
+        }
+
+        if ($this->canHaveOnlyOneSubscription() && $this->hasActiveSubscriptions()) {
+            throw OnlyOneActiveSubscriptionIsAllowed::new();
         }
 
         if (is_string($plan)) {
@@ -140,6 +146,13 @@ trait HasSubscriptions
         return $found;
     }
 
+    /**
+     * @return bool
+     */
+    public function canHaveOnlyOneSubscription(): bool
+    {
+        return !! config('stripe-billing.unique_subscription');
+    }
 
     /*
     |--------------------------------------------------------------------------

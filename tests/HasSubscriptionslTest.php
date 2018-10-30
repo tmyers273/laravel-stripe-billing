@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Stripe\Card;
 use Stripe\Customer;
 use TMyers\StripeBilling\Exceptions\AlreadySubscribed;
+use TMyers\StripeBilling\Exceptions\OnlyOneActiveSubscriptionIsAllowed;
 use TMyers\StripeBilling\Exceptions\SubscriptionNotFound;
 use TMyers\StripeBilling\Facades\StripeCustomer;
 use TMyers\StripeBilling\Facades\StripeSubscription;
@@ -260,6 +261,7 @@ class HasSubscriptionsTest extends TestCase
     /**
      * @test
      * @throws AlreadySubscribed
+     * @throws \TMyers\StripeBilling\Exceptions\OnlyOneActiveSubscriptionIsAllowed
      */
     public function user_cannot_subscribe_to_the_same_plan_twice()
     {
@@ -273,5 +275,29 @@ class HasSubscriptionsTest extends TestCase
         $this->expectException(AlreadySubscribed::class);
 
         $user->subscribeTo($basicYearlyPricingPlan);
+    }
+
+    /**
+     * @test
+     */
+    public function user_can_be_forced_to_have_only_one_active_subscription()
+    {
+        // Given only one subscription is allowed per user
+        config()->set('stripe-billing.unique_subscription', true);
+
+        // Given we have a user and two plans
+        $user = $this->createUser();
+        $basicPlan = $this->createBasicPlan();
+        $basicMonthlyPricingPlan = $this->createBasicMonthlyPricingPlan($basicPlan);
+        $this->createActiveSubscription($user, $basicMonthlyPricingPlan);
+
+        $teamPlan = $this->createTeamPlan();
+        $teamPricingPlan = $this->createTeamMonthlyPricingPlan($teamPlan);
+
+        // Expect exception
+        $this->expectException(OnlyOneActiveSubscriptionIsAllowed::class);
+
+        // Do try to subscribe to another plan
+        $user->subscribeTo($teamPricingPlan);
     }
 }

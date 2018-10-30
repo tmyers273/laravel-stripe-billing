@@ -198,7 +198,7 @@ Coupon can be either a Stripe/Coupon or a string coupon ID of an existing coupon
 $user->applyCoupon($coupon);
 ```
 
-#### Middleware
+### Middleware
 Register in HTTP `Kernel.php`
 ```php
 'subscription' => \TMyers\StripeBilling\Middleware\SubscriptionMiddleware::class,
@@ -207,5 +207,27 @@ Register in HTTP `Kernel.php`
 The middleware can take parameters like so: `subscription:basic,pro` - that means that 
 users with any of these subscriptions can pass the middleware. When used *without parameters* it will 
 just look for any active including `onTrial` or `OnGracePeriod` subscriptions 
+
+### Config
+```php
+'models' => [
+        'owner' => 'App\User',
+        'subscription' => \TMyers\StripeBilling\Models\Subscription::class,
+        'pricing_plan' => \TMyers\StripeBilling\Models\PricingPlan::class,
+        'plan' => \TMyers\StripeBilling\Models\Plan::class,
+        'card' => \TMyers\StripeBilling\Models\Card::class,
+    ],
+    
+    'tables' => [
+        'owner' => 'users',
+        'subscriptions' => 'subscriptions',
+        'pricing_plans' => 'pricing_plans',
+        'plans' => 'plans',
+        'cards' => 'cards',
+    ],
+    
+    'unique_subscription' => false,
+];
+```
 
 
