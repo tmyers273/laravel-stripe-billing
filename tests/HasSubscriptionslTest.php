@@ -6,6 +6,7 @@ namespace TMyers\StripeBilling\Tests;
 use Carbon\Carbon;
 use Stripe\Card;
 use Stripe\Customer;
+use TMyers\StripeBilling\Exceptions\AlreadySubscribed;
 use TMyers\StripeBilling\Exceptions\SubscriptionNotFound;
 use TMyers\StripeBilling\Facades\StripeCustomer;
 use TMyers\StripeBilling\Facades\StripeSubscription;
@@ -237,5 +238,40 @@ class HasSubscriptionsTest extends TestCase
         $this->expectException(SubscriptionNotFound::class);
 
         $user->getSubscriptionFor($monthlyPricingPlan);
+    }
+
+    /**
+     * @test
+     * @throws AlreadySubscribed
+     */
+    public function user_cannot_subscribe_to_the_same_pricing_plan_twice()
+    {
+        // Given we have a user and two plans
+        $user = $this->createUser();
+        $basicPlan = $this->createBasicPlan();
+        $basicMonthlyPricingPlan = $this->createBasicMonthlyPricingPlan($basicPlan);
+        $this->createActiveSubscription($user, $basicMonthlyPricingPlan);
+
+        $this->expectException(AlreadySubscribed::class);
+
+        $user->subscribeTo($basicMonthlyPricingPlan);
+    }
+
+    /**
+     * @test
+     * @throws AlreadySubscribed
+     */
+    public function user_cannot_subscribe_to_the_same_plan_twice()
+    {
+        // Given we have a user and two plans
+        $user = $this->createUser();
+        $basicPlan = $this->createBasicPlan();
+        $basicMonthlyPricingPlan = $this->createBasicMonthlyPricingPlan($basicPlan);
+        $basicYearlyPricingPlan = $this->createBasicYearlyPricingPlan($basicPlan);
+        $this->createActiveSubscription($user, $basicMonthlyPricingPlan);
+
+        $this->expectException(AlreadySubscribed::class);
+
+        $user->subscribeTo($basicYearlyPricingPlan);
     }
 }

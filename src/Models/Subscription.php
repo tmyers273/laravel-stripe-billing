@@ -207,15 +207,15 @@ class Subscription extends Model
         }
 
         if (is_string($plan)) {
-            return $this->pricingPlan->name === $plan || optional($this->pricingPlan->plan)->name === $plan;
+            return $this->pricingPlan->name === $plan || $this->pricingPlan->getType() === $plan;
         }
 
         if ( is_a($plan, StripeBilling::getPricingPlanModel()) ) {
-            return $this->pricing_plan_id === $plan->id;
+            return $this->pricingPlan->is($plan) || $this->pricingPlan->hasSameTypeAs($plan);
         }
 
         if ( is_a($plan, StripeBilling::getPlanModel()) ) {
-            return optional($this->pricingPlan->plan)->id === $plan->id;
+            return $plan->is($this->pricingPlan->plan);
         }
 
         return false;

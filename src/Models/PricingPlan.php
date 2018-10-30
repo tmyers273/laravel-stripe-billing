@@ -30,6 +30,7 @@ class PricingPlan extends Model
     protected $casts = [
         'trial_days' => 'integer',
         'active' => 'boolean',
+        'plan_id' => 'integer',
     ];
 
     /**
@@ -47,6 +48,15 @@ class PricingPlan extends Model
     public function isActive(): bool
     {
         return !! $this->active;
+    }
+
+    public function hasSameTypeAs($plan)
+    {
+        if (is_null($this->plan_id)) {
+            return false;
+        }
+
+        return (int) $this->plan->id === (int) $plan->plan_id;
     }
     
     /*
