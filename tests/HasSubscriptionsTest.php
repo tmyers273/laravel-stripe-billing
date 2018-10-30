@@ -6,6 +6,8 @@ namespace TMyers\StripeBilling\Tests;
 use Carbon\Carbon;
 use Stripe\Card;
 use Stripe\Customer;
+use TMyers\StripeBilling\Exceptions\AlreadySubscribed;
+use TMyers\StripeBilling\Exceptions\OnlyOneActiveSubscriptionIsAllowed;
 use TMyers\StripeBilling\Exceptions\SubscriptionNotFound;
 use TMyers\StripeBilling\Facades\StripeCustomer;
 use TMyers\StripeBilling\Facades\StripeSubscription;
@@ -153,11 +155,14 @@ class HasSubscriptionsTest extends TestCase
             'trial_ends_at' => now()->addDays(11)
         ]);
 
-        tap($user->fresh(), function(User $user) use ($basicPlan, $basicMonthlyPricingPlan, $teamType, $teamPlan) {
+        tap($user->fresh(), function(User $user) use ($subscription, $basicPlan, $basicMonthlyPricingPlan, $teamType, $teamPlan) {
             // expect to be subscribed to basic plan
             $this->assertTrue($user->isSubscribedTo($basicMonthlyPricingPlan));
             $this->assertTrue($user->isSubscribedTo($basicPlan));
             $this->assertTrue($user->isSubscribedTo('basic'));
+
+            $this->assertTrue($user->getSubscriptionFor($basicMonthlyPricingPlan)->is($subscription));
+            $this->assertTrue($user->getFirstActiveSubscription()->is($subscription));
 
             // expect not to be subscribed to other plans
             $this->assertFalse($user->isSubscribedTo($teamPlan));
@@ -176,7 +181,9 @@ class HasSubscriptionsTest extends TestCase
         });
     }
 
-    /** @test */
+    /** @test
+     * @throws SubscriptionNotFound
+     */
     public function it_can_get_subscription_for_user()
     {
         // Given we have a user and two plans
@@ -185,22 +192,33 @@ class HasSubscriptionsTest extends TestCase
         $basicMonthlyPricingPlan = $this->createBasicMonthlyPricingPlan($basicPlan);
         $basicSubscription = $this->createActiveSubscription($user, $basicMonthlyPricingPlan);
 
-        $teamType = $this->createTeamPlan();
-        $teamPlan = $this->createTeamMonthlyPricingPlan($teamType);
-        $teamSubscription = $this->createActiveSubscription($user, $teamPlan);
+        $teamPlan = $this->createTeamPlan();
+        $teamPricingPlan = $this->createTeamMonthlyPricingPlan($teamPlan);
+        $teamSubscription = $this->createActiveSubscription($user, $teamPricingPlan);
 
         // Expect correct subscription to be found
-        $this->assertTrue($teamSubscription->is($user->getSubscriptionFor($teamPlan)));
+        $this->assertTrue($teamSubscription->is($user->getSubscriptionFor($teamPricingPlan)));
         $this->assertTrue($basicSubscription->is($user->getSubscriptionFor($basicMonthlyPricingPlan)));
 
         // by code name
-        $this->assertTrue($teamSubscription->is($user->getSubscriptionFor($teamPlan->name)));
+        $this->assertTrue($teamSubscription->is($user->getSubscriptionFor($teamPricingPlan->name)));
         $this->assertTrue($basicSubscription->is($user->getSubscriptionFor($basicMonthlyPricingPlan->name)));
 
-        // chaining
-        $this->assertTrue(
-            $user->getSubscriptionFor($teamPlan->name)->isActive()
-        );
+        // Expect subscription to e retrieved by pricing plan model
+        $this->assertTrue($user->getSubscriptionFor($basicMonthlyPricingPlan)->isActive());
+        $this->assertTrue($user->getSubscriptionFor($basicMonthlyPricingPlan)->is($basicSubscription));
+        $this->assertTrue($user->getSubscriptionFor($teamPricingPlan)->isActive());
+        $this->assertTrue($user->getSubscriptionFor($teamPricingPlan)->is($teamSubscription));
+
+        // Expect subscription to e retrieved by pricing plan name
+        $this->assertTrue($user->getSubscriptionFor($basicMonthlyPricingPlan->name)->isActive());
+        $this->assertTrue($user->getSubscriptionFor($basicMonthlyPricingPlan->name)->is($basicSubscription));
+        $this->assertTrue($user->getSubscriptionFor($teamPricingPlan->name)->isActive());
+        $this->assertTrue($user->getSubscriptionFor($teamPricingPlan->name)->is($teamSubscription));
+
+        // Expect first subscription to be the basic subscription
+        $this->assertTrue($user->getFirstActiveSubscription()->isActive());
+        $this->assertTrue($user->getFirstActiveSubscription()->is($basicSubscription));
     }
 
     /** @test */
@@ -221,5 +239,65 @@ class HasSubscriptionsTest extends TestCase
         $this->expectException(SubscriptionNotFound::class);
 
         $user->getSubscriptionFor($monthlyPricingPlan);
+    }
+
+    /**
+     * @test
+     * @throws AlreadySubscribed
+     */
+    public function user_cannot_subscribe_to_the_same_pricing_plan_twice()
+    {
+        // Given we have a user and two plans
+        $user = $this->createUser();
+        $basicPlan = $this->createBasicPlan();
+        $basicMonthlyPricingPlan = $this->createBasicMonthlyPricingPlan($basicPlan);
+        $this->createActiveSubscription($user, $basicMonthlyPricingPlan);
+
+        $this->expectException(AlreadySubscribed::class);
+
+        $user->subscribeTo($basicMonthlyPricingPlan);
+    }
+
+    /**
+     * @test
+     * @throws AlreadySubscribed
+     * @throws \TMyers\StripeBilling\Exceptions\OnlyOneActiveSubscriptionIsAllowed
+     */
+    public function user_cannot_subscribe_to_the_same_plan_twice()
+    {
+        // Given we have a user and two plans
+        $user = $this->createUser();
+        $basicPlan = $this->createBasicPlan();
+        $basicMonthlyPricingPlan = $this->createBasicMonthlyPricingPlan($basicPlan);
+        $basicYearlyPricingPlan = $this->createBasicYearlyPricingPlan($basicPlan);
+        $this->createActiveSubscription($user, $basicMonthlyPricingPlan);
+
+        $this->expectException(AlreadySubscribed::class);
+
+        $user->subscribeTo($basicYearlyPricingPlan);
+    }
+
+    /**
+     * @test
+     */
+    public function user_can_be_forced_to_have_only_one_active_subscription()
+    {
+        // Given only one subscription is allowed per user
+        config()->set('stripe-billing.unique_active_subscription', true);
+
+        // Given we have a user and two plans
+        $user = $this->createUser();
+        $basicPlan = $this->createBasicPlan();
+        $basicMonthlyPricingPlan = $this->createBasicMonthlyPricingPlan($basicPlan);
+        $this->createActiveSubscription($user, $basicMonthlyPricingPlan);
+
+        $teamPlan = $this->createTeamPlan();
+        $teamPricingPlan = $this->createTeamMonthlyPricingPlan($teamPlan);
+
+        // Expect exception
+        $this->expectException(OnlyOneActiveSubscriptionIsAllowed::class);
+
+        // Do try to subscribe to another plan
+        $user->subscribeTo($teamPricingPlan);
     }
 }

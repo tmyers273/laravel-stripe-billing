@@ -16,4 +16,6 @@ return [
         'plans' => 'plans',
         'cards' => 'cards',
     ],
+
+    'unique_active_subscription' => false,
 ];

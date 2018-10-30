@@ -103,6 +103,27 @@ trait PlanFactory
      * @param array $overrides
      * @return PricingPlan
      */
+    protected function createBasicYearlyPricingPlan(Plan $plan = null, array $overrides = []): PricingPlan
+    {
+        $plan = $plan ?: $this->createBasicPlan();
+
+        return PricingPlan::create(array_merge([
+            'plan_id' => $plan->id,
+            'description' => 'Basic yearly plan',
+            'name' => 'basic-yearly-9000',
+            'interval' => 'month',
+            'stripe_plan_id' => 'basic_yearly_9000',
+            'price' => 90000,
+            'trial_days' => 33,
+            'active' => true,
+        ], $overrides));
+    }
+
+    /**
+     * @param Plan|null $plan
+     * @param array $overrides
+     * @return PricingPlan
+     */
     protected function createTeamMonthlyPricingPlan(Plan $plan = null, array $overrides = []): PricingPlan
     {
         $plan = $plan ?: $this->createTeamPlan();

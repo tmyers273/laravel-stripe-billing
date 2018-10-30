@@ -1,15 +1,14 @@
 # Laravel Stripe Billing
 
 ## Installation
-**Coming soon!**
-
-But for now:
+Via composer:
 
 `composer require tmyers273/laravel-stripe-billing`
 
 After package is installed via composer, run the following command:
 `php artisan vendor:publish`
 and then pick ` Provider: TMyers\StripeBilling\StripeBillingServiceProvider` from the displayed list.
+This will copy migrations files and config into your app.
 
 Afterwards run the migrations:
 ```php artisan migrate```
@@ -18,11 +17,11 @@ Add `Billable` trait to the User model.
 
 ### Stripe Secret
 In order to use this package you must posses a **Stripe Secret Key**.
-It must be stored as an environment variable `STRIPE_SECRET`
+It must be stored as an environment variable `STRIPE_SECRET` and/or set in `config/services.php`
 
 ### Models
-- Plan
-- PricingPlan
+- Plan (this is the parent plan used to control access rights - e.g. Pro, Gold, Basic, Team etc.)
+- PricingPlan (this defines price and trial period e.g. pro_monthly_10, gold_yearly_9999 etc.)
 - Subscription
 - Card
 
@@ -46,11 +45,19 @@ $user->retrieveStripeCustomer($token);
 ```
 
 ### Subscriptions
+
+By default users can have multiple subscriptions. 
+But this can be changed by setting `unique_active_subscription` to `true` in `config/stripe-billing.php`
+
+
 ##### Check subscription
 ```php
 // Check if user is already subscribed to plan
 // Accepts PricingPlan object, Plan object, string (name of Plan or PricingPlan) e.g. basic, basic_yearly_90
 $user->isSubscribedTo($plan);
+
+// Check if user is subscribed to a specific $pricingPlan
+$user->isSubscribedStrictlyTo($pricingPlan);
 
 // true or false
 $user->hasActiveSubscriptions();
@@ -64,13 +71,35 @@ $subscription->isFor($plan);
 ```php
 $user->getSubscriptionFor($teamPlan)->isActive();
 $user->getSubscriptionFor('basic-monthly-10')->cancelNow();
+
+// in the vast majority of cases your users will be only allowed
+// to have one active subscription, so use this method when applicable
+$user->getFirstActiveSubscription();
 ```
 
-##### Create subscription
+##### Create plans and subscriptions
 ```php
-// Accepts Plan object or string representing Plan name e.g. pro_monthly_10
-$user->subscribeTo($plan); // for already existing stripe customer
-$user->subscribeTo($plan, $token); // for user without created customer
+// Create the plans
+$bronzePlan= Plan::create([
+    'description' => 'Bronze Plan',
+    'name' => 'bronze',
+    'is_free' => false,
+]);
+
+// Create the PricingPlan
+$bronzeMonthly = PricingPlan::create([
+    'plan_id' => $bronzePlan->id, // parent plan id
+    'description' => 'Monthly Bronze Plan',
+    'name' => 'bronze_monthly_50.00',
+    'interval' => 'month',
+    'stripe_plan_id' => 'bronze_monthly', // this needs to be created in Stripe first
+    'price' => 5000,
+    'active' => true,
+]);
+
+// Accepts Plan object or string representing Plan name e.g. bronze_monthly_50.00
+$user->subscribeTo($bronzeMonthly); // for already existing stripe customer
+$user->subscribeTo($bronzeMonthly, $token); // for user without created customer
 ```
 
 ##### List subscriptions
@@ -173,7 +202,7 @@ Coupon can be either a Stripe/Coupon or a string coupon ID of an existing coupon
 $user->applyCoupon($coupon);
 ```
 
-#### Middleware
+### Middleware
 Register in HTTP `Kernel.php`
 ```php
 'subscription' => \TMyers\StripeBilling\Middleware\SubscriptionMiddleware::class,
@@ -182,5 +211,27 @@ Register in HTTP `Kernel.php`
 The middleware can take parameters like so: `subscription:basic,pro` - that means that 
 users with any of these subscriptions can pass the middleware. When used *without parameters* it will 
 just look for any active including `onTrial` or `OnGracePeriod` subscriptions 
+
+### Config
+```php
+'models' => [
+        'owner' => 'App\User',
+        'subscription' => \TMyers\StripeBilling\Models\Subscription::class,
+        'pricing_plan' => \TMyers\StripeBilling\Models\PricingPlan::class,
+        'plan' => \TMyers\StripeBilling\Models\Plan::class,
+        'card' => \TMyers\StripeBilling\Models\Card::class,
+    ],
+    
+    'tables' => [
+        'owner' => 'users',
+        'subscriptions' => 'subscriptions',
+        'pricing_plans' => 'pricing_plans',
+        'plans' => 'plans',
+        'cards' => 'cards',
+    ],
+    
+    'unique_active_subscription' => false,
+];
+```
 
 

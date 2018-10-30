@@ -30,6 +30,7 @@ class PricingPlan extends Model
     protected $casts = [
         'trial_days' => 'integer',
         'active' => 'boolean',
+        'plan_id' => 'integer',
     ];
 
     /**
@@ -41,9 +42,21 @@ class PricingPlan extends Model
         return static::whereName($name)->firstOrFail();
     }
 
+    /**
+     * @return bool
+     */
     public function isActive(): bool
     {
         return !! $this->active;
+    }
+
+    public function hasSameTypeAs($plan)
+    {
+        if (is_null($this->plan_id)) {
+            return false;
+        }
+
+        return (int) $this->plan->id === (int) $plan->plan_id;
     }
     
     /*
@@ -83,7 +96,7 @@ class PricingPlan extends Model
     /**
      * @return string
      */
-    public function asPlanString(): string
+    public function getType(): string
     {
         return $this->plan ? $this->plan->name : 'default';
     }
