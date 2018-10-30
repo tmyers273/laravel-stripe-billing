@@ -133,7 +133,7 @@ class Subscription extends Model
 
         $this->update([
             'pricing_plan_id' => $plan->id,
-            'type' => $plan->asPlanString(),
+            'type' => $plan->getType(),
         ]);
 
         return $this;

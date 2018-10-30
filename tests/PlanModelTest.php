@@ -9,6 +9,8 @@
 namespace TMyers\StripeBilling\Tests;
 
 
+use TMyers\StripeBilling\Models\Plan;
+
 class PlanModelTest extends TestCase
 {
     /** @test */
@@ -38,7 +40,12 @@ class PlanModelTest extends TestCase
         $this->assertCount(2, $pricing);
 
         $this->assertTrue($pricing[0]->is($montlyPlan));
+        $this->assertEquals('basic', $pricing[0]->getType());
+        $this->assertInstanceOf(Plan::class, $pricing[0]->plan);
+
         $this->assertTrue($pricing[1]->is($yearlyPlan));
+        $this->assertEquals('basic', $pricing[1]->getType());
+        $this->assertInstanceOf(Plan::class, $pricing[1]->plan);
 
         $this->assertFalse($basic->isFree());
     }

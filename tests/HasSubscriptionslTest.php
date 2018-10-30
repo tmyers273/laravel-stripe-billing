@@ -153,11 +153,14 @@ class HasSubscriptionsTest extends TestCase
             'trial_ends_at' => now()->addDays(11)
         ]);
 
-        tap($user->fresh(), function(User $user) use ($basicPlan, $basicMonthlyPricingPlan, $teamType, $teamPlan) {
+        tap($user->fresh(), function(User $user) use ($subscription, $basicPlan, $basicMonthlyPricingPlan, $teamType, $teamPlan) {
             // expect to be subscribed to basic plan
             $this->assertTrue($user->isSubscribedTo($basicMonthlyPricingPlan));
             $this->assertTrue($user->isSubscribedTo($basicPlan));
             $this->assertTrue($user->isSubscribedTo('basic'));
+
+            $this->assertTrue($user->getSubscriptionFor($basicMonthlyPricingPlan)->is($subscription));
+            $this->assertTrue($user->getFirstActiveSubscription()->is($subscription));
 
             // expect not to be subscribed to other plans
             $this->assertFalse($user->isSubscribedTo($teamPlan));

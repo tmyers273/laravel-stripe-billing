@@ -41,6 +41,9 @@ class PricingPlan extends Model
         return static::whereName($name)->firstOrFail();
     }
 
+    /**
+     * @return bool
+     */
     public function isActive(): bool
     {
         return !! $this->active;
@@ -83,7 +86,7 @@ class PricingPlan extends Model
     /**
      * @return string
      */
-    public function asPlanString(): string
+    public function getType(): string
     {
         return $this->plan ? $this->plan->name : 'default';
     }

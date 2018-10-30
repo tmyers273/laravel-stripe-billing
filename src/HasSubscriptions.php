@@ -125,6 +125,21 @@ trait HasSubscriptions
         return $this->activeSubscriptions->count() > 0;
     }
 
+    /**
+     * @return mixed
+     * @throws SubscriptionNotFound
+     */
+    public function getFirstActiveSubscription()
+    {
+        $found = $this->activeSubscriptions->first();
+
+        if (!$found) {
+            throw new SubscriptionNotFound("User [{$this->id}] does not have any active subscriptions.");
+        }
+
+        return $found;
+    }
+
 
     /*
     |--------------------------------------------------------------------------
