@@ -32,6 +32,14 @@ class Plan extends Model
     {
         return static::whereName($name)->firstOrFail();
     }
+
+    /**
+     * @return bool
+     */
+    public function isFree(): bool
+    {
+        return !! $this->is_free;
+    }
     
     /*
     |--------------------------------------------------------------------------
@@ -77,7 +85,7 @@ class Plan extends Model
     public function pricingPlans()
     {
         return $this
-            ->hasMany(config('stripe-billing.models.pricing_plan'), 'plan_id')
+            ->hasMany(StripeBilling::getPricingPlanModel(), 'plan_id')
             ->orderBy('price');
     }
 }

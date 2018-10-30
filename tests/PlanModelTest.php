@@ -39,6 +39,8 @@ class PlanModelTest extends TestCase
 
         $this->assertTrue($pricing[0]->is($montlyPlan));
         $this->assertTrue($pricing[1]->is($yearlyPlan));
+
+        $this->assertFalse($basic->isFree());
     }
 
     /** @test */

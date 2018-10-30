@@ -52,6 +52,9 @@ $user->retrieveStripeCustomer($token);
 // Accepts PricingPlan object, Plan object, string (name of Plan or PricingPlan) e.g. basic, basic_yearly_90
 $user->isSubscribedTo($plan);
 
+// Check if user is subscribed to a specific $pricingPlan
+$user->isSubscribedStrictlyTo($pricingPlan);
+
 // true or false
 $user->hasActiveSubscriptions();
 
@@ -66,11 +69,29 @@ $user->getSubscriptionFor($teamPlan)->isActive();
 $user->getSubscriptionFor('basic-monthly-10')->cancelNow();
 ```
 
-##### Create subscription
+##### Create plans and subscriptions
 ```php
-// Accepts Plan object or string representing Plan name e.g. pro_monthly_10
-$user->subscribeTo($plan); // for already existing stripe customer
-$user->subscribeTo($plan, $token); // for user without created customer
+// Create the plans
+$bronzePlan= Plan::create([
+    'description' => 'Bronze Plan',
+    'name' => 'bronze',
+    'is_free' => false,
+]);
+
+// Create the PricingPlan
+$bronzeMonthly = PricingPlan::create([
+    'plan_id' => $bronzePlan->id, // parent plan id
+    'description' => 'Monthly Bronze Plan',
+    'name' => 'bronze_monthly_50.00',
+    'interval' => 'month',
+    'stripe_plan_id' => 'bronze_monthly', // this needs to be created in Stripe first
+    'price' => 5000,
+    'active' => true,
+]);
+
+// Accepts Plan object or string representing Plan name e.g. bronze_monthly_50.00
+$user->subscribeTo($bronzeMonthly); // for already existing stripe customer
+$user->subscribeTo($bronzeMonthly, $token); // for user without created customer
 ```
 
 ##### List subscriptions

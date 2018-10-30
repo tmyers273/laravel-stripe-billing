@@ -40,6 +40,24 @@ trait HasSubscriptions
     }
 
     /**
+     * @param $pricingPlan
+     * @return bool
+     */
+    public function isSubscribedStrictlyTo($pricingPlan): bool
+    {
+        $subscriptions = $this->activeSubscriptions;
+
+        /** @var Subscription $subscription */
+        foreach ($subscriptions as $subscription) {
+            if ($subscription->isStrictlyFor($pricingPlan) && $subscription->isActive()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * @param $plan
      * @param null $token
      * @param array $options
