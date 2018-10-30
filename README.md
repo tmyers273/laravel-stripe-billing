@@ -67,6 +67,10 @@ $subscription->isFor($plan);
 ```php
 $user->getSubscriptionFor($teamPlan)->isActive();
 $user->getSubscriptionFor('basic-monthly-10')->cancelNow();
+
+// in the vast majority of cases your users will be only allowed
+// to have one active subscription, so use this method when applicable
+$user->getFirstActiveSubscription();
 ```
 
 ##### Create plans and subscriptions
