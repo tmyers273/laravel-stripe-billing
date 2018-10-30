@@ -179,7 +179,9 @@ class HasSubscriptionsTest extends TestCase
         });
     }
 
-    /** @test */
+    /** @test
+     * @throws SubscriptionNotFound
+     */
     public function it_can_get_subscription_for_user()
     {
         // Given we have a user and two plans
@@ -188,22 +190,33 @@ class HasSubscriptionsTest extends TestCase
         $basicMonthlyPricingPlan = $this->createBasicMonthlyPricingPlan($basicPlan);
         $basicSubscription = $this->createActiveSubscription($user, $basicMonthlyPricingPlan);
 
-        $teamType = $this->createTeamPlan();
-        $teamPlan = $this->createTeamMonthlyPricingPlan($teamType);
-        $teamSubscription = $this->createActiveSubscription($user, $teamPlan);
+        $teamPlan = $this->createTeamPlan();
+        $teamPricingPlan = $this->createTeamMonthlyPricingPlan($teamPlan);
+        $teamSubscription = $this->createActiveSubscription($user, $teamPricingPlan);
 
         // Expect correct subscription to be found
-        $this->assertTrue($teamSubscription->is($user->getSubscriptionFor($teamPlan)));
+        $this->assertTrue($teamSubscription->is($user->getSubscriptionFor($teamPricingPlan)));
         $this->assertTrue($basicSubscription->is($user->getSubscriptionFor($basicMonthlyPricingPlan)));
 
         // by code name
-        $this->assertTrue($teamSubscription->is($user->getSubscriptionFor($teamPlan->name)));
+        $this->assertTrue($teamSubscription->is($user->getSubscriptionFor($teamPricingPlan->name)));
         $this->assertTrue($basicSubscription->is($user->getSubscriptionFor($basicMonthlyPricingPlan->name)));
 
-        // chaining
-        $this->assertTrue(
-            $user->getSubscriptionFor($teamPlan->name)->isActive()
-        );
+        // Expect subscription to e retrieved by pricing plan model
+        $this->assertTrue($user->getSubscriptionFor($basicMonthlyPricingPlan)->isActive());
+        $this->assertTrue($user->getSubscriptionFor($basicMonthlyPricingPlan)->is($basicSubscription));
+        $this->assertTrue($user->getSubscriptionFor($teamPricingPlan)->isActive());
+        $this->assertTrue($user->getSubscriptionFor($teamPricingPlan)->is($teamSubscription));
+
+        // Expect subscription to e retrieved by pricing plan name
+        $this->assertTrue($user->getSubscriptionFor($basicMonthlyPricingPlan->name)->isActive());
+        $this->assertTrue($user->getSubscriptionFor($basicMonthlyPricingPlan->name)->is($basicSubscription));
+        $this->assertTrue($user->getSubscriptionFor($teamPricingPlan->name)->isActive());
+        $this->assertTrue($user->getSubscriptionFor($teamPricingPlan->name)->is($teamSubscription));
+
+        // Expect first subscription to be the basic subscription
+        $this->assertTrue($user->getFirstActiveSubscription()->isActive());
+        $this->assertTrue($user->getFirstActiveSubscription()->is($basicSubscription));
     }
 
     /** @test */
