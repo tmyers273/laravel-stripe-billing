@@ -1,15 +1,14 @@
 # Laravel Stripe Billing
 
 ## Installation
-**Coming soon!**
-
-But for now:
+Via composer:
 
 `composer require tmyers273/laravel-stripe-billing`
 
 After package is installed via composer, run the following command:
 `php artisan vendor:publish`
 and then pick ` Provider: TMyers\StripeBilling\StripeBillingServiceProvider` from the displayed list.
+This will copy migrations files and config into your app.
 
 Afterwards run the migrations:
 ```php artisan migrate```
@@ -18,11 +17,11 @@ Add `Billable` trait to the User model.
 
 ### Stripe Secret
 In order to use this package you must posses a **Stripe Secret Key**.
-It must be stored as an environment variable `STRIPE_SECRET`
+It must be stored as an environment variable `STRIPE_SECRET` and/or set in `config/services.php`
 
 ### Models
-- Plan
-- PricingPlan
+- Plan (this is the parent plan used to control access rights - e.g. Pro, Gold, Basic, Team etc.)
+- PricingPlan (this defines price and trial period e.g. pro_monthly_10, gold_yearly_9999 etc.)
 - Subscription
 - Card
 
@@ -46,6 +45,11 @@ $user->retrieveStripeCustomer($token);
 ```
 
 ### Subscriptions
+
+By default users can have multiple subscriptions. 
+But this can be changed by setting `unique_subscription` to `false` in `config/stripe-billing.php`
+
+
 ##### Check subscription
 ```php
 // Check if user is already subscribed to plan

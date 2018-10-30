@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: denismitr
- * Date: 19.10.2018
- * Time: 18:13
- */
 
 namespace TMyers\StripeBilling\Tests\Integration;
 
@@ -50,6 +44,8 @@ class HasSubscriptionsIntegrationTest extends TestCase
         $this->assertDatabaseHas('subscriptions', [
             'owner_id'=> $user->id,
             'pricing_plan_id' => $monthlyPlan->id,
+            'type' => 'default',
+            'ends_at' => null,
         ]);
 
         tap($user->fresh(), function(User $user) use ($monthlyPlan, $teamMonthlyPricingPlan) {
