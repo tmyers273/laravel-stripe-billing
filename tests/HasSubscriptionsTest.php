@@ -283,7 +283,7 @@ class HasSubscriptionsTest extends TestCase
     public function user_can_be_forced_to_have_only_one_active_subscription()
     {
         // Given only one subscription is allowed per user
-        config()->set('stripe-billing.unique_subscription', true);
+        config()->set('stripe-billing.unique_active_subscription', true);
 
         // Given we have a user and two plans
         $user = $this->createUser();

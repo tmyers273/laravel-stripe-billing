@@ -17,5 +17,5 @@ return [
         'cards' => 'cards',
     ],
 
-    'unique_subscription' => false,
+    'unique_active_subscription' => false,
 ];

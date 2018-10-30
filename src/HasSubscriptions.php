@@ -151,7 +151,7 @@ trait HasSubscriptions
      */
     public function canHaveOnlyOneSubscription(): bool
     {
-        return !! config('stripe-billing.unique_subscription');
+        return !! config('stripe-billing.unique_active_subscription');
     }
 
     /*

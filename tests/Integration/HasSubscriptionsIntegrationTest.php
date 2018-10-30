@@ -74,8 +74,8 @@ class HasSubscriptionsIntegrationTest extends TestCase
         $basicPlan = $this->createBasicPlan();
         $basicMonthlyPricingPlan = $this->createBasicMonthlyPricingPlan($basicPlan);
 
-        $teamType = $this->createTeamPlan();
-        $teamMonthlyPricingPlan = $this->createTeamMonthlyPricingPlan($teamType);
+        $teamPlan = $this->createTeamPlan();
+        $teamMonthlyPricingPlan = $this->createTeamMonthlyPricingPlan($teamPlan);
 
         $subscription = $user->subscribeTo($basicMonthlyPricingPlan, $this->createTestToken());
 
@@ -89,7 +89,7 @@ class HasSubscriptionsIntegrationTest extends TestCase
             'trial_ends_at' => now()->addDays(11)
         ]);
 
-        tap($user->fresh(), function(User $user) use ($basicPlan, $basicMonthlyPricingPlan, $teamType, $teamMonthlyPricingPlan) {
+        tap($user->fresh(), function(User $user) use ($basicPlan, $basicMonthlyPricingPlan, $teamPlan, $teamMonthlyPricingPlan) {
             // expect to be subscribed to basic plan
             $this->assertTrue($user->isSubscribedTo($basicMonthlyPricingPlan));
             $this->assertTrue($user->isSubscribedTo($basicPlan));
@@ -97,7 +97,7 @@ class HasSubscriptionsIntegrationTest extends TestCase
 
             // expect not to be subscribed to other plans
             $this->assertFalse($user->isSubscribedTo($teamMonthlyPricingPlan));
-            $this->assertFalse($user->isSubscribedTo($teamType));
+            $this->assertFalse($user->isSubscribedTo($teamPlan));
 
             // expect new card to be created
             $defaultCard = $user->defaultCard;
@@ -111,5 +111,62 @@ class HasSubscriptionsIntegrationTest extends TestCase
                 'brand' => 'Visa',
             ]);
         });
+    }
+
+    /** @test */
+    public function user_can_create_new_subscription_given_an_old_canceled_one()
+    {
+        // Given we have a user and two plans
+        $user = $this->createUser();
+        $basicPlan = $this->createBasicPlan();
+        $basicMonthlyPricingPlan = $this->createBasicMonthlyPricingPlan($basicPlan);
+
+        $teamPlan = $this->createTeamPlan();
+        $teamMonthlyPricingPlan = $this->createTeamMonthlyPricingPlan($teamPlan);
+
+        $basicMonthlySubscription = $user->subscribeTo($basicMonthlyPricingPlan, $this->createTestToken());
+
+        $basicMonthlySubscription->cancelNow();
+
+        $this->assertFalse($basicMonthlySubscription->isActive());
+        $this->assertCount(0, $user->fresh()->activeSubscriptions);
+        $this->assertFalse($user->fresh()->hasActiveSubscriptions());
+
+        $teamSubscription = $user->subscribeTo($teamMonthlyPricingPlan);
+
+        $this->assertTrue($teamSubscription->isActive());
+        $this->assertCount(1, $user->fresh()->activeSubscriptions);
+        $this->assertTrue($user->fresh()->hasActiveSubscriptions());
+    }
+    
+    /** @test */
+    public function user_can_create_new_subscription_given_an_old_canceled_one_and_unique_subscription_constraint()
+    {
+        // Given only one subscription is allowed per user
+        config()->set('stripe-billing.unique_active_subscription', true);
+
+        // Given we have a user and two plans
+        $user = $this->createUser();
+        $basicPlan = $this->createBasicPlan();
+        $basicMonthlyPricingPlan = $this->createBasicMonthlyPricingPlan($basicPlan);
+
+        $teamPlan = $this->createTeamPlan();
+        $teamMonthlyPricingPlan = $this->createTeamMonthlyPricingPlan($teamPlan);
+
+        $basicMonthlySubscription = $user->subscribeTo($basicMonthlyPricingPlan, $this->createTestToken());
+
+        $basicMonthlySubscription->cancelNow();
+
+        $this->assertFalse($basicMonthlySubscription->isActive());
+        $this->assertCount(0, $user->fresh()->activeSubscriptions);
+        $this->assertFalse($user->fresh()->hasActiveSubscriptions());
+
+        $teamSubscription = $user->subscribeTo($teamMonthlyPricingPlan);
+
+        $this->assertTrue($teamSubscription->isActive());
+        $this->assertCount(1, $user->fresh()->activeSubscriptions);
+        $this->assertTrue($user->fresh()->hasActiveSubscriptions());
+
+        $this->assertEquals(1, $user->retrieveStripeCustomer()->subscriptions->total_count);
     }
 }

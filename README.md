@@ -47,7 +47,7 @@ $user->retrieveStripeCustomer($token);
 ### Subscriptions
 
 By default users can have multiple subscriptions. 
-But this can be changed by setting `unique_subscription` to `false` in `config/stripe-billing.php`
+But this can be changed by setting `unique_active_subscription` to `true` in `config/stripe-billing.php`
 
 
 ##### Check subscription
@@ -230,7 +230,7 @@ just look for any active including `onTrial` or `OnGracePeriod` subscriptions
         'cards' => 'cards',
     ],
     
-    'unique_subscription' => false,
+    'unique_active_subscription' => false,
 ];
 ```
 
