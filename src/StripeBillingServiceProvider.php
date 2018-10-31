@@ -43,6 +43,13 @@ class StripeBillingServiceProvider extends ServiceProvider
                     database_path('migrations/' . date('Y_m_d_His', time()) . '_create_subscriptions_table.php'),
             ], 'migrations');
         }
+
+        if ( ! class_exists('CreateCardsTable')) {
+            $this->publishes([
+                __DIR__ . '/../database/migrations/create_cards_table.php' =>
+                    database_path('migrations/' . date('Y_m_d_His', time()) . '_create_cards_table.php'),
+            ], 'migrations');
+        }
     }
 
     public function register()

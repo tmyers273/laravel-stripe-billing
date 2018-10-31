@@ -34,6 +34,12 @@ class CreatePricingPlansTable extends Migration
                 ->references('id')
                 ->on(config('stripe-billing.tables.plans'))
                 ->onDelete('set null');
+
+            $table
+                ->foreign('plan_id')
+                ->references('id')
+                ->on(config('stripe-billing.tables.plans'))
+                ->onDelete('set null');
         });
     }
 

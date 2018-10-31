@@ -80,8 +80,11 @@ class PlanModelTest extends TestCase
         $subscriptionC = $this->createActiveSubscription($userA, $yearlyPlan);
 
         $basicSubscriptions = $basic->subscriptions;
+        $pricingPlans = $basic->pricingPlans;
 
         $this->assertCount(3, $basicSubscriptions);
+        $this->assertCount(2, $pricingPlans);
+
         $this->assertTrue($basicSubscriptions[0]->is($subscriptionA));
         $this->assertTrue($basicSubscriptions[1]->is($subscriptionB));
         $this->assertTrue($basicSubscriptions[2]->is($subscriptionC));
