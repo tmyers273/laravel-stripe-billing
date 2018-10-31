@@ -20,6 +20,7 @@ class CreatePlansTable extends Migration
             $table->text('detailed_description')->nullable();
             $table->boolean('is_free');
             $table->boolean('active')->default(true);
+            $table->tinyInteger('weight')->default(0);
             $table->boolean('teams_enabled')->default(false);
             $table->unsignedInteger('team_users_limit')->nullable();
             $table->softDeletes();
