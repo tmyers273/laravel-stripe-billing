@@ -49,18 +49,20 @@ class SubscriptionModelIntegrationTest extends TestCase
         ]);
 
         // Expect user to be subscribed to monthly plan
-        $this->assertTrue($subscription->isFor($monthlyPlan));
+        $this->assertTrue($subscription->fresh()->isFor($monthlyPlan));
         $this->assertTrue($user->fresh()->isSubscribedTo($monthlyPlan));
 
         $subscription->changeTo($teamPlan);
 
-        // Expect user not to be subscribed to monthly plan anymore
-        $this->assertFalse($subscription->isFor($monthlyPlan));
-        $this->assertFalse($user->isSubscribedTo($monthlyPlan));
+        tap($subscription->fresh(), function(Subscription $subscription) use ($user, $monthlyPlan, $teamPlan) {
+            // Expect user not to be subscribed to monthly plan anymore
+            $this->assertFalse($subscription->isFor($monthlyPlan));
+            $this->assertFalse($user->fresh()->isSubscribedTo($monthlyPlan));
 
-        // Expect user to be subscribed to team plan now
-        $this->assertTrue($subscription->isFor($teamPlan));
-        $this->assertTrue($user->fresh()->isSubscribedTo($teamPlan));
+            // Expect user to be subscribed to team plan now
+            $this->assertTrue($subscription->isFor($teamPlan));
+            $this->assertTrue($user->fresh()->isSubscribedTo($teamPlan));
+        });
 
         $this->assertDatabaseHas('subscriptions', [
             'owner_id'=> $user->id,
