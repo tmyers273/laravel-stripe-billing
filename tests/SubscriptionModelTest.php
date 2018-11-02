@@ -35,7 +35,7 @@ class SubscriptionModelTest extends TestCase
             'stripe_subscription_id' => 'fake-stripe-id',
         ]);
 
-        $this->assertInstanceOf(User::class, $subscription->user);
+        $this->assertInstanceOf(User::class, $subscription->owner);
         $this->assertInstanceOf(PricingPlan::class, $subscription->pricingPlan);
         $this->assertInstanceOf(Plan::class, $subscription->pricingPlan->plan);
     }

@@ -20,6 +20,7 @@ use TMyers\StripeBilling\StripeBilling;
  * @property Carbon $ends_at
  * @property integer $owner_id
  * @property integer $pricing_plan_id
+ * @property mixed $user
  */
 class Subscription extends Model
 {
@@ -280,7 +281,7 @@ class Subscription extends Model
         return $this->belongsTo(StripeBilling::getPricingPlanModel(), 'pricing_plan_id');
     }
 
-    public function user()
+    public function owner()
     {
         return $this->belongsTo(StripeBilling::getOwnerModel(), 'owner_id');
     }
