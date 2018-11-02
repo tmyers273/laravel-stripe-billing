@@ -62,6 +62,11 @@ class Plan extends Model
         return $builder->whereTeamsEnabled(true);
     }
 
+    public function scopeWeighted(Builder $builder)
+    {
+        return $builder->orderBy('weight');
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Relationships

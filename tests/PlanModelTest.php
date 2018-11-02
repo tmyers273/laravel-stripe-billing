@@ -89,4 +89,44 @@ class PlanModelTest extends TestCase
         $this->assertTrue($basicSubscriptions[1]->is($subscriptionB));
         $this->assertTrue($basicSubscriptions[2]->is($subscriptionC));
     }
+
+    /** @test */
+    public function plans_can_be_sorted_by_weight()
+    {
+        $teamPlan = Plan::create([
+            'description' => 'Team plan',
+            'name' => 'team',
+            'is_free' => false,
+            'weight' => 10,
+        ]);
+
+        $basicPlan = Plan::create([
+            'description' => 'Basic plan',
+            'name' => 'basic',
+            'is_free' => false,
+            'weight' => 1,
+        ]);
+
+        $proPlan = Plan::create([
+            'description' => 'Pro plan',
+            'name' => 'pro',
+            'is_free' => false,
+            'weight' => 3,
+        ]);
+
+        $freePlan = Plan::create([
+            'description' => 'Free plan',
+            'name' => 'free',
+            'is_free' => true,
+            'weight' => 0,
+        ]);
+
+        $plans = Plan::weighted()->get();
+
+        $this->assertCount(4, $plans);
+        $this->assertTrue($plans[0]->is($freePlan));
+        $this->assertTrue($plans[1]->is($basicPlan));
+        $this->assertTrue($plans[2]->is($proPlan));
+        $this->assertTrue($plans[3]->is($teamPlan));
+    }
 }
