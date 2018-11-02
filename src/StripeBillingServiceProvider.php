@@ -3,6 +3,7 @@
 namespace TMyers\StripeBilling;
 
 
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use TMyers\StripeBilling\Gateways\StripeChargeGateway;
 use TMyers\StripeBilling\Gateways\StripeCustomerGateway;
@@ -50,6 +51,8 @@ class StripeBillingServiceProvider extends ServiceProvider
                     database_path('migrations/' . date('Y_m_d_His', time()) . '_create_cards_table.php'),
             ], 'migrations');
         }
+
+        $this->registerBladeDirectives();
     }
 
     public function register()
@@ -69,6 +72,25 @@ class StripeBillingServiceProvider extends ServiceProvider
 
         $this->app->bind('stripe-charge-gateway', function() {
             return new StripeChargeGateway();
+        });
+    }
+
+    protected function registerBladeDirectives()
+    {
+        Blade::directive('subscribed', function() {
+            return "<?php if(auth()->check() && auth()->user()->hasActiveSubscriptions()): ?>";
+        });
+
+        Blade::directive('endsubscribed', function() {
+            return "<?php endif; ?>";
+        });
+
+        Blade::directive('unless_subscribed', function() {
+            return "<?php if(auth()->check() && !auth()->user()->hasActiveSubscriptions()): ?>";
+        });
+
+        Blade::directive('endunless_subscribed', function() {
+            return "<?php endif; ?>";
         });
     }
 }
