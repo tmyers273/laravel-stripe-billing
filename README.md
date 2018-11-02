@@ -212,6 +212,20 @@ The middleware can take parameters like so: `subscription:basic,pro` - that mean
 users with any of these subscriptions can pass the middleware. When used *without parameters* it will 
 just look for any active including `onTrial` or `OnGracePeriod` subscriptions 
 
+### Blade directives
+**subscribed** directive determines if user is logged in and subscribed
+```blade
+@subscribed
+// do something
+@endsubscribed
+```
+**unless_subscribed** directive determines if user is logged in and not subscribed
+```blade
+@unless_subscribed
+// do something
+@endunless_subscribed
+```
+
 ### Config
 ```php
 'models' => [
