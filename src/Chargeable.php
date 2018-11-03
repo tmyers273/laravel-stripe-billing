@@ -24,6 +24,8 @@ trait Chargeable
             'stripe_card_id' => $data['stripe_card_id'],
             'brand' => $data['brand'],
             'last_4' => $data['last_4'],
+            'exp_month' => $data['exp_month'],
+            'exp_year' => $data['exp_year'],
         ]);
 
         $this->forceFill([
@@ -61,6 +63,8 @@ trait Chargeable
             'stripe_card_id' => $stripeCard->id,
             'brand' => $stripeCard->brand,
             'last_4' => $stripeCard->last4,
+            'exp_month' => $stripeCard->exp_month,
+            'exp_year' => $stripeCard->exp_year,
         ]);
 
         if (!$this->default_card_id) {

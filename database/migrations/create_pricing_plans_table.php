@@ -17,7 +17,7 @@ class CreatePricingPlansTable extends Migration
             $table->increments('id');
             $table->unsignedInteger('plan_id')->nullable();
             $table->string('name', 50);
-            $table->string('interval', 50);
+            $table->string('interval', 50)->nullable();
             $table->string('description');
             $table->string('stripe_plan_id')->nullable();
             $table->unsignedInteger('price');

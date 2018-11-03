@@ -10,6 +10,7 @@ namespace TMyers\StripeBilling\Tests;
 
 
 use TMyers\StripeBilling\Models\Plan;
+use TMyers\StripeBilling\Models\PricingPlan;
 
 class PlanModelTest extends TestCase
 {
@@ -128,5 +129,90 @@ class PlanModelTest extends TestCase
         $this->assertTrue($plans[1]->is($basicPlan));
         $this->assertTrue($plans[2]->is($proPlan));
         $this->assertTrue($plans[3]->is($teamPlan));
+    }
+
+    /** @test */
+    public function plans_can_be_compared()
+    {
+        $basicPlan = Plan::create([
+            'description' => 'Basic plan',
+            'name' => 'basic',
+            'is_free' => false,
+            'weight' => 1,
+        ]);
+
+        $proPlan = Plan::create([
+            'description' => 'Pro plan',
+            'name' => 'pro',
+            'is_free' => false,
+            'weight' => 3,
+        ]);
+
+        $freePlan = Plan::create([
+            'description' => 'Free plan',
+            'name' => 'free',
+            'is_free' => true,
+            'weight' => 0,
+        ]);
+
+        $freePricingPlan = PricingPlan::create([
+            'name' => 'free_plan_0',
+            'description' => 'Free plan',
+            'plan_id' => $freePlan->id,
+            'price' => 0
+        ]);
+
+        $proMonthlyPricingPlan = PricingPlan::create([
+            'name' => 'pro_monthly_plan',
+            'description' => 'Pro monthly',
+            'price' => 3000,
+            'plan_id' => $proPlan->id,
+            'interval' => 'month'
+        ]);
+
+        $proYearlyPricingPlan = PricingPlan::create([
+            'name' => 'pro_yearly_plan',
+            'description' => 'Pro yearly',
+            'price' => 45000,
+            'plan_id' => $proPlan->id,
+            'interval' => 'year'
+        ]);
+
+        $basicYearlyPricingPlan = PricingPlan::create([
+            'name' => 'basic_yearly_plan',
+            'description' => 'Basic yearly',
+            'price' => 27000,
+            'plan_id' => $basicPlan->id,
+            'interval' => 'year'
+        ]);
+
+        $justMonthlyPlan = PricingPlan::create([
+            'name' => 'simple_monthly',
+            'description' => 'Simple monthly',
+            'price' => 2700,
+            'interval' => 'month'
+        ]);
+
+        $justYearlyPlan = PricingPlan::create([
+            'name' => 'simple_yearly',
+            'description' => 'Simple yearly',
+            'price' => 45000,
+            'interval' => 'year'
+        ]);
+
+        $this->assertTrue($proMonthlyPricingPlan->isBetterThan($freePricingPlan));
+        $this->assertTrue($freePricingPlan->isWorthThan($proMonthlyPricingPlan));
+        $this->assertFalse($proMonthlyPricingPlan->isBetterThan($proYearlyPricingPlan));
+        $this->assertFalse($proMonthlyPricingPlan->isWorthThan($proYearlyPricingPlan));
+
+        $this->assertTrue($proMonthlyPricingPlan->isBetterThan($basicYearlyPricingPlan));
+        $this->assertTrue($basicYearlyPricingPlan->isWorthThan($proMonthlyPricingPlan));
+
+        $this->assertTrue($justYearlyPlan->isBetterThan($justMonthlyPlan));
+        $this->assertTrue($justMonthlyPlan->isWorthThan($justYearlyPlan));
+
+        // because more expensive
+        // but generally comparison of plans with and without weight should not happen
+        $this->assertTrue($justYearlyPlan->isBetterThan($basicYearlyPricingPlan));
     }
 }

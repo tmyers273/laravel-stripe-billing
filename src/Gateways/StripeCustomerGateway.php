@@ -93,6 +93,8 @@ class StripeCustomerGateway extends StripeGateway
             'stripe_card_id' => $customer->sources->data[0]->id,
             'brand' => $customer->sources->data[0]->brand,
             'last_4' => $customer->sources->data[0]->last4,
+            'exp_month' => $customer->sources->data[0]->exp_month,
+            'exp_year' => $customer->sources->data[0]->exp_year,
         ];
     }
 }

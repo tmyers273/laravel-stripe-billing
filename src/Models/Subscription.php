@@ -270,6 +270,11 @@ class Subscription extends Model
         return $this->whereNull('ends_at')->orWhere('ends_at', '>', now());
     }
 
+    public function scopeCanceledAndArchived()
+    {
+        return $this->whereNotNull('ends_at')->where('ends_at', '<', now());
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Relationships

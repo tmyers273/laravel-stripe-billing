@@ -58,6 +58,8 @@ class HasSubscriptionsTest extends TestCase
                 'stripe_card_id' => 'fake-card-id',
                 'brand' => 'FakeBrand',
                 'last_4' => '4242',
+                'exp_month' => 8,
+                'exp_year' => 2019,
             ]);
 
         StripeSubscription::shouldReceive('create')
@@ -132,6 +134,8 @@ class HasSubscriptionsTest extends TestCase
                 'stripe_card_id' => 'fake-card-id',
                 'brand' => 'FakeBrand',
                 'last_4' => '4242',
+                'exp_month' => 8,
+                'exp_year' => 2019,
             ]);
 
         StripeSubscription::shouldReceive('create')

@@ -17,12 +17,15 @@ use TMyers\StripeBilling\StripeBilling;
  * @property string $string
  * @property boolean $active
  * @property integer $id
+ * @property integer $weight
  * @property Collection $pricingPlans
  * @property Collection $subscriptions
  */
 class Plan extends Model
 {
     protected $guarded = ['id'];
+
+    protected $casts = ['weight' => 'integer'];
 
     /**
      * @param string $name

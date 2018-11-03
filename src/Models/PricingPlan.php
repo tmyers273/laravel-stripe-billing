@@ -6,6 +6,7 @@ namespace TMyers\StripeBilling\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use TMyers\StripeBilling\Exceptions\StripeBillingException;
 use TMyers\StripeBilling\StripeBilling;
 
 /**
@@ -57,6 +58,42 @@ class PricingPlan extends Model
         }
 
         return (int) $this->plan->id === (int) $plan->plan_id;
+    }
+
+    /**
+     * @param PricingPlan $pricingPlan
+     * @return bool
+     * @throws StripeBillingException
+     */
+    public function isBetterThan($pricingPlan): bool
+    {
+        if (!is_a($pricingPlan, StripeBilling::getPricingPlanModel())) {
+            throw new StripeBillingException("Only pricing plans are allowed for comparison");
+        }
+
+        if ($this->plan && $pricingPlan->plan) {
+            return $this->plan->weight > $pricingPlan->plan->weight;
+        }
+
+        return $this->price > $pricingPlan->price;
+    }
+
+    /**
+     * @param PricingPlan $pricingPlan
+     * @return bool
+     * @throws StripeBillingException
+     */
+    public function isWorthThan($pricingPlan): bool
+    {
+        if (!is_a($pricingPlan, StripeBilling::getPricingPlanModel())) {
+            throw new StripeBillingException("Only pricing plans are allowed for comparison");
+        }
+
+        if ($this->plan && $pricingPlan->plan) {
+            return $this->plan->weight < $pricingPlan->plan->weight;
+        }
+
+        return $this->price < $pricingPlan->price;
     }
     
     /*

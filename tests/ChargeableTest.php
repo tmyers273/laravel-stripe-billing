@@ -43,6 +43,8 @@ class ChargeableTest extends TestCase
                 'stripe_card_id' => self::FAKE_CUSTOMER_100,
                 'brand' => 'Visa',
                 'last_4' => '4242',
+                'exp_month' => 8,
+                'exp_year' => 2019,
             ]);
 
         $card = $user->addCardFromToken($token);
@@ -58,6 +60,8 @@ class ChargeableTest extends TestCase
             'owner_id' => $user->id,
             'brand' => 'Visa',
             'last_4' => '4242',
+            'exp_month' => 8,
+            'exp_year' => 2019,
         ]);
 
         $this->assertDatabaseHas('users', [

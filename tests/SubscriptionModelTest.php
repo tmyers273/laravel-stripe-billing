@@ -395,4 +395,20 @@ class SubscriptionModelTest extends TestCase
 
         $graceSubscription->resume();
     }
+
+    /** @test */
+    public function it_can_retrieve_all_canceled_and_archived_subscriptions()
+    {
+        $canceledA = $this->createExpiredSubscription($this->createUser(), $this->createMonthlyPricingPlan());
+        $canceledB = $this->createExpiredSubscription($this->createUser(), $this->createBasicYearlyPricingPlan());
+        $graceA = $this->createGraceSubscription($this->createUser(), $this->createInactivePricingPlan());
+        $active = $this->createActiveSubscription($this->createUser(), $this->createTeamMonthlyPricingPlan());
+        $trial = $this->createOnTrialSubscription($this->createUser(), $this->createMonthlyPricingPlan(['name' => 'monthly_10']));
+
+        $archived = Subscription::canceledAndArchived()->get();
+
+        $this->assertCount(2, $archived);
+        $this->assertTrue($archived[0]->is($canceledA));
+        $this->assertTrue($archived[1]->is($canceledB));
+    }
 }

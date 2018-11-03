@@ -19,6 +19,8 @@ class CreateCardsTable extends Migration
             $table->string('stripe_card_id');
             $table->string('brand', 30);
             $table->string('last_4', 8);
+            $table->integer('exp_month')->nullable();
+            $table->integer('exp_year')->nullable();
             $table->softDeletes();
             $table->timestamps();
 

@@ -120,10 +120,16 @@ Resuming subscription is possible only as long as it is on grace period
 $subscription->resume();
 ```
 
-##### Changing plan
+#### Changing plan
 ```php
 // Accepts Plan object
 $subscription->changeTo($basicMonthlyPlan);
+```
+
+#### Subscription scopes
+```php
+Subscription::active()->get(); // get all active subscriptions
+Subscription::canceledAndArchived()->get(); // get all canceled and non active subscriptions
 ```
 
 ## Charges and credit cards
