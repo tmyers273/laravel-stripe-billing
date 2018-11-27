@@ -109,7 +109,7 @@ class Subscription extends Model
             );
         }
 
-        if ($this->isFor($plan)) {
+        if ($this->isStrictlyFor($plan)) {
             throw AlreadySubscribed::toPlan($plan);
         }
 
