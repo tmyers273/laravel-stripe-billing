@@ -8,6 +8,7 @@ use TMyers\StripeBilling\Exceptions\AlreadySubscribed;
 use TMyers\StripeBilling\Exceptions\PlanIsInactive;
 use TMyers\StripeBilling\Exceptions\StripeBillingException;
 use TMyers\StripeBilling\Facades\StripeSubscription;
+use TMyers\StripeBilling\Models\Card;
 use TMyers\StripeBilling\Models\Plan;
 use TMyers\StripeBilling\Models\PricingPlan;
 use TMyers\StripeBilling\Models\Subscription;
@@ -410,5 +411,65 @@ class SubscriptionModelTest extends TestCase
         $this->assertCount(2, $archived);
         $this->assertTrue($archived[0]->is($canceledA));
         $this->assertTrue($archived[1]->is($canceledB));
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Trial modification
+    |--------------------------------------------------------------------------
+    */
+
+    /** @test */
+    public function trial_can_be_changed_by_timestamp() {
+        // 1. Given
+        $user = $this->createUser();
+        $subscription = $this->createOnTrialSubscription($user, $this->createBasicMonthlyPricingPlan());
+        $timestamp = Carbon::now()->addDays(35)->getTimestamp();
+
+        // Mock
+        $stripeSubscription = m::mock('Stripe\Subscription[save]')->makePartial();
+        $stripeSubscription->shouldReceive('save')->once();
+        $stripeId = 'fake-stripe-id';
+
+        StripeSubscription::shouldReceive('retrieve')
+            ->once()
+            ->with($stripeId)
+            ->andReturn($stripeSubscription);
+
+        // 2. Do this
+        $subscription->trialEndAt($timestamp);
+
+        // 3.1 Expect
+        $this->assertEquals(Carbon::createFromTimestamp($timestamp), $subscription->trial_ends_at);
+        $this->assertFalse($subscription->onGracePeriod());
+        $this->assertTrue($subscription->isActive());
+        $this->assertTrue($subscription->onTrial());
+    }
+
+    /** @test */
+    public function trial_can_be_changed_by_adding_days() {
+        // 1. Given
+        $user = $this->createUser();
+        $subscription = $this->createOnTrialSubscription($user, $this->createBasicMonthlyPricingPlan());
+        $timestamp = Carbon::now()->addDays(35)->getTimestamp();
+
+        // Mock
+        $stripeSubscription = m::mock('Stripe\Subscription[save]')->makePartial();
+        $stripeSubscription->shouldReceive('save')->once();
+        $stripeId = 'fake-stripe-id';
+
+        StripeSubscription::shouldReceive('retrieve')
+            ->once()
+            ->with($stripeId)
+            ->andReturn($stripeSubscription);
+
+        // 2. Do this
+        $subscription->addDaysToTrial(10);
+
+        // 3.1 Expect
+        $this->assertEquals(Carbon::createFromTimestamp($timestamp), $subscription->trial_ends_at);
+        $this->assertFalse($subscription->onGracePeriod());
+        $this->assertTrue($subscription->isActive());
+        $this->assertTrue($subscription->onTrial());
     }
 }

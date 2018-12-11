@@ -202,4 +202,50 @@ class SubscriptionModelIntegrationTest extends TestCase
             $this->assertFalse($subscription->onGracePeriod());
         });
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Trial modification
+    |--------------------------------------------------------------------------
+    */
+
+    /** @test */
+    public function trial_can_be_extended_by_timestamp() {
+        // 1. Given we have a user and subscription
+        $user = $this->createUser();
+        $monthlyPlan = $this->createMonthlyPricingPlan();
+        $subscription = $user->subscribeTo($monthlyPlan, $this->createTestToken());
+        $timestamp = Carbon::now()->addDays(35)->getTimestamp();
+
+        // 2. Do extend trial by timestamp
+        $subscription->trialEndAt($timestamp);
+
+        // 3. Expect subscription trial to be extended
+        tap($subscription->fresh(), function(Subscription $subscription) use ($timestamp) {
+            $this->assertEquals(Carbon::createFromTimestamp($timestamp), $subscription->trial_ends_at);
+            $this->assertFalse($subscription->onGracePeriod());
+            $this->assertTrue($subscription->isActive());
+            $this->assertTrue($subscription->onTrial());
+        });
+    }
+
+    /** @test */
+    public function trial_can_be_extended_by_days() {
+        // 1. Given we have a user and subscription
+        $user = $this->createUser();
+        $monthlyPlan = $this->createMonthlyPricingPlan();
+        $subscription = $user->subscribeTo($monthlyPlan, $this->createTestToken());
+        $timestamp = Carbon::now()->addDays(35)->getTimestamp();
+
+        // 2. Do extend trial by timestamp
+        $subscription->addDaysToTrial(34);
+
+        // 3. Expect subscription trial to be extended
+        tap($subscription->fresh(), function(Subscription $subscription) use ($timestamp) {
+            $this->assertEquals(Carbon::createFromTimestamp($timestamp), $subscription->trial_ends_at);
+            $this->assertFalse($subscription->onGracePeriod());
+            $this->assertTrue($subscription->isActive());
+            $this->assertTrue($subscription->onTrial());
+        });
+    }
 }

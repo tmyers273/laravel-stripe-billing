@@ -89,6 +89,24 @@ class Subscription extends Model
         $this->fill(['ends_at' => Carbon::now()])->save();
     }
 
+    // @todo readme
+    public function trialEndAt(int $unixTimestamp, bool $prorate = false) {
+        $stripeSubscription = StripeSubscription::retrieve($this->stripe_subscription_id);
+
+        $stripeSubscription->trial_end = $unixTimestamp;
+        $stripeSubscription->prorate = $prorate;
+
+        $stripeSubscription->save();
+
+        $this->update([
+            'trial_ends_at' => $unixTimestamp,
+        ]);
+    }
+
+    public function addDaysToTrial(int $days, bool $prorate = false) {
+        $this->trialEndAt((clone $this->trial_ends_at)->addDays($days)->getTimestamp(), $prorate);
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Swapping plans
