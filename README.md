@@ -120,6 +120,19 @@ Resuming subscription is possible only as long as it is on grace period
 $subscription->resume();
 ```
 
+##### Extend trial
+Extending the trial is done in two ways.
+
+```php
+$subscription->trialEndAt($unixTimestamp);
+```
+```php
+$days = 10;
+$subscription->addDaysToTrial($days);
+```
+
+**This will default prorate to false**
+
 #### Changing plan
 ```php
 // Accepts Plan object

@@ -89,7 +89,6 @@ class Subscription extends Model
         $this->fill(['ends_at' => Carbon::now()])->save();
     }
 
-    // @todo readme
     public function trialEndAt(int $unixTimestamp, bool $prorate = false) {
         $stripeSubscription = StripeSubscription::retrieve($this->stripe_subscription_id);
 
