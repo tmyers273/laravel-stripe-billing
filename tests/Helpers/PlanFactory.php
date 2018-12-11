@@ -74,6 +74,7 @@ trait PlanFactory
             'stripe_plan_id' => 'monthly',
             'price' => 2000,
             'active' => true,
+            'trial_days' => 1,
         ], $overrides));
     }
 
