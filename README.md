@@ -1,5 +1,10 @@
 # Laravel Stripe Billing
 
+## Versions
+
+- 1.x - Laravel 5.1 -> 5.7  
+- 2.x - Laravel 5.8+
+
 ## Installation
 Via composer:
 
