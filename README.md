@@ -22,7 +22,7 @@ Add `Billable` trait to the User model.
 
 ### Stripe Secret
 In order to use this package you must posses a **Stripe Secret Key**.
-It must be stored as an environment variable `STRIPE_SECRET` and/or set in `config/services.php`
+It must be stored as an environment variable `STRIPE_SECRET` and/or set in `config/services.php` under `stripe.secret`
 
 ### Models
 - Plan (this is the parent plan used to control access rights - e.g. Pro, Gold, Basic, Team etc.)
