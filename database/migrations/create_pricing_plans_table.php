@@ -15,12 +15,12 @@ class CreatePricingPlansTable extends Migration
     {
         Schema::create('pricing_plans', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('plan_id')->nullable();
+            $table->unsignedBigInteger('plan_id')->nullable();
             $table->string('name', 50);
             $table->string('interval', 50)->nullable();
             $table->string('description');
             $table->string('stripe_plan_id')->nullable();
-            $table->unsignedInteger('price');
+            $table->unsignedInteger('price'); // in cents
             $table->unsignedInteger('trial_days')->default(0);
             $table->boolean('active')->default(true);
             $table->softDeletes();

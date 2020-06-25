@@ -15,7 +15,7 @@ class AddStripeBillingColumnsToOwnerTable extends Migration
     {
         Schema::table(config('stripe-billing.tables.owner'), function (Blueprint $table) {
             $table->string('stripe_id')->nullable()->collation('utf8mb4_bin');
-            $table->unsignedInteger('default_card_id')->nullable();
+            $table->unsignedBigInteger('default_card_id')->nullable();
         });
     }
 
