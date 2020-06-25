@@ -14,7 +14,7 @@ class CreateCardsTable extends Migration
     public function up()
     {
         Schema::create(config('stripe-billing.tables.cards'), function (Blueprint $table) {
-            $table->increments('id');
+            $table->id('id');
             $table->unsignedBigInteger('owner_id');
             $table->string('stripe_card_id');
             $table->string('brand', 30);

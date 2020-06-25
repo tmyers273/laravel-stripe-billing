@@ -14,7 +14,7 @@ class CreateSubscriptionsTable extends Migration
     public function up()
     {
         Schema::create('subscriptions', function (Blueprint $table) {
-            $table->increments('id');
+            $table->id('id');
             $table->unsignedBigInteger('owner_id');
             $table->unsignedBigInteger('pricing_plan_id');
             $table->string('type', 50)->default('default');

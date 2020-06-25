@@ -14,7 +14,7 @@ class CreatePricingPlansTable extends Migration
     public function up()
     {
         Schema::create('pricing_plans', function (Blueprint $table) {
-            $table->increments('id');
+            $table->id('id');
             $table->unsignedBigInteger('plan_id')->nullable();
             $table->string('name', 50);
             $table->string('interval', 50)->nullable();
