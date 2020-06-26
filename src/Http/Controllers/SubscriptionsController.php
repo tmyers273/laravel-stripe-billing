@@ -12,7 +12,7 @@ use Stripe\Stripe;
 use TMyers\StripeBilling\BillableContract;
 use TMyers\StripeBilling\Exceptions\AlreadySubscribed;
 use TMyers\StripeBilling\Exceptions\CardException;
-use TMyers\StripeBilling\Exceptions\PlanIsInactive;
+use TMyers\StripeBilling\Exceptions\PriceIsInactive;
 use TMyers\StripeBilling\Exceptions\StripeBillingException;
 use TMyers\StripeBilling\Http\Requests\ApplyCouponRequest;
 use TMyers\StripeBilling\Http\Requests\CreateSubscriptionRequest;
@@ -84,7 +84,7 @@ class SubscriptionsController extends Controller
             $this->usm->updateSubscription($subscription, $request->getStripePrice());
         } catch (AlreadySubscribed $e) {
             return response()->json($e->getMessage(), 400);
-        } catch (PlanIsInactive $e) {
+        } catch (PriceIsInactive $e) {
             return response()->json($e->getMessage(), 400);
         }
 
