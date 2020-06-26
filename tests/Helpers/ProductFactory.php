@@ -3,6 +3,7 @@
 namespace TMyers\StripeBilling\Tests\Helpers;
 
 
+use Illuminate\Database\Eloquent\Model;
 use TMyers\StripeBilling\Models\Price;
 use TMyers\StripeBilling\Models\Plan;
 use TMyers\StripeBilling\Models\Product;
@@ -16,6 +17,7 @@ trait ProductFactory
     protected function createFreePlan(array $overrides = []): Product
     {
         return Product::create(array_merge([
+            'stripe_product_id' => 'prod_HXB1GforslJ5lO',
             'description' => 'Free plan',
             'name' => 'free',
         ], $overrides));
@@ -28,6 +30,7 @@ trait ProductFactory
     protected function createBasicPlan(array $overrides = []): Product
     {
         return Product::create(array_merge([
+            'stripe_product_id' => 'prod_HXB1GforslJ5lO',
             'description' => 'Basic plan',
             'name' => 'basic',
         ], $overrides));
@@ -40,6 +43,7 @@ trait ProductFactory
     protected function createTeamPlan(array $overrides = []): Product
     {
         return Product::create(array_merge([
+            'stripe_product_id' => 'prod_HXB1GforslJ5lO',
             'description' => 'Team plan',
             'name' => 'team',
         ], $overrides));
@@ -48,9 +52,9 @@ trait ProductFactory
     /**
      * @param Product $plan
      * @param array $attributes
-     * @return Price
+     * @return Model
      */
-    protected function createPrice(Product $plan, array $attributes): Price {
+    protected function createPrice(Product $plan, array $attributes): Model {
         return $plan->prices()->create($attributes);
     }
 
@@ -63,7 +67,7 @@ trait ProductFactory
             'product_id' => null,
             'name' => 'monthly',
             'interval' => 'month',
-            'stripe_price_id' => 'monthly',
+            'stripe_price_id' => 'price_1Gy6fZDPgfzJHRbDGaGQlMkN',
             'price' => 2000,
             'active' => true,
         ], $overrides));
@@ -81,7 +85,7 @@ trait ProductFactory
             'product_id' => $product->id,
             'name' => 'basic-monthly',
             'interval' => 'month',
-            'stripe_price_id' => 'basic_monthly',
+            'stripe_price_id' => 'price_1Gy6fZDPgfzJHRbDGaGQlMkN',
             'price' => 1500,
             'active' => true,
         ], $overrides));
@@ -99,7 +103,7 @@ trait ProductFactory
             'product_id' => $product->id,
             'name' => 'basic-yearly-9000',
             'interval' => 'month',
-            'stripe_price_id' => 'basic_yearly_9000',
+            'stripe_price_id' => 'price_1Gy6fZDPgfzJHRbDGaGQlMkN',
             'price' => 90000,
             'active' => true,
         ], $overrides));
@@ -118,7 +122,7 @@ trait ProductFactory
             'product_id' => $product->id,
             'name' => 'team-monthly-10',
             'interval' => 'month',
-            'stripe_price_id' => 'team_monthly_10',
+            'stripe_price_id' => 'price_1Gy6fZDPgfzJHRbDGaGQlMkN',
             'price' => 4500,
             'active' => true,
         ], $overrides));
@@ -133,7 +137,7 @@ trait ProductFactory
         return Price::create(array_merge([
             'name' => 'team-monthly-24',
             'interval' => 'month',
-            'stripe_price_id' => 'team_monthly_24',
+            'stripe_price_id' => 'price_1Gy6fZDPgfzJHRbDGaGQlMkN',
             'price' => 5500,
             'active' => false,
         ], $overrides));

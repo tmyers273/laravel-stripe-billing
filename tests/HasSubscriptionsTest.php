@@ -64,7 +64,9 @@ class HasSubscriptionsTest extends TestCase
         StripeSubscription::shouldReceive('create')
             ->once()
             ->with($customer, [
-                'price' => $monthlyPrice->stripe_price_id,
+                'items' => [
+                    ['price' => $monthlyPrice->stripe_price_id],
+                ],
                 'trial_end' => now()->getTimestamp() + 86400, // 1 trial day
             ])
             ->andReturn($this->createSubscriptionObject('new-subscription-id'));
@@ -140,7 +142,9 @@ class HasSubscriptionsTest extends TestCase
         StripeSubscription::shouldReceive('create')
             ->once()
             ->with($customer, [
-                'price' => $basicMonthlyPrice->stripe_price_id,
+                'items' => [
+                    ['price' => $basicMonthlyPrice->stripe_price_id],
+                ],
                 'trial_end' => now()->addDays(11)->getTimestamp(),
             ])
             ->andReturn($this->createSubscriptionObject('new-subscription-id'));

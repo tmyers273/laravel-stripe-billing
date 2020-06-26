@@ -65,8 +65,7 @@ class HasSubscriptionsIntegrationTest extends TestCase
     }
 
     /** @test */
-    public function user_can_subscribe_to_basic_type_monthly_plan()
-    {
+    public function user_can_subscribe_to_basic_type_monthly_plan() {
         // Given we have a user and two plans
         $user = $this->createUser();
         $basicPlan = $this->createBasicPlan();
@@ -75,7 +74,7 @@ class HasSubscriptionsIntegrationTest extends TestCase
         $teamPlan = $this->createTeamPlan();
         $teamMonthlyPrice = $this->createTeamMonthlyPrice($teamPlan);
 
-        $subscription = $user->subscribeTo($basicMonthlyPrice, 1, $this->createTestToken());
+        $subscription = $user->subscribeTo($basicMonthlyPrice, 11, $this->createTestToken());
 
         $this->assertInstanceOf(Subscription::class, $subscription);
 
@@ -84,7 +83,7 @@ class HasSubscriptionsIntegrationTest extends TestCase
             'owner_id'=> $user->id,
             'price_id' => $basicMonthlyPrice->id,
             'type' => 'basic',
-            'trial_ends_at' => now()->addDays(11)
+            'trial_ends_at' => now()->addDays(11)->toDateTimeString(),
         ]);
 
         tap($user->fresh(), function(User $user) use ($basicPlan, $basicMonthlyPrice, $teamPlan, $teamMonthlyPrice) {

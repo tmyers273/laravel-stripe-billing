@@ -17,6 +17,7 @@ class CreateProductsTable extends Migration
             $table->id('id');
             $table->string('name', 50);
             $table->string('description')->nullable();
+            $table->string('stripe_product_id');
             $table->text('detailed_description')->nullable();
             $table->boolean('active')->default(true);
             $table->softDeletes();

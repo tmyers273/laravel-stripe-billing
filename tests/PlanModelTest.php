@@ -9,6 +9,7 @@
 namespace TMyers\StripeBilling\Tests;
 
 
+use Illuminate\Support\Str;
 use TMyers\StripeBilling\Models\Plan;
 use TMyers\StripeBilling\Models\Price;
 use TMyers\StripeBilling\Models\Product;
@@ -91,14 +92,17 @@ class PlanModelTest extends TestCase
     {
         $basicPlan = Product::create([
             'name' => 'basic',
+            'stripe_product_id' => Str::random(),
         ]);
 
         $proPlan = Product::create([
             'name' => 'pro',
+            'stripe_product_id' => Str::random(),
         ]);
 
         $freePlan = Product::create([
             'name' => 'free',
+            'stripe_product_id' => Str::random(),
         ]);
 
         $freePrice = Price::create([

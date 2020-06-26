@@ -87,7 +87,9 @@ class StripeSubscriptionBuilder
      */
     protected function getSubscriptionOptions(): array {
         return array_filter([
-            'price' => $this->price->stripe_price_id,
+            'items' => [
+                ['price' => $this->price->stripe_price_id],
+            ],
             'trial_end' => $this->getTrialEnd(),
         ]);
     }
