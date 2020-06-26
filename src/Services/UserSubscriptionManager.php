@@ -2,7 +2,7 @@
 
 namespace TMyers\StripeBilling\Services;
 
-use TMyers\StripeBilling\Billable;
+use TMyers\StripeBilling\BillableContract;
 use TMyers\StripeBilling\Models\Card;
 use TMyers\StripeBilling\Models\StripePrice;
 use TMyers\StripeBilling\Models\Subscription;
@@ -10,9 +10,9 @@ use TMyers\StripeBilling\Models\Subscription;
 class UserSubscriptionManager {
 
     /**
-     * @param Billable $user
+     * @param BillableContract $user
      */
-    public function resetUserCards(Billable $user) {
+    public function resetUserCards(BillableContract $user) {
         $user->cards()->delete();
         $user->forceFill([
             'stripe_id' => null,
@@ -21,24 +21,21 @@ class UserSubscriptionManager {
     }
 
     /**
-     * @param Billable $user
+     * @param BillableContract $user
      * @param StripePrice $price
      * @param string $token
      * @return Subscription
-     * @throws \TMyers\StripeBilling\Exceptions\AlreadySubscribed
-     * @throws \TMyers\StripeBilling\Exceptions\OnlyOneActiveSubscriptionIsAllowed
      */
-    public function subscribe(Billable $user, StripePrice $price, $token = null): Subscription {
+    public function subscribe(BillableContract $user, StripePrice $price, $token = null): Subscription {
         return $user->subscribeTo($price, $token);
     }
 
     /**
-     * @param Billable $user
+     * @param BillableContract $user
      * @param string $token
      * @return Card
-     * @throws \TMyers\StripeBilling\Exceptions\CardException
      */
-    public function newDefaultCard(Billable $user, string $token): Card {
+    public function newDefaultCard(BillableContract $user, string $token): Card {
         return $user->addCardFromToken($token);
     }
 

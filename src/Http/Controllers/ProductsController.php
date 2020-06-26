@@ -4,13 +4,12 @@ namespace TMyers\StripeBilling\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use TMyers\StripeBilling\Billable;
 use TMyers\StripeBilling\Models\StripeProduct;
 
 class ProductsController extends Controller {
 
     public function index(Request $request) {
-        /** @var Billable $user */
+        /** @var BillableContract $user */
         $user = auth()->user();
 
         $plans = StripeProduct::with('prices')->active()->get();

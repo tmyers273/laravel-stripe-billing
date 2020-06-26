@@ -10,7 +10,7 @@ use Illuminate\Routing\Controller;
 use Stripe\Error\InvalidRequest;
 use Stripe\Invoice;
 use Stripe\Stripe;
-use TMyers\StripeBilling\Billable;
+use TMyers\StripeBilling\BillableContract;
 use TMyers\StripeBilling\Exceptions\AlreadySubscribed;
 use TMyers\StripeBilling\Exceptions\CardException;
 use TMyers\StripeBilling\Exceptions\PlanIsInactive;
@@ -37,7 +37,7 @@ class SubscriptionsController extends Controller
     }
 
     public function store(CreateSubscriptionRequest $request) {
-        /** @var Billable $user */
+        /** @var BillableContract $user */
         $user = auth()->user();
 
         // Try to delete any "dummy" subscriptions that are created when a user first signs up
@@ -73,7 +73,7 @@ class SubscriptionsController extends Controller
      * @throws \TMyers\StripeBilling\Exceptions\PriceIsInactive
      */
     public function update(Subscription $subscription, UpdateSubscriptionRequest $request) {
-        /** @var Billable $user */
+        /** @var BillableContract $user */
         $user = auth()->user();
 
         if ($subscription->owner_id !== $user->id) {
@@ -98,7 +98,7 @@ class SubscriptionsController extends Controller
      * @throws \Stripe\Exception\ApiErrorException
      */
     public function resume(Subscription $subscription, Request $request) {
-        /** @var Billable $user */
+        /** @var BillableContract $user */
         $user = auth()->user();
 
         if ($subscription->owner_id !== $user->id) {

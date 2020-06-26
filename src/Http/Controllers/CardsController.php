@@ -5,7 +5,7 @@ namespace TMyers\StripeBilling\Http\Controllers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use TMyers\StripeBilling\Billable;
+use TMyers\StripeBilling\BillableContract;
 use TMyers\StripeBilling\Exceptions\CardException;
 use TMyers\StripeBilling\Http\Requests\AddNewCardRequest;
 use TMyers\StripeBilling\Models\Card;
@@ -25,7 +25,7 @@ class CardsController extends Controller
     }
 
     public function index(Request $request) {
-        /** @var Billable $user */
+        /** @var BillableContract $user */
         $user = $request->user();
 
         $cards = $user->cards()->with('owner')->get();
@@ -38,7 +38,7 @@ class CardsController extends Controller
      * @return JsonResponse
      */
     public function store(AddNewCardRequest $request) {
-        /** @var Billable $user */
+        /** @var BillableContract $user */
         $user = $request->user();
 
         try {
@@ -56,7 +56,7 @@ class CardsController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
     public function default(Card $card, Request $request) {
-        /** @var Billable $user */
+        /** @var BillableContract $user */
         $user = $request->user();
 
         try {
@@ -74,7 +74,7 @@ class CardsController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(Card $card, Request $request) {
-        /** @var Billable $user */
+        /** @var BillableContract $user */
         $user = $request->user();
 
         try {
