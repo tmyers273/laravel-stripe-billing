@@ -41,7 +41,7 @@ class HasSubscriptionsIntegrationTest extends TestCase
 
         $this->assertDatabaseHas('subscriptions', [
             'owner_id'=> $user->id,
-            'pricing_plan_id' => $monthlyPlan->id,
+            'price_id' => $monthlyPlan->id,
             'type' => 'default',
             'ends_at' => null,
         ]);
@@ -82,7 +82,7 @@ class HasSubscriptionsIntegrationTest extends TestCase
         // expect subscription to be created
         $this->assertDatabaseHas('subscriptions', [
             'owner_id'=> $user->id,
-            'pricing_plan_id' => $basicMonthlyPricingPlan->id,
+            'price_id' => $basicMonthlyPricingPlan->id,
             'type' => 'basic',
             'trial_ends_at' => now()->addDays(11)
         ]);

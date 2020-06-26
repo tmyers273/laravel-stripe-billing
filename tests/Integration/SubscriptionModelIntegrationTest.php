@@ -43,7 +43,7 @@ class SubscriptionModelIntegrationTest extends TestCase
 
         $this->assertDatabaseHas('subscriptions', [
             'owner_id'=> $user->id,
-            'pricing_plan_id' => $monthlyPlan->id,
+            'price_id' => $monthlyPlan->id,
         ]);
 
         // Expect user to be subscribed to monthly plan
@@ -64,7 +64,7 @@ class SubscriptionModelIntegrationTest extends TestCase
 
         $this->assertDatabaseHas('subscriptions', [
             'owner_id'=> $user->id,
-            'pricing_plan_id' => $teamPlan->id,
+            'price_id' => $teamPlan->id,
         ]);
 
         $this->assertTrue($user->fresh()->hasActiveSubscriptions());
@@ -87,7 +87,7 @@ class SubscriptionModelIntegrationTest extends TestCase
 
         $this->assertDatabaseHas('subscriptions', [
             'owner_id'=> $user->id,
-            'pricing_plan_id' => $monthlyPlan->id,
+            'price_id' => $monthlyPlan->id,
         ]);
 
         // Expect user to be subscribed to monthly plan
@@ -121,7 +121,7 @@ class SubscriptionModelIntegrationTest extends TestCase
 
         $this->assertDatabaseHas('subscriptions', [
             'owner_id'=> $user->id,
-            'pricing_plan_id' => $monthlyPlan->id,
+            'price_id' => $monthlyPlan->id,
         ]);
 
         // Expect user to be subscribed to monthly plan
@@ -162,7 +162,7 @@ class SubscriptionModelIntegrationTest extends TestCase
 
         $this->assertDatabaseHas('subscriptions', [
             'owner_id'=> $user->id,
-            'pricing_plan_id' => $monthlyPlan->id,
+            'price_id' => $monthlyPlan->id,
         ]);
 
         // Expect user to be subscribed to monthly plan

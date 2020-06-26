@@ -9,7 +9,7 @@ use Stripe\Customer;
 use TMyers\StripeBilling\Exceptions\AlreadySubscribed;
 use TMyers\StripeBilling\Exceptions\OnlyOneActiveSubscriptionIsAllowed;
 use TMyers\StripeBilling\Exceptions\SubscriptionNotFound;
-use TMyers\StripeBilling\Models\PricingPlan;
+use TMyers\StripeBilling\Models\Price;
 use TMyers\StripeBilling\Models\Plan;
 use TMyers\StripeBilling\Models\Subscription;
 
@@ -23,7 +23,7 @@ use TMyers\StripeBilling\Models\Subscription;
 trait HasSubscriptions
 {
     /**
-     * @param PricingPlan|Plan|string $plan
+     * @param Price|Plan|string $plan
      * @return bool
      */
     public function isSubscribedTo($plan): bool
@@ -59,16 +59,16 @@ trait HasSubscriptions
     }
 
     /**
-     * @param $plan
+     * @param $price
      * @param null $token
      * @param array $options
      * @return mixed
      * @throws AlreadySubscribed
      * @throws OnlyOneActiveSubscriptionIsAllowed
      */
-    public function subscribeTo($plan, $token = null, array $options = []): Subscription
+    public function subscribeTo($price, $token = null, array $options = []): Subscription
     {
-        if (is_null($plan)) {
+        if (is_null($price)) {
             throw new \InvalidArgumentException("Plan cannot be null.");
         }
 
@@ -76,16 +76,16 @@ trait HasSubscriptions
             throw OnlyOneActiveSubscriptionIsAllowed::new();
         }
 
-        if (is_string($plan)) {
-            $pricingPlanModel = StripeBilling::getPricingPlanModel();
-            $plan = $pricingPlanModel::findByName($plan);
+        if (is_string($price)) {
+            $priceModel = StripeBilling::getPricesModel();
+            $price = $priceModel::findByName($price);
         }
 
-        if ($this->isSubscribedTo($plan)) {
-            throw AlreadySubscribed::toPlan($plan);
+        if ($this->isSubscribedTo($price)) {
+            throw AlreadySubscribed::toPrice($price);
         }
 
-        $builder = new StripeSubscriptionBuilder($this, $plan);
+        $builder = new StripeSubscriptionBuilder($this, $price);
 
         return $builder->create($token, $options);
     }

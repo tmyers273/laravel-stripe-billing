@@ -16,7 +16,7 @@ class CreateSubscriptionsTable extends Migration
         Schema::create('subscriptions', function (Blueprint $table) {
             $table->id('id');
             $table->unsignedBigInteger('owner_id');
-            $table->unsignedBigInteger('pricing_plan_id');
+            $table->unsignedBigInteger('price_id');
             $table->string('type', 50)->default('default');
             $table->string('stripe_subscription_id');
             $table->timestamp('trial_ends_at')->nullable();
@@ -30,7 +30,7 @@ class CreateSubscriptionsTable extends Migration
                 ->onDelete('cascade');
 
             $table
-                ->foreign('pricing_plan_id')
+                ->foreign('price_id')
                 ->references('id')
                 ->on(config('stripe-billing.tables.pricing_plans'))
                 ->onDelete('cascade');

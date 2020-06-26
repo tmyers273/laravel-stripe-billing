@@ -7,7 +7,7 @@ use Carbon\Carbon;
 use Stripe\Customer;
 use TMyers\StripeBilling\Facades\StripeCustomer;
 use TMyers\StripeBilling\Facades\StripeSubscription;
-use TMyers\StripeBilling\Models\PricingPlan;
+use TMyers\StripeBilling\Models\Price;
 use TMyers\StripeBilling\Models\Subscription;
 
 class StripeSubscriptionBuilder
@@ -15,7 +15,7 @@ class StripeSubscriptionBuilder
     protected $owner;
 
     /**
-     * @var PricingPlan
+     * @var Price
      */
     protected $pricingPlan;
 
@@ -28,7 +28,7 @@ class StripeSubscriptionBuilder
      * StripeSubscriptionBuilder constructor.
      *
      * @param $owner
-     * @param PricingPlan $pricingPlan
+     * @param Price $pricingPlan
      */
     public function __construct($owner, $pricingPlan)
     {
@@ -56,7 +56,7 @@ class StripeSubscriptionBuilder
         }
 
         return $this->owner->subscriptions()->create([
-            'pricing_plan_id' => $this->pricingPlan->id,
+            'price_id' => $this->pricingPlan->id,
             'stripe_subscription_id' => $subscription->id,
             'type' => $this->pricingPlan->getType(),
             'trial_ends_at' => $trialEndsAt,
@@ -89,7 +89,7 @@ class StripeSubscriptionBuilder
     protected function getSubscriptionOptions(): array
     {
         return array_filter([
-            'plan' => $this->pricingPlan->stripe_plan_id,
+            'plan' => $this->pricingPlan->stripe_product_id,
             'trial_end' => $this->getTrialEnd(),
         ]);
     }

@@ -13,16 +13,12 @@ class CreatePlansTable extends Migration
      */
     public function up()
     {
-        Schema::create('plans', function (Blueprint $table) {
+        Schema::create('products', function (Blueprint $table) {
             $table->id('id');
             $table->string('name', 50);
-            $table->string('description');
+            $table->string('description')->nullable();
             $table->text('detailed_description')->nullable();
-            $table->boolean('is_free');
             $table->boolean('active')->default(true);
-            $table->tinyInteger('weight')->default(0);
-            $table->boolean('teams_enabled')->default(false);
-            $table->unsignedInteger('team_users_limit')->nullable();
             $table->softDeletes();
             $table->timestamps();
 

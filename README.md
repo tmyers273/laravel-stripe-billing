@@ -88,16 +88,15 @@ $user->getFirstActiveSubscription();
 $bronzePlan= Plan::create([
     'description' => 'Bronze Plan',
     'name' => 'bronze',
-    'is_free' => false,
 ]);
 
 // Create the PricingPlan
 $bronzeMonthly = PricingPlan::create([
-    'plan_id' => $bronzePlan->id, // parent plan id
+    'product_id' => $bronzePlan->id, // parent plan id
     'description' => 'Monthly Bronze Plan',
     'name' => 'bronze_monthly_50.00',
     'interval' => 'month',
-    'stripe_plan_id' => 'bronze_monthly', // this needs to be created in Stripe first
+    'stripe_product_id' => 'bronze_monthly', // this needs to be created in Stripe first
     'price' => 5000,
     'active' => true,
 ]);
