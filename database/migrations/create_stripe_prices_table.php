@@ -20,6 +20,7 @@ class CreateStripePricesTable extends Migration
             $table->string('interval', 50)->nullable();
             $table->string('stripe_price_id')->nullable();
             $table->unsignedInteger('price'); // in cents
+            $table->unsignedInteger('trial_days')->default(30);
             $table->boolean('active')->default(true);
             $table->softDeletes();
             $table->timestamps();

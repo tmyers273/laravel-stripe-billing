@@ -55,7 +55,7 @@ class SubscriptionsController extends Controller
             $this->usm->resetUserCards($user);
 
             $card = $this->usm->newDefaultCard($user, $request->stripeToken);
-            $subscription = $this->usm->subscribe($user->fresh(), $request->getStripePrice()); // @todo - fix this
+            $subscription = $this->usm->subscribe($user->fresh(), $request->getStripePrice()); // @todo - fix this, pass in trial days
         } catch (StripeBillingException $e) {
             return response()->json($e->getMessage(), 500);
         } catch (CardException $e) {

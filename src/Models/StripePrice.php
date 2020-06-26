@@ -17,6 +17,7 @@ use TMyers\StripeBilling\StripeBilling;
  * @property StripeProduct $product
  * @property integer $id
  * @property int $stripe_price_id
+ * @property int $trial_days
  * @property boolean $active
  * @property string $name
  * @property string $description

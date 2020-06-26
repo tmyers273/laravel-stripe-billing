@@ -22,13 +22,12 @@ class UserSubscriptionManager {
 
     /**
      * @param BillableContract $user
-     * @param int $trialDays
      * @param StripePrice $price
      * @param string $token
      * @return Subscription
      */
-    public function subscribe(BillableContract $user, int $trialDays, StripePrice $price, $token = null): Subscription {
-        return $user->subscribeTo($price, $trialDays, $token);
+    public function subscribe(BillableContract $user, StripePrice $price, $token = null): Subscription {
+        return $user->subscribeTo($price, $price->trial_days, $token);
     }
 
     /**
