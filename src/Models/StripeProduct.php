@@ -2,14 +2,13 @@
 
 namespace TMyers\StripeBilling\Models;
 
-
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use TMyers\StripeBilling\StripeBilling;
 
 /**
- * Class Plan
+ * Class Product
  *
  * @package TMyers\StripeBilling\Models
  *
@@ -18,10 +17,10 @@ use TMyers\StripeBilling\StripeBilling;
  * @property boolean $active
  * @property integer $id
  * @property integer $weight
- * @property Collection $pricingPlans
+ * @property Collection $prices
  * @property Collection $subscriptions
  */
-class Plan extends Model
+class StripeProduct extends Model
 {
     protected $guarded = ['id'];
 
@@ -29,45 +28,20 @@ class Plan extends Model
 
     /**
      * @param string $name
-     * @return Plan
+     * @return StripeProduct
      */
-    public static function findByName(string $name): self
-    {
+    public static function findByName(string $name): self {
         return static::whereName($name)->firstOrFail();
     }
 
-    /**
-     * @return bool
-     */
-    public function isFree(): bool
-    {
-        return !! $this->is_free;
-    }
-    
     /*
     |--------------------------------------------------------------------------
     | Scopes
     |--------------------------------------------------------------------------
     */
 
-    public function scopeActive(Builder $builder)
-    {
+    public function scopeActive(Builder $builder) {
         return $builder->whereActive(true);
-    }
-
-    public function scopeForIndividualUsers(Builder $builder)
-    {
-        return $builder->whereTeamsEnabled(false);
-    }
-
-    public function scopeForTeams(Builder $builder)
-    {
-        return $builder->whereTeamsEnabled(true);
-    }
-
-    public function scopeWeighted(Builder $builder)
-    {
-        return $builder->orderBy('weight');
     }
 
     /*
@@ -79,21 +53,19 @@ class Plan extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
      */
-    public function subscriptions()
-    {
+    public function subscriptions() {
         return $this->hasManyThrough(
             StripeBilling::getSubscriptionModel(),
-            StripeBilling::getPricingPlanModel()
+            StripeBilling::getPricesModel(),
+            'product_id',
+            'price_id'
         );
     }
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function pricingPlans()
-    {
-        return $this
-            ->hasMany(StripeBilling::getPricingPlanModel(), 'plan_id')
-            ->orderBy('price');
+    public function prices() {
+        return $this->hasMany(StripeBilling::getPricesModel(), 'product_id');
     }
 }

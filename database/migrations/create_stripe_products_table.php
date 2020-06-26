@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreatePlansTable extends Migration
+class CreateStripeProductsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,16 +13,13 @@ class CreatePlansTable extends Migration
      */
     public function up()
     {
-        Schema::create('plans', function (Blueprint $table) {
+        Schema::create('stripe_products', function (Blueprint $table) {
             $table->id('id');
             $table->string('name', 50);
-            $table->string('description');
+            $table->string('description')->nullable();
+            $table->string('stripe_product_id');
             $table->text('detailed_description')->nullable();
-            $table->boolean('is_free');
             $table->boolean('active')->default(true);
-            $table->tinyInteger('weight')->default(0);
-            $table->boolean('teams_enabled')->default(false);
-            $table->unsignedInteger('team_users_limit')->nullable();
             $table->softDeletes();
             $table->timestamps();
 
@@ -38,6 +35,6 @@ class CreatePlansTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('plans');
+        Schema::dropIfExists('stripe_products');
     }
 }

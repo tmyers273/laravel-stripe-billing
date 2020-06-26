@@ -8,8 +8,7 @@ use Illuminate\Support\Facades\View;
 
 class BladeDirectivesTest extends TestCase
 {
-    public function setUp()
-    {
+    public function setUp(): void {
         parent::setUp();
 
         // Views for testing
@@ -28,7 +27,7 @@ class BladeDirectivesTest extends TestCase
     public function subscribed_directive_will_evaluate_to_true_if_logged_user_is_subscribed()
     {
         $user = $this->createUser();
-        $subscription = $this->createActiveSubscription($user, $this->createMonthlyPricingPlan());
+        $subscription = $this->createActiveSubscription($user, $this->createMonthlyPrice());
 
         // Do login
         $this->be($user);

@@ -5,7 +5,7 @@ namespace TMyers\StripeBilling\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use TMyers\StripeBilling\Exceptions\AlreadySubscribed;
-use TMyers\StripeBilling\Exceptions\PlanIsInactive;
+use TMyers\StripeBilling\Exceptions\PriceIsInactive;
 use TMyers\StripeBilling\Exceptions\StripeBillingException;
 use TMyers\StripeBilling\Facades\StripeSubscription;
 use TMyers\StripeBilling\StripeBilling;
@@ -14,22 +14,22 @@ use TMyers\StripeBilling\StripeBilling;
  * Class Subscription
  *
  * @package TMyers\StripeBilling\Models
- * @property PricingPlan $pricingPlan
+ * @property StripePrice $price
  * @property string $stripe_subscription_id
  * @property Carbon $trial_ends_at
  * @property Carbon $ends_at
  * @property integer $owner_id
- * @property integer $pricing_plan_id
+ * @property integer $price_id
  * @property mixed $user
  */
 class Subscription extends Model
 {
     protected $guarded = ['id'];
 
-    protected $with = ['pricingPlan', 'pricingPlan.plan'];
+    protected $with = ['price', 'price.product'];
 
     protected $casts = [
-        'pricing_plan_id' => 'integer',
+        'price_id' => 'integer',
         'owner_id' => 'integer',
     ];
 
@@ -53,8 +53,7 @@ class Subscription extends Model
     |--------------------------------------------------------------------------
     */
 
-    public function cancelAtPeriodEnd(): self
-    {
+    public function cancelAtPeriodEnd(): self {
         $stripeSubscription = StripeSubscription::retrieve($this->stripe_subscription_id);
 
         $stripeSubscription->cancel_at_period_end = true;
@@ -72,8 +71,7 @@ class Subscription extends Model
         return $this;
     }
 
-    public function cancelNow(): self
-    {
+    public function cancelNow(): self {
         /** @var \Stripe\Subscription $stripeSubscription */
         $stripeSubscription = StripeSubscription::retrieve($this->stripe_subscription_id);
 
@@ -84,8 +82,7 @@ class Subscription extends Model
         return $this;
     }
 
-    public function markAsCanceled()
-    {
+    public function markAsCanceled() {
         $this->fill(['ends_at' => Carbon::now()])->save();
     }
 
@@ -113,31 +110,32 @@ class Subscription extends Model
     */
 
     /**
-     * @param PricingPlan $plan
+     * @param $price
      * @return $this
+     * @throws PriceIsInactive
+     * @throws \Stripe\Exception\ApiErrorException
      * @throws AlreadySubscribed
-     * @throws PlanIsInactive
      */
-    public function changeTo($plan): self
-    {
-        if ( ! is_a($plan, StripeBilling::getPricingPlanModel()) ) {
+    public function changeTo($price): self {
+        if ( ! is_a($price, StripeBilling::getPricesModel()) ) {
             throw new \InvalidArgumentException(
-                "Plan must be an instance of " . StripeBilling::getPricingPlanModel()
+                "Plan must be an instance of " . StripeBilling::getPricesModel()
             );
         }
 
-        if ($this->isStrictlyFor($plan)) {
-            throw AlreadySubscribed::toPlan($plan);
+        if ($this->isStrictlyFor($price)) {
+            throw AlreadySubscribed::toPrice($price);
         }
 
-        if ( ! $plan->isActive()) {
-            throw PlanIsInactive::plan($plan);
+        if ( ! $price->isActive()) {
+            throw PriceIsInactive::price($price);
         }
 
         /** @var \Stripe\Subscription $stripeSubscription */
         $stripeSubscription = StripeSubscription::retrieve($this->stripe_subscription_id);
 
-        $stripeSubscription->plan = $plan->stripe_plan_id;
+        // @todo this probably won't work anymore
+        $stripeSubscription->plan = $price->stripe_price_id;
 
         if ($this->onTrial()) {
             $stripeSubscription->trial_end = $this->trial_ends_at->getTimestamp();
@@ -150,8 +148,8 @@ class Subscription extends Model
         $stripeSubscription->save();
 
         $this->update([
-            'pricing_plan_id' => $plan->id,
-            'type' => $plan->getType(),
+            'price_id' => $price->id,
+            'type' => $price->getType(),
         ]);
 
         return $this;
@@ -159,24 +157,25 @@ class Subscription extends Model
 
     /**
      * @throws StripeBillingException
+     * @throws \Stripe\Exception\ApiErrorException
      */
     public function resume(): self
     {
         if (!$this->onGracePeriod()) {
             throw new StripeBillingException(
-                "Subscription for plan {$this->pricingPlan->name} is not on grace period"
+                "Subscription for plan {$this->price->name} is not on grace period"
             );
         }
 
-        if (!$this->pricingPlan->isActive()) {
-            throw PlanIsInactive::plan($this->pricingPlan);
+        if (!$this->price->isActive()) {
+            throw PriceIsInactive::price($this->price);
         }
 
         /** @var \Stripe\Subscription $stripeSubscription */
         $stripeSubscription = StripeSubscription::retrieve($this->stripe_subscription_id);
 
         $stripeSubscription->cancel_at_period_end = false;
-        $stripeSubscription->plan = $this->pricingPlan->stripe_plan_id;
+        $stripeSubscription->plan = $this->price->stripe_price_id;
 
         if ($this->onTrial()) {
             $stripeSubscription->trial_end = $this->trial_ends_at->getTimestamp();
@@ -198,42 +197,41 @@ class Subscription extends Model
     */
 
     /**
-     * @param string|PricingPlan $pricingPlan
+     * @param string|StripePrice $price
      * @return bool
      */
-    public function isStrictlyFor($pricingPlan): bool
+    public function isStrictlyFor($price): bool
     {
-        if ( is_string($pricingPlan))  {
-            return $this->pricingPlan->name === $pricingPlan;
+        if ( is_string($price))  {
+            return $this->price->name === $price;
         }
 
-        if ( is_a($pricingPlan, StripeBilling::getPricingPlanModel()) ) {
-            return $this->pricing_plan_id === $pricingPlan->id;
+        if ( is_a($price, StripeBilling::getPricesModel()) ) {
+            return $this->price_id === $price->id;
         }
 
         return false;
     }
 
     /**
-     * @param string|PricingPlan|Plan $plan
+     * @param string|StripePrice|StripeProduct $plan
      * @return bool
      */
-    public function isFor($plan): bool
-    {
+    public function isFor($plan): bool {
         if (!$this->isActive()) {
             return false;
         }
 
         if (is_string($plan)) {
-            return $this->pricingPlan->name === $plan || $this->pricingPlan->getType() === $plan;
+            return $this->price->name === $plan || $this->price->getType() === $plan;
         }
 
-        if ( is_a($plan, StripeBilling::getPricingPlanModel()) ) {
-            return $this->pricingPlan->is($plan) || $this->pricingPlan->hasSameTypeAs($plan);
+        if ( is_a($plan, StripeBilling::getPricesModel()) ) {
+            return $this->price->is($plan) || $this->price->hasSameTypeAs($plan);
         }
 
-        if ( is_a($plan, StripeBilling::getPlanModel()) ) {
-            return $plan->is($this->pricingPlan->plan);
+        if ( is_a($plan, StripeBilling::getProductModel()) ) {
+            return $plan->is($this->price->product);
         }
 
         return false;
@@ -298,13 +296,11 @@ class Subscription extends Model
     |--------------------------------------------------------------------------
     */
 
-    public function pricingPlan()
-    {
-        return $this->belongsTo(StripeBilling::getPricingPlanModel(), 'pricing_plan_id');
+    public function price() {
+        return $this->belongsTo(StripeBilling::getPricesModel(), 'price_id');
     }
 
-    public function owner()
-    {
+    public function owner() {
         return $this->belongsTo(StripeBilling::getOwnerModel(), 'owner_id');
     }
 }

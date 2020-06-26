@@ -9,8 +9,8 @@ use Stripe\Customer;
 use TMyers\StripeBilling\Exceptions\AlreadySubscribed;
 use TMyers\StripeBilling\Exceptions\OnlyOneActiveSubscriptionIsAllowed;
 use TMyers\StripeBilling\Exceptions\SubscriptionNotFound;
-use TMyers\StripeBilling\Models\PricingPlan;
-use TMyers\StripeBilling\Models\Plan;
+use TMyers\StripeBilling\Models\StripePrice;
+use TMyers\StripeBilling\Models\StripeProduct;
 use TMyers\StripeBilling\Models\Subscription;
 
 /**
@@ -23,7 +23,7 @@ use TMyers\StripeBilling\Models\Subscription;
 trait HasSubscriptions
 {
     /**
-     * @param PricingPlan|Plan|string $plan
+     * @param StripePrice|StripeProduct|string $plan
      * @return bool
      */
     public function isSubscribedTo($plan): bool
@@ -41,16 +41,16 @@ trait HasSubscriptions
     }
 
     /**
-     * @param $pricingPlan
+     * @param $price
      * @return bool
      */
-    public function isSubscribedStrictlyTo($pricingPlan): bool
+    public function isSubscribedStrictlyTo($price): bool
     {
         $subscriptions = $this->activeSubscriptions;
 
         /** @var Subscription $subscription */
         foreach ($subscriptions as $subscription) {
-            if ($subscription->isStrictlyFor($pricingPlan) && $subscription->isActive()) {
+            if ($subscription->isStrictlyFor($price) && $subscription->isActive()) {
                 return true;
             }
         }
@@ -59,35 +59,35 @@ trait HasSubscriptions
     }
 
     /**
-     * @param $plan
+     * @param $price
+     * @param int $trialDays
      * @param null $token
      * @param array $options
      * @return mixed
      * @throws AlreadySubscribed
      * @throws OnlyOneActiveSubscriptionIsAllowed
      */
-    public function subscribeTo($plan, $token = null, array $options = []): Subscription
+    public function subscribeTo($price, int $trialDays, $token = null, array $options = []): Subscription
     {
-        if (is_null($plan)) {
-            throw new \InvalidArgumentException("Plan cannot be null.");
+        if (is_null($price)) {
+            throw new \InvalidArgumentException("Price cannot be null.");
         }
 
         if ($this->canHaveOnlyOneSubscription() && $this->hasActiveSubscriptions()) {
             throw OnlyOneActiveSubscriptionIsAllowed::new();
         }
 
-        if (is_string($plan)) {
-            $pricingPlanModel = StripeBilling::getPricingPlanModel();
-            $plan = $pricingPlanModel::findByName($plan);
+        if (is_string($price)) {
+            $priceModel = StripeBilling::getPricesModel();
+            $price = $priceModel::findByName($price);
         }
 
-        if ($this->isSubscribedTo($plan)) {
-            throw AlreadySubscribed::toPlan($plan);
+        if ($this->isSubscribedTo($price)) {
+            throw AlreadySubscribed::toPrice($price);
         }
 
-        $builder = new StripeSubscriptionBuilder($this, $plan);
-
-        return $builder->create($token, $options);
+        $builder = new StripeSubscriptionBuilder($this, $price);
+        return $builder->create($trialDays, $token, $options);
     }
 
     /**

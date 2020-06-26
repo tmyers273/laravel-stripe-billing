@@ -2,7 +2,6 @@
 
 namespace TMyers\StripeBilling\Tests;
 
-
 use Carbon\Carbon;
 use Stripe\Card;
 use Stripe\Customer;
@@ -11,7 +10,7 @@ use TMyers\StripeBilling\Exceptions\OnlyOneActiveSubscriptionIsAllowed;
 use TMyers\StripeBilling\Exceptions\SubscriptionNotFound;
 use TMyers\StripeBilling\Facades\StripeCustomer;
 use TMyers\StripeBilling\Facades\StripeSubscription;
-use TMyers\StripeBilling\Models\PricingPlan;
+use TMyers\StripeBilling\Models\StripePrice;
 use TMyers\StripeBilling\Models\Subscription;
 use TMyers\StripeBilling\Tests\Helpers\StripeObjectsFactory;
 use TMyers\StripeBilling\Tests\Helpers\SubscriptionFactory;
@@ -19,15 +18,13 @@ use TMyers\StripeBilling\Tests\Stubs\Models\User;
 
 class HasSubscriptionsTest extends TestCase
 {
-    public function setUp()
-    {
+    public function setUp(): void {
         parent::setUp();
 
         Carbon::setTestNow(now());
     }
 
-    protected function tearDown()
-    {
+    protected function tearDown(): void {
         Carbon::setTestNow();
         parent::tearDown();
     }
@@ -35,10 +32,12 @@ class HasSubscriptionsTest extends TestCase
     /** @test */
     public function user_can_subscribe_to_regular_monthly_plan_with_credit_card_token()
     {
+        Carbon::setTestNow(now());
+
         // Given we have a user and two simple plans
         $user = $this->createUser();
-        $monthlyPricingPlan = $this->createMonthlyPricingPlan();
-        $teamPlan = $this->createTeamMonthlyPricingPlan();
+        $monthlyPrice = $this->createMonthlyPrice();
+        $teamPlan = $this->createTeamMonthlyPrice();
 
         // Fake token
         $token = 'fake-credit-card-token';
@@ -65,13 +64,15 @@ class HasSubscriptionsTest extends TestCase
         StripeSubscription::shouldReceive('create')
             ->once()
             ->with($customer, [
-                'plan' => 'monthly',
-                'trial_end' => now()->getTimestamp(),
+                'items' => [
+                    ['price' => $monthlyPrice->stripe_price_id],
+                ],
+                'trial_end' => now()->getTimestamp() + 86400, // 1 trial day
             ])
             ->andReturn($this->createSubscriptionObject('new-subscription-id'));
 
         // Do subscribe to monthly plan
-        $subscription = $user->subscribeTo($monthlyPricingPlan, $token);
+        $subscription = $user->subscribeTo($monthlyPrice, 1, $token);
 
         $this->assertInstanceOf(Subscription::class, $subscription);
 
@@ -82,12 +83,12 @@ class HasSubscriptionsTest extends TestCase
 
         $this->assertDatabaseHas('subscriptions', [
             'owner_id'=> $user->id,
-            'pricing_plan_id' => $monthlyPricingPlan->id,
+            'price_id' => $monthlyPrice->id,
             'stripe_subscription_id' => 'new-subscription-id',
         ]);
 
-        tap($user->fresh(), function(User $user) use ($monthlyPricingPlan, $teamPlan) {
-            $this->assertTrue($user->isSubscribedTo($monthlyPricingPlan));
+        tap($user->fresh(), function(User $user) use ($monthlyPrice, $teamPlan) {
+            $this->assertTrue($user->isSubscribedTo($monthlyPrice));
             $this->assertFalse($user->isSubscribedTo($teamPlan));
 
             // expect new card to be created
@@ -109,10 +110,10 @@ class HasSubscriptionsTest extends TestCase
         // Given we have a user and two plans
         $user = $this->createUser();
         $basicPlan = $this->createBasicPlan();
-        $basicMonthlyPricingPlan = $this->createBasicMonthlyPricingPlan($basicPlan);
+        $basicMonthlyPrice = $this->createBasicMonthlyPrice($basicPlan);
 
         $teamType = $this->createTeamPlan();
-        $teamPlan = $this->createTeamMonthlyPricingPlan($teamType);
+        $teamPlan = $this->createTeamMonthlyPrice($teamType);
 
         // Fake token
         $token = 'fake-credit-card-token';
@@ -141,31 +142,33 @@ class HasSubscriptionsTest extends TestCase
         StripeSubscription::shouldReceive('create')
             ->once()
             ->with($customer, [
-                'plan' => 'basic_monthly',
-                'trial_end' => now()->addDays($basicMonthlyPricingPlan->trial_days)->getTimestamp(),
+                'items' => [
+                    ['price' => $basicMonthlyPrice->stripe_price_id],
+                ],
+                'trial_end' => now()->addDays(11)->getTimestamp(),
             ])
             ->andReturn($this->createSubscriptionObject('new-subscription-id'));
 
-        $subscription = $user->subscribeTo($basicMonthlyPricingPlan, $token);
+        $subscription = $user->subscribeTo($basicMonthlyPrice, 11, $token);
 
         $this->assertInstanceOf(Subscription::class, $subscription);
 
         // expect subscription to be created
         $this->assertDatabaseHas('subscriptions', [
-            'owner_id'=> $user->id,
-            'pricing_plan_id' => $basicMonthlyPricingPlan->id,
+            'owner_id'=> (string) $user->id,
+            'price_id' => (string) $basicMonthlyPrice->id,
             'type' => 'basic',
             'stripe_subscription_id' => 'new-subscription-id',
-            'trial_ends_at' => now()->addDays(11)
+            'trial_ends_at' => now()->addDays(11)->toDateTimeString(),
         ]);
 
-        tap($user->fresh(), function(User $user) use ($subscription, $basicPlan, $basicMonthlyPricingPlan, $teamType, $teamPlan) {
+        tap($user->fresh(), function(User $user) use ($subscription, $basicPlan, $basicMonthlyPrice, $teamType, $teamPlan) {
             // expect to be subscribed to basic plan
-            $this->assertTrue($user->isSubscribedTo($basicMonthlyPricingPlan));
+            $this->assertTrue($user->isSubscribedTo($basicMonthlyPrice));
             $this->assertTrue($user->isSubscribedTo($basicPlan));
             $this->assertTrue($user->isSubscribedTo('basic'));
 
-            $this->assertTrue($user->getSubscriptionFor($basicMonthlyPricingPlan)->is($subscription));
+            $this->assertTrue($user->getSubscriptionFor($basicMonthlyPrice)->is($subscription));
             $this->assertTrue($user->getFirstActiveSubscription()->is($subscription));
 
             // expect not to be subscribed to other plans
@@ -193,32 +196,32 @@ class HasSubscriptionsTest extends TestCase
         // Given we have a user and two plans
         $user = $this->createUser();
         $basicPlan = $this->createBasicPlan();
-        $basicMonthlyPricingPlan = $this->createBasicMonthlyPricingPlan($basicPlan);
-        $basicSubscription = $this->createActiveSubscription($user, $basicMonthlyPricingPlan);
+        $basicMonthlyPrice = $this->createBasicMonthlyPrice($basicPlan);
+        $basicSubscription = $this->createActiveSubscription($user, $basicMonthlyPrice);
 
         $teamPlan = $this->createTeamPlan();
-        $teamPricingPlan = $this->createTeamMonthlyPricingPlan($teamPlan);
-        $teamSubscription = $this->createActiveSubscription($user, $teamPricingPlan);
+        $teamPrice = $this->createTeamMonthlyPrice($teamPlan);
+        $teamSubscription = $this->createActiveSubscription($user, $teamPrice);
 
         // Expect correct subscription to be found
-        $this->assertTrue($teamSubscription->is($user->getSubscriptionFor($teamPricingPlan)));
-        $this->assertTrue($basicSubscription->is($user->getSubscriptionFor($basicMonthlyPricingPlan)));
+        $this->assertTrue($teamSubscription->is($user->getSubscriptionFor($teamPrice)));
+        $this->assertTrue($basicSubscription->is($user->getSubscriptionFor($basicMonthlyPrice)));
 
         // by code name
-        $this->assertTrue($teamSubscription->is($user->getSubscriptionFor($teamPricingPlan->name)));
-        $this->assertTrue($basicSubscription->is($user->getSubscriptionFor($basicMonthlyPricingPlan->name)));
+        $this->assertTrue($teamSubscription->is($user->getSubscriptionFor($teamPrice->name)));
+        $this->assertTrue($basicSubscription->is($user->getSubscriptionFor($basicMonthlyPrice->name)));
 
         // Expect subscription to e retrieved by pricing plan model
-        $this->assertTrue($user->getSubscriptionFor($basicMonthlyPricingPlan)->isActive());
-        $this->assertTrue($user->getSubscriptionFor($basicMonthlyPricingPlan)->is($basicSubscription));
-        $this->assertTrue($user->getSubscriptionFor($teamPricingPlan)->isActive());
-        $this->assertTrue($user->getSubscriptionFor($teamPricingPlan)->is($teamSubscription));
+        $this->assertTrue($user->getSubscriptionFor($basicMonthlyPrice)->isActive());
+        $this->assertTrue($user->getSubscriptionFor($basicMonthlyPrice)->is($basicSubscription));
+        $this->assertTrue($user->getSubscriptionFor($teamPrice)->isActive());
+        $this->assertTrue($user->getSubscriptionFor($teamPrice)->is($teamSubscription));
 
         // Expect subscription to e retrieved by pricing plan name
-        $this->assertTrue($user->getSubscriptionFor($basicMonthlyPricingPlan->name)->isActive());
-        $this->assertTrue($user->getSubscriptionFor($basicMonthlyPricingPlan->name)->is($basicSubscription));
-        $this->assertTrue($user->getSubscriptionFor($teamPricingPlan->name)->isActive());
-        $this->assertTrue($user->getSubscriptionFor($teamPricingPlan->name)->is($teamSubscription));
+        $this->assertTrue($user->getSubscriptionFor($basicMonthlyPrice->name)->isActive());
+        $this->assertTrue($user->getSubscriptionFor($basicMonthlyPrice->name)->is($basicSubscription));
+        $this->assertTrue($user->getSubscriptionFor($teamPrice->name)->isActive());
+        $this->assertTrue($user->getSubscriptionFor($teamPrice->name)->is($teamSubscription));
 
         // Expect first subscription to be the basic subscription
         $this->assertTrue($user->getFirstActiveSubscription()->isActive());
@@ -231,18 +234,18 @@ class HasSubscriptionsTest extends TestCase
         // Given we have a user and two plans
         $user = $this->createUser();
         $basicPlan = $this->createBasicPlan();
-        $basicMonthlyPricingPlan = $this->createBasicMonthlyPricingPlan($basicPlan);
-        $basicSubscription = $this->createActiveSubscription($user, $basicMonthlyPricingPlan);
+        $basicMonthlyPrice = $this->createBasicMonthlyPrice($basicPlan);
+        $basicSubscription = $this->createActiveSubscription($user, $basicMonthlyPrice);
 
         $teamType = $this->createTeamPlan();
-        $teamPlan = $this->createTeamMonthlyPricingPlan($teamType);
+        $teamPlan = $this->createTeamMonthlyPrice($teamType);
         $teamSubscription = $this->createActiveSubscription($user, $teamPlan);
 
-        $monthlyPricingPlan = $this->createMonthlyPricingPlan();
+        $monthlyPrice = $this->createMonthlyPrice();
 
         $this->expectException(SubscriptionNotFound::class);
 
-        $user->getSubscriptionFor($monthlyPricingPlan);
+        $user->getSubscriptionFor($monthlyPrice);
     }
 
     /**
@@ -254,12 +257,12 @@ class HasSubscriptionsTest extends TestCase
         // Given we have a user and two plans
         $user = $this->createUser();
         $basicPlan = $this->createBasicPlan();
-        $basicMonthlyPricingPlan = $this->createBasicMonthlyPricingPlan($basicPlan);
-        $this->createActiveSubscription($user, $basicMonthlyPricingPlan);
+        $basicMonthlyPrice = $this->createBasicMonthlyPrice($basicPlan);
+        $this->createActiveSubscription($user, $basicMonthlyPrice);
 
         $this->expectException(AlreadySubscribed::class);
 
-        $user->subscribeTo($basicMonthlyPricingPlan);
+        $user->subscribeTo($basicMonthlyPrice, 1);
     }
 
     /**
@@ -272,13 +275,13 @@ class HasSubscriptionsTest extends TestCase
         // Given we have a user and two plans
         $user = $this->createUser();
         $basicPlan = $this->createBasicPlan();
-        $basicMonthlyPricingPlan = $this->createBasicMonthlyPricingPlan($basicPlan);
-        $basicYearlyPricingPlan = $this->createBasicYearlyPricingPlan($basicPlan);
-        $this->createActiveSubscription($user, $basicMonthlyPricingPlan);
+        $basicMonthlyPrice = $this->createBasicMonthlyPrice($basicPlan);
+        $basicYearlyPrice = $this->createBasicYearlyPrice($basicPlan);
+        $this->createActiveSubscription($user, $basicMonthlyPrice);
 
         $this->expectException(AlreadySubscribed::class);
 
-        $user->subscribeTo($basicYearlyPricingPlan);
+        $user->subscribeTo($basicYearlyPrice, 1);
     }
 
     /**
@@ -292,16 +295,16 @@ class HasSubscriptionsTest extends TestCase
         // Given we have a user and two plans
         $user = $this->createUser();
         $basicPlan = $this->createBasicPlan();
-        $basicMonthlyPricingPlan = $this->createBasicMonthlyPricingPlan($basicPlan);
-        $this->createActiveSubscription($user, $basicMonthlyPricingPlan);
+        $basicMonthlyPrice = $this->createBasicMonthlyPrice($basicPlan);
+        $this->createActiveSubscription($user, $basicMonthlyPrice);
 
         $teamPlan = $this->createTeamPlan();
-        $teamPricingPlan = $this->createTeamMonthlyPricingPlan($teamPlan);
+        $teamPrice = $this->createTeamMonthlyPrice($teamPlan);
 
         // Expect exception
         $this->expectException(OnlyOneActiveSubscriptionIsAllowed::class);
 
         // Do try to subscribe to another plan
-        $user->subscribeTo($teamPricingPlan);
+        $user->subscribeTo($teamPrice, 1);
     }
 }

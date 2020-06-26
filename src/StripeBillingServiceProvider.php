@@ -13,10 +13,21 @@ class StripeBillingServiceProvider extends ServiceProvider
 {
     public function boot()
     {
+        $this->registerConfigPublisher();
+        $this->registerMigrationPublisher();
+
+        $this->registerBladeDirectives();
+
+        $this->loadRoutesFrom(__DIR__.'/routes.php');
+    }
+
+    protected function registerConfigPublisher() {
         $this->publishes([
             __DIR__.'/../config/stripe-billing.php' => config_path('stripe-billing.php'),
         ], 'config');
+    }
 
+    protected function registerMigrationPublisher() {
         if ( ! class_exists('AddStripeBillingColumnsToOwnerTable')) {
             $this->publishes([
                 __DIR__ . '/../database/migrations/add_stripe_billing_columns_to_owner_table.php' =>
@@ -24,21 +35,21 @@ class StripeBillingServiceProvider extends ServiceProvider
             ], 'migrations');
         }
 
-        if ( ! class_exists('CreatePlansTable')) {
+        if ( ! class_exists('CreateProductsTable')) {
             $this->publishes([
-                __DIR__ . '/../database/migrations/create_plans_table.php' =>
-                    database_path('migrations/' . date('Y_m_d_His', time()) . '_create_plans_table.php'),
+                __DIR__ . '/../database/migrations/create_stripe_products_table.php' =>
+                    database_path('migrations/' . date('Y_m_d_His', time()) . '_create_stripe_products_table.php'),
             ], 'migrations');
         }
 
-        if ( ! class_exists('CreatePricingPlansTable')) {
+        if ( ! class_exists('CreateStripePricesTable')) {
             $this->publishes([
-                __DIR__ . '/../database/migrations/create_pricing_plans_table.php' =>
-                    database_path('migrations/' . date('Y_m_d_His', time()) . '_create_pricing_plans_table.php'),
+                __DIR__ . '/../database/migrations/create_stripe_prices_table.php' =>
+                    database_path('migrations/' . date('Y_m_d_His', time()) . '_create_stripe_prices_table.php'),
             ], 'migrations');
         }
 
-        if ( ! class_exists('CreateSubscriptionsTable')) {
+        if ( ! class_exists('CreateStripeSubscriptionsTable')) {
             $this->publishes([
                 __DIR__ . '/../database/migrations/create_subscriptions_table.php' =>
                     database_path('migrations/' . date('Y_m_d_His', time()) . '_create_subscriptions_table.php'),
@@ -51,8 +62,6 @@ class StripeBillingServiceProvider extends ServiceProvider
                     database_path('migrations/' . date('Y_m_d_His', time()) . '_create_cards_table.php'),
             ], 'migrations');
         }
-
-        $this->registerBladeDirectives();
     }
 
     public function register()

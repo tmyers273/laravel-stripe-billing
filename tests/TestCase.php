@@ -6,10 +6,10 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 use TMyers\StripeBilling\Models\Card;
-use TMyers\StripeBilling\Models\PricingPlan;
+use TMyers\StripeBilling\Models\StripePrice;
 use TMyers\StripeBilling\Models\Plan;
 use TMyers\StripeBilling\StripeBillingServiceProvider;
-use TMyers\StripeBilling\Tests\Helpers\PlanFactory;
+use TMyers\StripeBilling\Tests\Helpers\ProductFactory;
 use TMyers\StripeBilling\Tests\Helpers\StripeObjectsFactory;
 use TMyers\StripeBilling\Tests\Helpers\SubscriptionFactory;
 use TMyers\StripeBilling\Tests\Helpers\UserAndCardFactory;
@@ -17,10 +17,9 @@ use TMyers\StripeBilling\Tests\Stubs\Models\User;
 
 abstract class TestCase extends OrchestraTestCase
 {
-    use UserAndCardFactory, PlanFactory, SubscriptionFactory, StripeObjectsFactory;
+    use UserAndCardFactory, ProductFactory, SubscriptionFactory, StripeObjectsFactory;
 
-    public function setUp()
-    {
+    public function setUp(): void {
         parent::setUp();
 
         config()->set('stripe-billing.models.owner', User::class);
@@ -58,14 +57,14 @@ abstract class TestCase extends OrchestraTestCase
         });
 
         include_once __DIR__ . '/../database/migrations/add_stripe_billing_columns_to_owner_table.php';
-        include_once __DIR__ . '/../database/migrations/create_plans_table.php';
-        include_once __DIR__ . '/../database/migrations/create_pricing_plans_table.php';
+        include_once __DIR__ . '/../database/migrations/create_stripe_products_table.php';
+        include_once __DIR__ . '/../database/migrations/create_stripe_prices_table.php';
         include_once __DIR__.'/../database/migrations/create_subscriptions_table.php';
         include_once __DIR__.'/../database/migrations/create_cards_table.php';
 
         (new \AddStripeBillingColumnsToOwnerTable())->up();
-        (new \CreatePlansTable())->up();
-        (new \CreatePricingPlansTable())->up();
+        (new \CreateProductsTable())->up();
+        (new \CreatePricesTable())->up();
         (new \CreateSubscriptionsTable())->up();
         (new \CreateCardsTable())->up();
     }

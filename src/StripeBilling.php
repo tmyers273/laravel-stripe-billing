@@ -60,17 +60,17 @@ class StripeBilling
     /**
      * @return string
      */
-    public static function getPlanModel(): string
+    public static function getProductModel(): string
     {
-        return config('stripe-billing.models.plan');
+        return config('stripe-billing.models.product');
     }
 
     /**
      * @return string
      */
-    public static function getPricingPlanModel(): string
+    public static function getPricesModel(): string
     {
-        return config('stripe-billing.models.pricing_plan');
+        return config('stripe-billing.models.prices');
     }
 
     /**

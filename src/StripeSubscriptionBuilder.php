@@ -7,43 +7,44 @@ use Carbon\Carbon;
 use Stripe\Customer;
 use TMyers\StripeBilling\Facades\StripeCustomer;
 use TMyers\StripeBilling\Facades\StripeSubscription;
-use TMyers\StripeBilling\Models\PricingPlan;
+use TMyers\StripeBilling\Models\StripePrice;
 use TMyers\StripeBilling\Models\Subscription;
 
 class StripeSubscriptionBuilder
 {
     protected $owner;
 
-    /**
-     * @var PricingPlan
-     */
-    protected $pricingPlan;
+    /** @var StripePrice */
+    protected $price;
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     protected $skipTrial;
+
+    /** @var int */
+    protected $trialDays;
 
     /**
      * StripeSubscriptionBuilder constructor.
      *
      * @param $owner
-     * @param PricingPlan $pricingPlan
+     * @param int $trialDays
+     * @param StripePrice $price
      */
-    public function __construct($owner, $pricingPlan)
-    {
+    public function __construct($owner, $price) {
         $this->owner = $owner;
-        $this->pricingPlan = $pricingPlan;
-        $this->skipTrial = $this->pricingPlan->trial_days === 0;
+        $this->price = $price;
     }
 
     /**
+     * @param int $trialDays
      * @param null $token
      * @param array $options
      * @return Subscription
      */
-    public function create($token = null, array $options = [])
-    {
+    public function create(int $trialDays, $token = null, array $options = []) {
+        $this->trialDays = $trialDays;
+        $this->skipTrial = $trialDays === 0;
+
         $subscription = StripeSubscription::create(
             $this->owner->retrieveOrCreateStripeCustomer($token, $options),
             $this->getSubscriptionOptions()
@@ -56,9 +57,9 @@ class StripeSubscriptionBuilder
         }
 
         return $this->owner->subscriptions()->create([
-            'pricing_plan_id' => $this->pricingPlan->id,
+            'price_id' => $this->price->id,
             'stripe_subscription_id' => $subscription->id,
-            'type' => $this->pricingPlan->getType(),
+            'type' => $this->price->getType(),
             'trial_ends_at' => $trialEndsAt,
         ]);
     }
@@ -66,8 +67,7 @@ class StripeSubscriptionBuilder
     /**
      * @return int|string
      */
-    protected function getTrialEnd()
-    {
+    protected function getTrialEnd() {
         if ($this->skipTrial) {
             return 'now';
         }
@@ -78,18 +78,18 @@ class StripeSubscriptionBuilder
     /**
      * @return Carbon
      */
-    public function getTrialExpiresAt()
-    {
-        return Carbon::now()->addDays($this->pricingPlan->trial_days);
+    public function getTrialExpiresAt() {
+        return Carbon::now()->addDays($this->trialDays);
     }
 
     /**
      * @return array
      */
-    protected function getSubscriptionOptions(): array
-    {
+    protected function getSubscriptionOptions(): array {
         return array_filter([
-            'plan' => $this->pricingPlan->stripe_plan_id,
+            'items' => [
+                ['price' => $this->price->stripe_price_id],
+            ],
             'trial_end' => $this->getTrialEnd(),
         ]);
     }

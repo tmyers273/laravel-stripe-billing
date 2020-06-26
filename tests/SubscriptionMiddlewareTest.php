@@ -21,9 +21,9 @@ class SubscriptionMiddlewareTest extends TestCase
     {
         // Given we have a user, am active plan and an active subscription
         $user = $this->createUser();
-        $monthlyPricingPlan = $this->createMonthlyPricingPlan();
+        $monthlyPrice = $this->createMonthlyPrice();
 
-        $this->createActiveSubscription($user, $monthlyPricingPlan);
+        $this->createActiveSubscription($user, $monthlyPrice);
 
         // Initialize fake request
         $this->be($user);
@@ -50,9 +50,9 @@ class SubscriptionMiddlewareTest extends TestCase
     {
         // Given we have a user, am active plan and an active subscription
         $user = $this->createUser();
-        $monthlyPricingPlan = $this->createMonthlyPricingPlan();
+        $monthlyPrice = $this->createMonthlyPrice();
 
-        $this->createExpiredSubscription($user, $monthlyPricingPlan);
+        $this->createExpiredSubscription($user, $monthlyPrice);
 
         // Initialize fake request
         $this->be($user);
@@ -80,9 +80,9 @@ class SubscriptionMiddlewareTest extends TestCase
     {
         // Given we have a user, am active plan and an active subscription
         $user = $this->createUser();
-        $monthlyPricingPlan = $this->createMonthlyPricingPlan();
+        $monthlyPrice = $this->createMonthlyPrice();
 
-        $this->createExpiredSubscription($user, $monthlyPricingPlan);
+        $this->createExpiredSubscription($user, $monthlyPrice);
 
         // Initialize fake request
         $this->be($user);
@@ -115,9 +115,9 @@ class SubscriptionMiddlewareTest extends TestCase
     {
         // Given we have a user, am active plan and an active subscription
         $user = $this->createUser();
-        $monthlyPricingPlan = $this->createMonthlyPricingPlan();
+        $monthlyPrice = $this->createMonthlyPrice();
 
-        $this->createActiveSubscription($user, $monthlyPricingPlan);
+        $this->createActiveSubscription($user, $monthlyPrice);
 
         // Initialize fake request
         $request = Request::create('/only/for/subscribed/users', 'GET');
@@ -149,10 +149,10 @@ class SubscriptionMiddlewareTest extends TestCase
     {
         // Given we have a user, am active plan and an active subscription
         $user = $this->createUser();
-        $monthlyPricingPlan = $this->createMonthlyPricingPlan();
-        $basicMonthlyPlan = $this->createBasicMonthlyPricingPlan();
+        $monthlyPrice = $this->createMonthlyPrice();
+        $basicMonthlyPlan = $this->createBasicMonthlyPrice();
 
-        $this->createActiveSubscription($user, $monthlyPricingPlan);
+        $this->createActiveSubscription($user, $monthlyPrice);
         $this->createOnTrialSubscription($user, $basicMonthlyPlan);
 
         // Initialize fake request

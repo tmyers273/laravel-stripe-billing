@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreatePricingPlansTable extends Migration
+class CreateStripePricesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,27 +13,20 @@ class CreatePricingPlansTable extends Migration
      */
     public function up()
     {
-        Schema::create('pricing_plans', function (Blueprint $table) {
+        Schema::create('stripe_prices', function (Blueprint $table) {
             $table->id('id');
-            $table->unsignedBigInteger('plan_id')->nullable();
-            $table->string('name', 50);
+            $table->unsignedBigInteger('product_id')->nullable();
+            $table->string('name', 50)->nullable();
             $table->string('interval', 50)->nullable();
-            $table->string('description');
-            $table->string('stripe_plan_id')->nullable();
+            $table->string('stripe_price_id')->nullable();
             $table->unsignedInteger('price'); // in cents
-            $table->unsignedInteger('trial_days')->default(0);
+            $table->unsignedInteger('trial_days')->default(30);
             $table->boolean('active')->default(true);
             $table->softDeletes();
             $table->timestamps();
 
             $table->unique('name');
             $table->index('name');
-
-            $table
-                ->foreign('plan_id')
-                ->references('id')
-                ->on(config('stripe-billing.tables.plans'))
-                ->onDelete('set null');
         });
     }
 
@@ -44,6 +37,6 @@ class CreatePricingPlansTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('pricing_plans');
+        Schema::dropIfExists('stripe_prices');
     }
 }

@@ -2,9 +2,9 @@
 
 namespace TMyers\StripeBilling\Gateways;
 
-
 use Stripe\Card;
 use Stripe\Customer;
+use Stripe\Exception\CardException;
 use Stripe\Token;
 use TMyers\StripeBilling\Exceptions\StripeGatewayException;
 
@@ -17,50 +17,50 @@ class StripeCustomerGateway extends StripeGateway
      * @return \Stripe\ApiResource
      * @throws \TMyers\StripeBilling\Exceptions\StripeGatewayException
      */
-    public function create(string $token, string $email, array $options = [])
-    {
+    public function create(string $token, string $email, array $options = []): Customer {
         try {
             $options = array_merge($options, [
                 'email' => $email,
                 'source' => $token,
             ]);
 
-            $customer = Customer::create($options, $this->getApiKey());
-        } catch (\Stripe\Error\Card $e) {
+            $customer = $this->client->customers->create($options);
+        } catch (CardException $e) {
             throw StripeGatewayException::cardDeclined($e);
         } catch (\Throwable $t) {
             throw new StripeGatewayException($t->getMessage(), $t->getCode(), $t);
         }
-
 
         return $customer;
     }
 
     /**
      * @param string $stripeId
-     * @return \Stripe\StripeObject
-     * @throws StripeGatewayException
+     * @return Customer
+     * @throws \Stripe\Exception\ApiErrorException
      */
-    public function retrieve(string $stripeId)
-    {
-        return Customer::retrieve($stripeId, $this->getApiKey());
+    public function retrieve(string $stripeId): Customer {
+        return $this->client->customers->retrieve($stripeId);
     }
 
     /**
      * @param Customer $customer
      * @param $token
      * @return Card
+     * @throws \Stripe\Exception\ApiErrorException
      */
-    public function createSource(Customer $customer, string $token): Card
-    {
-        return $customer->sources->create(['source' => $token]);
+    public function createSource(Customer $customer, string $token): Card {
+        return $this->client->customers->createSource($customer->id, [
+            'source' => $token,
+        ]);
     }
 
     /**
      * @param Customer $stripeCustomer
      * @param string $token
      * @return bool
-     * @throws StripeGatewayException
+     * @throws \Stripe\Exception\ApiErrorException
+     * @throws \TMyers\StripeBilling\Exceptions\StripeBillingException
      */
     public function isDefaultSource(Customer $stripeCustomer, string $token): bool
     {
@@ -72,6 +72,7 @@ class StripeCustomerGateway extends StripeGateway
     /**
      * @param Customer $customer
      * @param string $sourceId
+     * @throws \Stripe\Exception\ApiErrorException
      */
     public function deleteSource(Customer $customer, string $sourceId)
     {

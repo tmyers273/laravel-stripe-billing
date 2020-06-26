@@ -25,13 +25,13 @@ In order to use this package you must posses a **Stripe Secret Key**.
 It must be stored as an environment variable `STRIPE_SECRET` and/or set in `config/services.php` under `stripe.secret`
 
 ### Models
-- Plan (this is the parent plan used to control access rights - e.g. Pro, Gold, Basic, Team etc.)
-- PricingPlan (this defines price and trial period e.g. pro_monthly_10, gold_yearly_9999 etc.)
+- Product (this is the parent product used to control access rights - e.g. Pro, Gold, Basic, Team etc.)
+- Price (this defines price and trial period e.g. pro_monthly_10, gold_yearly_9999 etc.)
 - Subscription
 - Card
 
-Plan model represents plan access/priviledges parameters
-PricingPlan model optionally belongs to Plan model and represents price parameters   
+Product model represents product access/privileges parameters
+Price model optionally belongs to Product model and represents price parameters   
 
 ## Public API
 
@@ -57,24 +57,24 @@ But this can be changed by setting `unique_active_subscription` to `true` in `co
 
 ##### Check subscription
 ```php
-// Check if user is already subscribed to plan
-// Accepts PricingPlan object, Plan object, string (name of Plan or PricingPlan) e.g. basic, basic_yearly_90
-$user->isSubscribedTo($plan);
+// Check if user is already subscribed to product
+// Accepts Price object, Product object, string (name of Product or Price) e.g. basic, basic_yearly_90
+$user->isSubscribedTo($product);
 
-// Check if user is subscribed to a specific $pricingPlan
-$user->isSubscribedStrictlyTo($pricingPlan);
+// Check if user is subscribed to a specific $price
+$user->isSubscribedStrictlyTo($price);
 
 // true or false
 $user->hasActiveSubscriptions();
 
 // or for subscription
-// accepts PricingPlan|Plan|string (name of Plan or PricingPlan)
-$subscription->isFor($plan);
+// accepts Price|Product|string (name of Product or Price)
+$subscription->isFor($product);
 ```
 
 ##### Retrieve subscriptions and chain methods
 ```php
-$user->getSubscriptionFor($teamPlan)->isActive();
+$user->getSubscriptionFor($product)->isActive();
 $user->getSubscriptionFor('basic-monthly-10')->cancelNow();
 
 // in the vast majority of cases your users will be only allowed
@@ -82,22 +82,21 @@ $user->getSubscriptionFor('basic-monthly-10')->cancelNow();
 $user->getFirstActiveSubscription();
 ```
 
-##### Create plans and subscriptions
+##### Create products and subscriptions
 ```php
 // Create the plans
 $bronzePlan= Plan::create([
     'description' => 'Bronze Plan',
     'name' => 'bronze',
-    'is_free' => false,
 ]);
 
-// Create the PricingPlan
-$bronzeMonthly = PricingPlan::create([
-    'plan_id' => $bronzePlan->id, // parent plan id
+// Create the Price
+$bronzeMonthly = Price::create([
+    'product_id' => $bronzePlan->id, // parent plan id
     'description' => 'Monthly Bronze Plan',
     'name' => 'bronze_monthly_50.00',
     'interval' => 'month',
-    'stripe_plan_id' => 'bronze_monthly', // this needs to be created in Stripe first
+    'stripe_product_id' => 'bronze_monthly', // this needs to be created in Stripe first
     'price' => 5000,
     'active' => true,
 ]);
@@ -255,7 +254,7 @@ just look for any active including `onTrial` or `OnGracePeriod` subscriptions
 'models' => [
         'owner' => 'App\User',
         'subscription' => \TMyers\StripeBilling\Models\Subscription::class,
-        'pricing_plan' => \TMyers\StripeBilling\Models\PricingPlan::class,
+        'pricing_plan' => \TMyers\StripeBilling\Models\Price::class,
         'plan' => \TMyers\StripeBilling\Models\Plan::class,
         'card' => \TMyers\StripeBilling\Models\Card::class,
     ],

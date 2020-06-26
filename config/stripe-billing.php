@@ -4,16 +4,16 @@ return [
     'models' => [
         'owner' => 'App\User',
         'subscription' => \TMyers\StripeBilling\Models\Subscription::class,
-        'pricing_plan' => \TMyers\StripeBilling\Models\PricingPlan::class,
-        'plan' => \TMyers\StripeBilling\Models\Plan::class,
+        'prices' => \TMyers\StripeBilling\Models\StripePrice::class,
+        'product' => \TMyers\StripeBilling\Models\StripeProduct::class,
         'card' => \TMyers\StripeBilling\Models\Card::class,
     ],
 
     'tables' => [
         'owner' => 'users',
         'subscriptions' => 'subscriptions',
-        'pricing_plans' => 'pricing_plans',
-        'plans' => 'plans',
+        'prices' => 'stripe_prices',
+        'products' => 'stripe_products',
         'cards' => 'cards',
     ],
 

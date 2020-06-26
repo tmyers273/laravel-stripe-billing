@@ -13,8 +13,7 @@ use TMyers\StripeBilling\Tests\TestCase;
 
 class ChargeableIntegrationTest extends TestCase
 {
-    public function setUp()
-    {
+    public function setUp(): void {
         if (!env('RUN_INTEGRATION_TESTS')) {
             $this->markTestSkipped('Integration tests are being skipped. See phpunit.xml');
         }
@@ -24,8 +23,7 @@ class ChargeableIntegrationTest extends TestCase
         Carbon::setTestNow(now()->addMinutes(5));
     }
 
-    protected function tearDown()
-    {
+    protected function tearDown(): void {
         Carbon::setTestNow();
         parent::tearDown();
     }
@@ -33,9 +31,9 @@ class ChargeableIntegrationTest extends TestCase
     /**
      * @test
      * @throws \TMyers\StripeBilling\Exceptions\CardException
+     * @throws \TMyers\StripeBilling\Exceptions\StripeBillingException
      */
-    public function a_card_can_be_added_to_user_and_become_default()
-    {
+    public function a_card_can_be_added_to_user_and_become_default() {
         // Given we have a user without any card
         $user = $this->createUser();
 
@@ -147,13 +145,13 @@ class ChargeableIntegrationTest extends TestCase
         // Do try giving one user a card of another user
         $firstUser->setCardAsDefault($anotherCard);
     }
-    
+
     /*
     |--------------------------------------------------------------------------
     | Card removal
     |--------------------------------------------------------------------------
     */
-    
+
     /** @test */
     public function default_card_can_be_removed()
     {
@@ -213,7 +211,7 @@ class ChargeableIntegrationTest extends TestCase
         // Expect user not to have a source any more
         $this->assertCount(1, $user->retrieveStripeCustomer()->sources->data);
     }
-    
+
     /*
     |--------------------------------------------------------------------------
     | Single charges

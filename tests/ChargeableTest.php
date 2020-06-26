@@ -17,8 +17,7 @@ class ChargeableTest extends TestCase
     const FAKE_CUSTOMER_100 = 'fake-customer-100';
     const FAKE_TOKEN_1 = 'fake-token-1';
 
-    protected function tearDown()
-    {
+    protected function tearDown(): void {
         m::close();
         parent::tearDown();
     }
@@ -124,7 +123,7 @@ class ChargeableTest extends TestCase
         $this->assertFalse($firstCard->isDefault());
         $this->assertTrue($secondCard->isDefault());
     }
-    
+
     /** @test */
     public function user_with_different_cards_can_swap_them()
     {

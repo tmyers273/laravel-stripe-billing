@@ -10,100 +10,85 @@ use TMyers\StripeBilling\Exceptions\StripeBillingException;
 use TMyers\StripeBilling\StripeBilling;
 
 /**
- * Class PricingPlan
+ * Class Price
  *
  * @package TMyers\StripeBilling\Models
  *
- * @property Plan $plan
+ * @property StripeProduct $product
  * @property integer $id
- * @property int $stripe_plan_id
+ * @property int $stripe_price_id
+ * @property int $trial_days
  * @property boolean $active
  * @property string $name
  * @property string $description
  * @property string $interval
  * @property integer $price
- * @property integer $trial_days
  */
-class PricingPlan extends Model
+class StripePrice extends Model
 {
     protected $guarded = ['id'];
 
     protected $casts = [
-        'trial_days' => 'integer',
         'active' => 'boolean',
-        'plan_id' => 'integer',
+        'product_id' => 'integer',
     ];
 
     /**
      * @param string $name
-     * @return PricingPlan
+     * @return StripePrice
      */
-    public static function findByName(string $name): self
-    {
+    public static function findByName(string $name): self {
         return static::whereName($name)->firstOrFail();
     }
 
     /**
      * @return bool
      */
-    public function isActive(): bool
-    {
+    public function isActive(): bool {
         return !! $this->active;
     }
 
-    public function hasSameTypeAs($plan)
-    {
-        if (is_null($this->plan_id)) {
+    public function hasSameTypeAs($price) {
+        if (is_null($this->product_id)) {
             return false;
         }
 
-        return (int) $this->plan->id === (int) $plan->plan_id;
+        return (int) $this->product_id === (int) $price->product_id;
     }
 
     /**
-     * @param PricingPlan $pricingPlan
+     * @param StripePrice $price
      * @return bool
      * @throws StripeBillingException
      */
-    public function isBetterThan($pricingPlan): bool
-    {
-        if (!is_a($pricingPlan, StripeBilling::getPricingPlanModel())) {
+    public function isGreaterThan($price): bool {
+        if (!is_a($price, StripeBilling::getPricesModel())) {
             throw new StripeBillingException("Only pricing plans are allowed for comparison");
         }
 
-        if ($this->plan && $pricingPlan->plan) {
-            return $this->plan->weight > $pricingPlan->plan->weight;
-        }
-
-        return $this->price > $pricingPlan->price;
+        return $this->price > $price->price;
     }
 
     /**
-     * @param PricingPlan $pricingPlan
+     * @param StripePrice $price
      * @return bool
      * @throws StripeBillingException
      */
-    public function isWorthThan($pricingPlan): bool
-    {
-        if (!is_a($pricingPlan, StripeBilling::getPricingPlanModel())) {
+    public function isLessThan($price): bool {
+        if (!is_a($price, StripeBilling::getPricesModel())) {
             throw new StripeBillingException("Only pricing plans are allowed for comparison");
         }
 
-        if ($this->plan && $pricingPlan->plan) {
-            return $this->plan->weight < $pricingPlan->plan->weight;
-        }
-
-        return $this->price < $pricingPlan->price;
+        return $this->price < $price->price;
     }
-    
+
     /*
     |--------------------------------------------------------------------------
     | Scopes
     |--------------------------------------------------------------------------
     */
 
-    public function scopeActive(Builder $builder)
-    {
+    public function scopeActive(Builder $builder) {
         return $builder->whereActive(true);
     }
 
@@ -113,28 +98,21 @@ class PricingPlan extends Model
     |--------------------------------------------------------------------------
     */
 
-    public function subscriptions()
-    {
-        return $this->hasMany(
-            StripeBilling::getSubscriptionModel()
-        );
+    public function subscriptions() {
+        return $this->hasMany(StripeBilling::getSubscriptionModel());
     }
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function plan()
-    {
-        return $this->belongsTo(
-            StripeBilling::getPlanModel()
-        );
+    public function product() {
+        return $this->belongsTo(StripeBilling::getProductModel());
     }
 
     /**
      * @return string
      */
-    public function getType(): string
-    {
-        return $this->plan ? $this->plan->name : 'default';
+    public function getType(): string {
+        return $this->product ? $this->product->name : 'default';
     }
 }
