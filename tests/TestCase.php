@@ -57,8 +57,8 @@ abstract class TestCase extends OrchestraTestCase
         });
 
         include_once __DIR__ . '/../database/migrations/add_stripe_billing_columns_to_owner_table.php';
-        include_once __DIR__ . '/../database/migrations/create_products_table.php';
-        include_once __DIR__ . '/../database/migrations/create_prices_table.php';
+        include_once __DIR__ . '/../database/migrations/create_stripe_products_table.php';
+        include_once __DIR__ . '/../database/migrations/create_stripe_prices_table.php';
         include_once __DIR__.'/../database/migrations/create_subscriptions_table.php';
         include_once __DIR__.'/../database/migrations/create_cards_table.php';
 
