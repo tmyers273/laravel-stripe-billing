@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use TMyers\StripeBilling\Models\PricingPlan;
+use TMyers\StripeBilling\Models\StripePrice;
 
 class UpdateSubscriptionRequest extends FormRequest {
     /**
@@ -28,10 +29,10 @@ class UpdateSubscriptionRequest extends FormRequest {
     }
 
     /**
-     * @return PricingPlan
+     * @return StripePrice
      */
-    public function getPricingPlan(): PricingPlan
+    public function getStripePrice(): StripePrice
     {
-        return PricingPlan::findOrFail($this->pricingPlan);
+        return StripePrice::findOrFail($this->pricingPlan);
     }
 }

@@ -3,7 +3,7 @@
 namespace TMyers\StripeBilling\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use TMyers\StripeBilling\Models\PricingPlan;
+use TMyers\StripeBilling\Models\StripePrice;
 
 class CreateSubscriptionRequest extends FormRequest
 {
@@ -30,9 +30,9 @@ class CreateSubscriptionRequest extends FormRequest
     }
 
     /**
-     * @return PricingPlan
+     * @return StripePrice
      */
-    public function getPricingPlan(): PricingPlan {
-        return PricingPlan::findOrFail($this->pricingPlan);
+    public function getStripePrice(): StripePrice {
+        return StripePrice::findOrFail($this->pricingPlan);
     }
 }
