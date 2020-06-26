@@ -19,8 +19,7 @@ abstract class TestCase extends OrchestraTestCase
 {
     use UserAndCardFactory, PlanFactory, SubscriptionFactory, StripeObjectsFactory;
 
-    public function setUp()
-    {
+    public function setUp(): void {
         parent::setUp();
 
         config()->set('stripe-billing.models.owner', User::class);

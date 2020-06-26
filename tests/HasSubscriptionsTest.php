@@ -19,15 +19,13 @@ use TMyers\StripeBilling\Tests\Stubs\Models\User;
 
 class HasSubscriptionsTest extends TestCase
 {
-    public function setUp()
-    {
+    public function setUp(): void {
         parent::setUp();
 
         Carbon::setTestNow(now());
     }
 
-    protected function tearDown()
-    {
+    protected function tearDown(): void {
         Carbon::setTestNow();
         parent::tearDown();
     }

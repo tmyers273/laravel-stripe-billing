@@ -14,8 +14,7 @@ use TMyers\StripeBilling\Tests\TestCase;
 
 class StripeCustomerTest extends TestCase
 {
-    public function setUp()
-    {
+    public function setUp(): void {
         if (!env('RUN_INTEGRATION_TESTS')) {
             $this->markTestSkipped('Integration tests are being skipped. See phpunit.xml');
         }

@@ -18,8 +18,7 @@ use Mockery as m;
 
 class SubscriptionModelTest extends TestCase
 {
-    protected function tearDown()
-    {
+    protected function tearDown(): void {
         m::close();
         parent::tearDown();
     }
@@ -40,7 +39,7 @@ class SubscriptionModelTest extends TestCase
         $this->assertInstanceOf(PricingPlan::class, $subscription->pricingPlan);
         $this->assertInstanceOf(Plan::class, $subscription->pricingPlan->plan);
     }
-    
+
     /*
     |--------------------------------------------------------------------------
     | Periods and active status
@@ -102,13 +101,13 @@ class SubscriptionModelTest extends TestCase
 
         $this->assertFalse($graceSubscription->onTrial());
     }
-    
+
     /*
     |--------------------------------------------------------------------------
     | Cancellation
     |--------------------------------------------------------------------------
     */
-    
+
     /** @test */
     public function active_subscription_can_be_cancelled_at_period_end()
     {
@@ -179,7 +178,7 @@ class SubscriptionModelTest extends TestCase
             $this->assertEquals($trialEndsAt, $subscription->daysUntilTheEndOfTheGracePeriod());
         });
     }
-    
+
     /** @test */
     public function subscription_can_be_cancelled_immediately()
     {
@@ -319,7 +318,7 @@ class SubscriptionModelTest extends TestCase
         // Do change again to the same plan
         $activeSubscription->changeTo($monthlyPlan);
     }
-    
+
     /** @test */
     public function it_will_throw_if_try_to_change_to_plan_that_is_not_active_any_more()
     {

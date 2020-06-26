@@ -12,8 +12,7 @@ use TMyers\StripeBilling\Tests\TestCase;
 
 class HasSubscriptionsIntegrationTest extends TestCase
 {
-    public function setUp()
-    {
+    public function setUp(): void {
         if (!env('RUN_INTEGRATION_TESTS')) {
             $this->markTestSkipped('Integration tests are being skipped. See phpunit.xml');
         }
@@ -23,8 +22,7 @@ class HasSubscriptionsIntegrationTest extends TestCase
         Carbon::setTestNow(now()->addMinutes(5));
     }
 
-    protected function tearDown()
-    {
+    protected function tearDown(): void {
         Carbon::setTestNow();
         parent::tearDown();
     }
@@ -138,7 +136,7 @@ class HasSubscriptionsIntegrationTest extends TestCase
         $this->assertCount(1, $user->fresh()->activeSubscriptions);
         $this->assertTrue($user->fresh()->hasActiveSubscriptions());
     }
-    
+
     /** @test */
     public function user_can_create_new_subscription_given_an_old_canceled_one_and_unique_subscription_constraint()
     {

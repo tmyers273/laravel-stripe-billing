@@ -8,8 +8,7 @@ use Illuminate\Support\Facades\View;
 
 class BladeDirectivesTest extends TestCase
 {
-    public function setUp()
-    {
+    public function setUp(): void {
         parent::setUp();
 
         // Views for testing

@@ -10,8 +10,7 @@ use TMyers\StripeBilling\Tests\TestCase;
 
 class SubscriptionModelIntegrationTest extends TestCase
 {
-    public function setUp()
-    {
+    public function setUp(): void {
         if (!env('RUN_INTEGRATION_TESTS')) {
             $this->markTestSkipped('Integration tests are being skipped. See phpunit.xml');
         }
@@ -21,8 +20,7 @@ class SubscriptionModelIntegrationTest extends TestCase
 //        Carbon::setTestNow(now()->addMinutes(5));
     }
 
-    protected function tearDown()
-    {
+    protected function tearDown(): void {
 //        Carbon::setTestNow();
         parent::tearDown();
     }
@@ -71,7 +69,7 @@ class SubscriptionModelIntegrationTest extends TestCase
 
         $this->assertTrue($user->fresh()->hasActiveSubscriptions());
     }
-    
+
     /*
     |--------------------------------------------------------------------------
     | Cancellation
