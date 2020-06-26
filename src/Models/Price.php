@@ -10,7 +10,7 @@ use TMyers\StripeBilling\Exceptions\StripeBillingException;
 use TMyers\StripeBilling\StripeBilling;
 
 /**
- * Class PricingPlan
+ * Class Price
  *
  * @package TMyers\StripeBilling\Models
  *
@@ -69,16 +69,16 @@ class Price extends Model
     }
 
     /**
-     * @param Price $pricingPlan
+     * @param Price $price
      * @return bool
      * @throws StripeBillingException
      */
-    public function isLessThan($pricingPlan): bool {
-        if (!is_a($pricingPlan, StripeBilling::getPricesModel())) {
+    public function isLessThan($price): bool {
+        if (!is_a($price, StripeBilling::getPricesModel())) {
             throw new StripeBillingException("Only pricing plans are allowed for comparison");
         }
 
-        return $this->price < $pricingPlan->price;
+        return $this->price < $price->price;
     }
 
     /*

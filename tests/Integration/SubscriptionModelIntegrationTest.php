@@ -36,8 +36,8 @@ class SubscriptionModelIntegrationTest extends TestCase
     {
         // Given we have a user and two plans
         $user = $this->createUser();
-        $monthlyPlan = $this->createMonthlyPricingPlan();
-        $teamPlan = $this->createTeamMonthlyPricingPlan();
+        $monthlyPlan = $this->createMonthlyPrice();
+        $teamPlan = $this->createTeamMonthlyPrice();
 
         $subscription = $user->subscribeTo($monthlyPlan, $this->createTestToken());
 
@@ -81,7 +81,7 @@ class SubscriptionModelIntegrationTest extends TestCase
     {
         // Given we have a user and two plans
         $user = $this->createUser();
-        $monthlyPlan = $this->createMonthlyPricingPlan();
+        $monthlyPlan = $this->createMonthlyPrice();
 
         $subscription = $user->subscribeTo($monthlyPlan, $this->createTestToken());
 
@@ -115,7 +115,7 @@ class SubscriptionModelIntegrationTest extends TestCase
     {
         // Given we have a user and two plans
         $user = $this->createUser();
-        $monthlyPlan = $this->createMonthlyPricingPlan();
+        $monthlyPlan = $this->createMonthlyPrice();
 
         $subscription = $user->subscribeTo($monthlyPlan, $this->createTestToken());
 
@@ -156,7 +156,7 @@ class SubscriptionModelIntegrationTest extends TestCase
     {
         // Given we have a user and two plans
         $user = $this->createUser();
-        $monthlyPlan = $this->createMonthlyPricingPlan();
+        $monthlyPlan = $this->createMonthlyPrice();
 
         $subscription = $user->subscribeTo($monthlyPlan, $this->createTestToken());
 
@@ -211,7 +211,7 @@ class SubscriptionModelIntegrationTest extends TestCase
     public function trial_can_be_extended_by_timestamp() {
         // 1. Given we have a user and subscription
         $user = $this->createUser();
-        $monthlyPlan = $this->createMonthlyPricingPlan();
+        $monthlyPlan = $this->createMonthlyPrice();
         $subscription = $user->subscribeTo($monthlyPlan, $this->createTestToken());
         $timestamp = Carbon::now()->addDays(35)->getTimestamp();
 
@@ -231,7 +231,7 @@ class SubscriptionModelIntegrationTest extends TestCase
     public function trial_can_be_extended_by_days() {
         // 1. Given we have a user and subscription
         $user = $this->createUser();
-        $monthlyPlan = $this->createMonthlyPricingPlan();
+        $monthlyPlan = $this->createMonthlyPrice();
         $subscription = $user->subscribeTo($monthlyPlan, $this->createTestToken());
         $timestamp = Carbon::now()->addDays(35)->getTimestamp();
 

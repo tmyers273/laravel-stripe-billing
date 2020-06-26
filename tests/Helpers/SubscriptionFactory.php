@@ -10,11 +10,11 @@ use TMyers\StripeBilling\Tests\Stubs\Models\User;
 
 trait SubscriptionFactory
 {
-    public function createActiveSubscription(User $user, Price $pricingPlan, array $overrides = []): Subscription
+    public function createActiveSubscription(User $user, Price $price, array $overrides = []): Subscription
     {
         return Subscription::create(array_merge([
             'owner_id' => $user->id,
-            'price_id' => $pricingPlan->id,
+            'price_id' => $price->id,
             'stripe_subscription_id' => 'fake-stripe-id',
         ], $overrides));
     }

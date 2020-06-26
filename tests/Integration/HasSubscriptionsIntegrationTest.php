@@ -32,8 +32,8 @@ class HasSubscriptionsIntegrationTest extends TestCase
     {
         // Given we have a user and two plans
         $user = $this->createUser();
-        $monthlyPlan = $this->createMonthlyPricingPlan();
-        $teamMonthlyPricingPlan = $this->createTeamMonthlyPricingPlan();
+        $monthlyPlan = $this->createMonthlyPrice();
+        $teamMonthlyPrice = $this->createTeamMonthlyPrice();
 
         $subscription = $user->subscribeTo($monthlyPlan, $this->createTestToken());
 
@@ -46,9 +46,9 @@ class HasSubscriptionsIntegrationTest extends TestCase
             'ends_at' => null,
         ]);
 
-        tap($user->fresh(), function(User $user) use ($monthlyPlan, $teamMonthlyPricingPlan) {
+        tap($user->fresh(), function(User $user) use ($monthlyPlan, $teamMonthlyPrice) {
             $this->assertTrue($user->isSubscribedTo($monthlyPlan));
-            $this->assertFalse($user->isSubscribedTo($teamMonthlyPricingPlan));
+            $this->assertFalse($user->isSubscribedTo($teamMonthlyPrice));
 
             // Expect new card to be created
             $defaultCard = $user->defaultCard;
@@ -70,31 +70,31 @@ class HasSubscriptionsIntegrationTest extends TestCase
         // Given we have a user and two plans
         $user = $this->createUser();
         $basicPlan = $this->createBasicPlan();
-        $basicMonthlyPricingPlan = $this->createBasicMonthlyPricingPlan($basicPlan);
+        $basicMonthlyPrice = $this->createBasicMonthlyPrice($basicPlan);
 
         $teamPlan = $this->createTeamPlan();
-        $teamMonthlyPricingPlan = $this->createTeamMonthlyPricingPlan($teamPlan);
+        $teamMonthlyPrice = $this->createTeamMonthlyPrice($teamPlan);
 
-        $subscription = $user->subscribeTo($basicMonthlyPricingPlan, $this->createTestToken());
+        $subscription = $user->subscribeTo($basicMonthlyPrice, $this->createTestToken());
 
         $this->assertInstanceOf(Subscription::class, $subscription);
 
         // expect subscription to be created
         $this->assertDatabaseHas('subscriptions', [
             'owner_id'=> $user->id,
-            'price_id' => $basicMonthlyPricingPlan->id,
+            'price_id' => $basicMonthlyPrice->id,
             'type' => 'basic',
             'trial_ends_at' => now()->addDays(11)
         ]);
 
-        tap($user->fresh(), function(User $user) use ($basicPlan, $basicMonthlyPricingPlan, $teamPlan, $teamMonthlyPricingPlan) {
+        tap($user->fresh(), function(User $user) use ($basicPlan, $basicMonthlyPrice, $teamPlan, $teamMonthlyPrice) {
             // expect to be subscribed to basic plan
-            $this->assertTrue($user->isSubscribedTo($basicMonthlyPricingPlan));
+            $this->assertTrue($user->isSubscribedTo($basicMonthlyPrice));
             $this->assertTrue($user->isSubscribedTo($basicPlan));
             $this->assertTrue($user->isSubscribedTo('basic'));
 
             // expect not to be subscribed to other plans
-            $this->assertFalse($user->isSubscribedTo($teamMonthlyPricingPlan));
+            $this->assertFalse($user->isSubscribedTo($teamMonthlyPrice));
             $this->assertFalse($user->isSubscribedTo($teamPlan));
 
             // expect new card to be created
@@ -117,12 +117,12 @@ class HasSubscriptionsIntegrationTest extends TestCase
         // Given we have a user and two plans
         $user = $this->createUser();
         $basicPlan = $this->createBasicPlan();
-        $basicMonthlyPricingPlan = $this->createBasicMonthlyPricingPlan($basicPlan);
+        $basicMonthlyPrice = $this->createBasicMonthlyPrice($basicPlan);
 
         $teamPlan = $this->createTeamPlan();
-        $teamMonthlyPricingPlan = $this->createTeamMonthlyPricingPlan($teamPlan);
+        $teamMonthlyPrice = $this->createTeamMonthlyPrice($teamPlan);
 
-        $basicMonthlySubscription = $user->subscribeTo($basicMonthlyPricingPlan, $this->createTestToken());
+        $basicMonthlySubscription = $user->subscribeTo($basicMonthlyPrice, $this->createTestToken());
 
         $basicMonthlySubscription->cancelNow();
 
@@ -130,7 +130,7 @@ class HasSubscriptionsIntegrationTest extends TestCase
         $this->assertCount(0, $user->fresh()->activeSubscriptions);
         $this->assertFalse($user->fresh()->hasActiveSubscriptions());
 
-        $teamSubscription = $user->subscribeTo($teamMonthlyPricingPlan);
+        $teamSubscription = $user->subscribeTo($teamMonthlyPrice);
 
         $this->assertTrue($teamSubscription->isActive());
         $this->assertCount(1, $user->fresh()->activeSubscriptions);
@@ -146,12 +146,12 @@ class HasSubscriptionsIntegrationTest extends TestCase
         // Given we have a user and two plans
         $user = $this->createUser();
         $basicPlan = $this->createBasicPlan();
-        $basicMonthlyPricingPlan = $this->createBasicMonthlyPricingPlan($basicPlan);
+        $basicMonthlyPrice = $this->createBasicMonthlyPrice($basicPlan);
 
         $teamPlan = $this->createTeamPlan();
-        $teamMonthlyPricingPlan = $this->createTeamMonthlyPricingPlan($teamPlan);
+        $teamMonthlyPrice = $this->createTeamMonthlyPrice($teamPlan);
 
-        $basicMonthlySubscription = $user->subscribeTo($basicMonthlyPricingPlan, $this->createTestToken());
+        $basicMonthlySubscription = $user->subscribeTo($basicMonthlyPrice, $this->createTestToken());
 
         $basicMonthlySubscription->cancelNow();
 
@@ -159,7 +159,7 @@ class HasSubscriptionsIntegrationTest extends TestCase
         $this->assertCount(0, $user->fresh()->activeSubscriptions);
         $this->assertFalse($user->fresh()->hasActiveSubscriptions());
 
-        $teamSubscription = $user->subscribeTo($teamMonthlyPricingPlan);
+        $teamSubscription = $user->subscribeTo($teamMonthlyPrice);
 
         $this->assertTrue($teamSubscription->isActive());
         $this->assertCount(1, $user->fresh()->activeSubscriptions);

@@ -10,7 +10,7 @@ use TMyers\StripeBilling\Exceptions\AlreadySubscribed;
 use TMyers\StripeBilling\Exceptions\OnlyOneActiveSubscriptionIsAllowed;
 use TMyers\StripeBilling\Exceptions\SubscriptionNotFound;
 use TMyers\StripeBilling\Models\Price;
-use TMyers\StripeBilling\Models\Plan;
+use TMyers\StripeBilling\Models\Product;
 use TMyers\StripeBilling\Models\Subscription;
 
 /**
@@ -23,7 +23,7 @@ use TMyers\StripeBilling\Models\Subscription;
 trait HasSubscriptions
 {
     /**
-     * @param Price|Plan|string $plan
+     * @param Price|Product|string $plan
      * @return bool
      */
     public function isSubscribedTo($plan): bool
@@ -41,16 +41,16 @@ trait HasSubscriptions
     }
 
     /**
-     * @param $pricingPlan
+     * @param $price
      * @return bool
      */
-    public function isSubscribedStrictlyTo($pricingPlan): bool
+    public function isSubscribedStrictlyTo($price): bool
     {
         $subscriptions = $this->activeSubscriptions;
 
         /** @var Subscription $subscription */
         foreach ($subscriptions as $subscription) {
-            if ($subscription->isStrictlyFor($pricingPlan) && $subscription->isActive()) {
+            if ($subscription->isStrictlyFor($price) && $subscription->isActive()) {
                 return true;
             }
         }
@@ -69,7 +69,7 @@ trait HasSubscriptions
     public function subscribeTo($price, $token = null, array $options = []): Subscription
     {
         if (is_null($price)) {
-            throw new \InvalidArgumentException("Plan cannot be null.");
+            throw new \InvalidArgumentException("Price cannot be null.");
         }
 
         if ($this->canHaveOnlyOneSubscription() && $this->hasActiveSubscriptions()) {

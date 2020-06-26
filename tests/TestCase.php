@@ -63,8 +63,8 @@ abstract class TestCase extends OrchestraTestCase
         include_once __DIR__.'/../database/migrations/create_cards_table.php';
 
         (new \AddStripeBillingColumnsToOwnerTable())->up();
-        (new \CreatePlansTable())->up();
-        (new \CreatePricingPlansTable())->up();
+        (new \CreateProductsTable())->up();
+        (new \CreatePricesTable())->up();
         (new \CreateSubscriptionsTable())->up();
         (new \CreateCardsTable())->up();
     }
