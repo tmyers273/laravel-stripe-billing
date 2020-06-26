@@ -13,7 +13,7 @@ class StripeSubscriptionGateway extends StripeGateway
      * @param Customer $customer
      * @param array $options
      * @return Subscription
-     * @throws \TMyers\StripeBilling\Exceptions\StripeGatewayException
+     * @throws \TMyers\StripeBilling\Exceptions\StripeBillingException
      */
     public function create($customer, array $options)
     {
@@ -23,7 +23,8 @@ class StripeSubscriptionGateway extends StripeGateway
     /**
      * @param string $stripeSubscriptionId
      * @return \Stripe\Subscription
-     * @throws \TMyers\StripeBilling\Exceptions\StripeGatewayException
+     * @throws \Stripe\Exception\ApiErrorException
+     * @throws \TMyers\StripeBilling\Exceptions\StripeBillingException
      */
     public function retrieve(string $stripeSubscriptionId)
     {

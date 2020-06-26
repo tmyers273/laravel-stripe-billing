@@ -2,7 +2,6 @@
 
 namespace TMyers\StripeBilling\Tests;
 
-
 use Carbon\Carbon;
 use Stripe\Card;
 use Stripe\Customer;
@@ -33,6 +32,8 @@ class HasSubscriptionsTest extends TestCase
     /** @test */
     public function user_can_subscribe_to_regular_monthly_plan_with_credit_card_token()
     {
+        Carbon::setTestNow(now());
+
         // Given we have a user and two simple plans
         $user = $this->createUser();
         $monthlyPricingPlan = $this->createMonthlyPricingPlan();
@@ -64,7 +65,7 @@ class HasSubscriptionsTest extends TestCase
             ->once()
             ->with($customer, [
                 'plan' => 'monthly',
-                'trial_end' => now()->getTimestamp(),
+                'trial_end' => now()->getTimestamp() + 86400, // 1 trial day
             ])
             ->andReturn($this->createSubscriptionObject('new-subscription-id'));
 
