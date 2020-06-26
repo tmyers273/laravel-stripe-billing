@@ -64,13 +64,13 @@ class HasSubscriptionsTest extends TestCase
         StripeSubscription::shouldReceive('create')
             ->once()
             ->with($customer, [
-                'plan' => 'monthly',
+                'price' => $monthlyPrice->stripe_price_id,
                 'trial_end' => now()->getTimestamp() + 86400, // 1 trial day
             ])
             ->andReturn($this->createSubscriptionObject('new-subscription-id'));
 
         // Do subscribe to monthly plan
-        $subscription = $user->subscribeTo($monthlyPrice, $token);
+        $subscription = $user->subscribeTo($monthlyPrice, 1, $token);
 
         $this->assertInstanceOf(Subscription::class, $subscription);
 
@@ -140,13 +140,12 @@ class HasSubscriptionsTest extends TestCase
         StripeSubscription::shouldReceive('create')
             ->once()
             ->with($customer, [
-                'plan' => 'basic_monthly',
-                'trial_end' => now()->addDays($basicMonthlyPrice->trial_days)->getTimestamp(),
+                'price' => $basicMonthlyPrice->stripe_price_id,
+                'trial_end' => now()->addDays(11)->getTimestamp(),
             ])
             ->andReturn($this->createSubscriptionObject('new-subscription-id'));
 
-        // @todo pass trial length
-        $subscription = $user->subscribeTo($basicMonthlyPrice, $token);
+        $subscription = $user->subscribeTo($basicMonthlyPrice, 11, $token);
 
         $this->assertInstanceOf(Subscription::class, $subscription);
 
@@ -259,7 +258,7 @@ class HasSubscriptionsTest extends TestCase
 
         $this->expectException(AlreadySubscribed::class);
 
-        $user->subscribeTo($basicMonthlyPrice);
+        $user->subscribeTo($basicMonthlyPrice, 1);
     }
 
     /**
@@ -278,7 +277,7 @@ class HasSubscriptionsTest extends TestCase
 
         $this->expectException(AlreadySubscribed::class);
 
-        $user->subscribeTo($basicYearlyPrice);
+        $user->subscribeTo($basicYearlyPrice, 1);
     }
 
     /**
@@ -302,6 +301,6 @@ class HasSubscriptionsTest extends TestCase
         $this->expectException(OnlyOneActiveSubscriptionIsAllowed::class);
 
         // Do try to subscribe to another plan
-        $user->subscribeTo($teamPrice);
+        $user->subscribeTo($teamPrice, 1);
     }
 }

@@ -114,6 +114,7 @@ class Subscription extends Model
      * @return $this
      * @throws PriceIsInactive
      * @throws \Stripe\Exception\ApiErrorException
+     * @throws AlreadySubscribed
      */
     public function changeTo($price): self {
         if ( ! is_a($price, StripeBilling::getPricesModel()) ) {
@@ -133,7 +134,8 @@ class Subscription extends Model
         /** @var \Stripe\Subscription $stripeSubscription */
         $stripeSubscription = StripeSubscription::retrieve($this->stripe_subscription_id);
 
-        $stripeSubscription->plan = $price->stripe_product_id;
+        // @todo this probably won't work anymore
+        $stripeSubscription->plan = $price->stripe_price_id;
 
         if ($this->onTrial()) {
             $stripeSubscription->trial_end = $this->trial_ends_at->getTimestamp();
@@ -173,7 +175,7 @@ class Subscription extends Model
         $stripeSubscription = StripeSubscription::retrieve($this->stripe_subscription_id);
 
         $stripeSubscription->cancel_at_period_end = false;
-        $stripeSubscription->plan = $this->price->stripe_product_id;
+        $stripeSubscription->plan = $this->price->stripe_price_id;
 
         if ($this->onTrial()) {
             $stripeSubscription->trial_end = $this->trial_ends_at->getTimestamp();

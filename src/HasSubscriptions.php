@@ -60,13 +60,14 @@ trait HasSubscriptions
 
     /**
      * @param $price
+     * @param int $trialDays
      * @param null $token
      * @param array $options
      * @return mixed
      * @throws AlreadySubscribed
      * @throws OnlyOneActiveSubscriptionIsAllowed
      */
-    public function subscribeTo($price, $token = null, array $options = []): Subscription
+    public function subscribeTo($price, int $trialDays, $token = null, array $options = []): Subscription
     {
         if (is_null($price)) {
             throw new \InvalidArgumentException("Price cannot be null.");
@@ -86,8 +87,7 @@ trait HasSubscriptions
         }
 
         $builder = new StripeSubscriptionBuilder($this, $price);
-
-        return $builder->create($token, $options);
+        return $builder->create($trialDays, $token, $options);
     }
 
     /**

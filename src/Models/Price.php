@@ -16,7 +16,7 @@ use TMyers\StripeBilling\StripeBilling;
  *
  * @property Product $product
  * @property integer $id
- * @property int $stripe_product_id
+ * @property int $stripe_price_id
  * @property boolean $active
  * @property string $name
  * @property string $description

@@ -8,7 +8,7 @@ class PriceIsInactive extends StripeBillingException
     public static function price($plan): self
     {
         return new static(
-            "Price {$plan->name} with stripe id {$plan->stripe_product_id} is not active anymore"
+            "Price {$plan->name} with stripe id {$plan->stripe_price_id} is not active anymore"
         );
     }
 }

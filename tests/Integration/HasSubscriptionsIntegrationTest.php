@@ -35,7 +35,7 @@ class HasSubscriptionsIntegrationTest extends TestCase
         $monthlyPlan = $this->createMonthlyPrice();
         $teamMonthlyPrice = $this->createTeamMonthlyPrice();
 
-        $subscription = $user->subscribeTo($monthlyPlan, $this->createTestToken());
+        $subscription = $user->subscribeTo($monthlyPlan, 1, $this->createTestToken());
 
         $this->assertInstanceOf(Subscription::class, $subscription);
 
@@ -75,7 +75,7 @@ class HasSubscriptionsIntegrationTest extends TestCase
         $teamPlan = $this->createTeamPlan();
         $teamMonthlyPrice = $this->createTeamMonthlyPrice($teamPlan);
 
-        $subscription = $user->subscribeTo($basicMonthlyPrice, $this->createTestToken());
+        $subscription = $user->subscribeTo($basicMonthlyPrice, 1, $this->createTestToken());
 
         $this->assertInstanceOf(Subscription::class, $subscription);
 
@@ -122,7 +122,7 @@ class HasSubscriptionsIntegrationTest extends TestCase
         $teamPlan = $this->createTeamPlan();
         $teamMonthlyPrice = $this->createTeamMonthlyPrice($teamPlan);
 
-        $basicMonthlySubscription = $user->subscribeTo($basicMonthlyPrice, $this->createTestToken());
+        $basicMonthlySubscription = $user->subscribeTo($basicMonthlyPrice, 1, $this->createTestToken());
 
         $basicMonthlySubscription->cancelNow();
 
@@ -130,7 +130,7 @@ class HasSubscriptionsIntegrationTest extends TestCase
         $this->assertCount(0, $user->fresh()->activeSubscriptions);
         $this->assertFalse($user->fresh()->hasActiveSubscriptions());
 
-        $teamSubscription = $user->subscribeTo($teamMonthlyPrice);
+        $teamSubscription = $user->subscribeTo($teamMonthlyPrice, 1);
 
         $this->assertTrue($teamSubscription->isActive());
         $this->assertCount(1, $user->fresh()->activeSubscriptions);
@@ -151,7 +151,7 @@ class HasSubscriptionsIntegrationTest extends TestCase
         $teamPlan = $this->createTeamPlan();
         $teamMonthlyPrice = $this->createTeamMonthlyPrice($teamPlan);
 
-        $basicMonthlySubscription = $user->subscribeTo($basicMonthlyPrice, $this->createTestToken());
+        $basicMonthlySubscription = $user->subscribeTo($basicMonthlyPrice, 1, $this->createTestToken());
 
         $basicMonthlySubscription->cancelNow();
 
@@ -159,7 +159,7 @@ class HasSubscriptionsIntegrationTest extends TestCase
         $this->assertCount(0, $user->fresh()->activeSubscriptions);
         $this->assertFalse($user->fresh()->hasActiveSubscriptions());
 
-        $teamSubscription = $user->subscribeTo($teamMonthlyPrice);
+        $teamSubscription = $user->subscribeTo($teamMonthlyPrice, 1);
 
         $this->assertTrue($teamSubscription->isActive());
         $this->assertCount(1, $user->fresh()->activeSubscriptions);

@@ -18,7 +18,7 @@ class CreatePricesTable extends Migration
             $table->unsignedBigInteger('product_id')->nullable();
             $table->string('name', 50)->nullable();
             $table->string('interval', 50)->nullable();
-            $table->string('stripe_product_id')->nullable();
+            $table->string('stripe_price_id')->nullable();
             $table->unsignedInteger('price'); // in cents
             $table->boolean('active')->default(true);
             $table->softDeletes();

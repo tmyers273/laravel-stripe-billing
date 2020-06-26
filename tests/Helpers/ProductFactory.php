@@ -63,7 +63,7 @@ trait ProductFactory
             'product_id' => null,
             'name' => 'monthly',
             'interval' => 'month',
-            'stripe_product_id' => 'monthly',
+            'stripe_price_id' => 'monthly',
             'price' => 2000,
             'active' => true,
         ], $overrides));
@@ -81,7 +81,7 @@ trait ProductFactory
             'product_id' => $product->id,
             'name' => 'basic-monthly',
             'interval' => 'month',
-            'stripe_product_id' => 'basic_monthly',
+            'stripe_price_id' => 'basic_monthly',
             'price' => 1500,
             'active' => true,
         ], $overrides));
@@ -99,7 +99,7 @@ trait ProductFactory
             'product_id' => $product->id,
             'name' => 'basic-yearly-9000',
             'interval' => 'month',
-            'stripe_product_id' => 'basic_yearly_9000',
+            'stripe_price_id' => 'basic_yearly_9000',
             'price' => 90000,
             'active' => true,
         ], $overrides));
@@ -118,7 +118,7 @@ trait ProductFactory
             'product_id' => $product->id,
             'name' => 'team-monthly-10',
             'interval' => 'month',
-            'stripe_product_id' => 'team_monthly_10',
+            'stripe_price_id' => 'team_monthly_10',
             'price' => 4500,
             'active' => true,
         ], $overrides));
@@ -133,7 +133,7 @@ trait ProductFactory
         return Price::create(array_merge([
             'name' => 'team-monthly-24',
             'interval' => 'month',
-            'stripe_product_id' => 'team_monthly_24',
+            'stripe_price_id' => 'team_monthly_24',
             'price' => 5500,
             'active' => false,
         ], $overrides));

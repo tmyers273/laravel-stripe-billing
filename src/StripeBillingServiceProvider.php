@@ -31,7 +31,6 @@ class StripeBillingServiceProvider extends ServiceProvider
             ], 'migrations');
         }
 
-        // @todo rename migrations
         if ( ! class_exists('CreatePricesTable')) {
             $this->publishes([
                 __DIR__ . '/../database/migrations/create_prices_table.php' =>

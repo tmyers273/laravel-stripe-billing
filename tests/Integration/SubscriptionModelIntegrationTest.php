@@ -39,7 +39,7 @@ class SubscriptionModelIntegrationTest extends TestCase
         $monthlyPlan = $this->createMonthlyPrice();
         $teamPlan = $this->createTeamMonthlyPrice();
 
-        $subscription = $user->subscribeTo($monthlyPlan, $this->createTestToken());
+        $subscription = $user->subscribeTo($monthlyPlan, 1, $this->createTestToken());
 
         $this->assertDatabaseHas('subscriptions', [
             'owner_id'=> $user->id,
@@ -83,7 +83,7 @@ class SubscriptionModelIntegrationTest extends TestCase
         $user = $this->createUser();
         $monthlyPlan = $this->createMonthlyPrice();
 
-        $subscription = $user->subscribeTo($monthlyPlan, $this->createTestToken());
+        $subscription = $user->subscribeTo($monthlyPlan, 1, $this->createTestToken());
 
         $this->assertDatabaseHas('subscriptions', [
             'owner_id'=> $user->id,
@@ -117,7 +117,7 @@ class SubscriptionModelIntegrationTest extends TestCase
         $user = $this->createUser();
         $monthlyPlan = $this->createMonthlyPrice();
 
-        $subscription = $user->subscribeTo($monthlyPlan, $this->createTestToken());
+        $subscription = $user->subscribeTo($monthlyPlan, 1, $this->createTestToken());
 
         $this->assertDatabaseHas('subscriptions', [
             'owner_id'=> $user->id,
@@ -158,7 +158,7 @@ class SubscriptionModelIntegrationTest extends TestCase
         $user = $this->createUser();
         $monthlyPlan = $this->createMonthlyPrice();
 
-        $subscription = $user->subscribeTo($monthlyPlan, $this->createTestToken());
+        $subscription = $user->subscribeTo($monthlyPlan, 1, $this->createTestToken());
 
         $this->assertDatabaseHas('subscriptions', [
             'owner_id'=> $user->id,
@@ -212,7 +212,7 @@ class SubscriptionModelIntegrationTest extends TestCase
         // 1. Given we have a user and subscription
         $user = $this->createUser();
         $monthlyPlan = $this->createMonthlyPrice();
-        $subscription = $user->subscribeTo($monthlyPlan, $this->createTestToken());
+        $subscription = $user->subscribeTo($monthlyPlan, 1, $this->createTestToken());
         $timestamp = Carbon::now()->addDays(35)->getTimestamp();
 
         // 2. Do extend trial by timestamp
@@ -232,7 +232,7 @@ class SubscriptionModelIntegrationTest extends TestCase
         // 1. Given we have a user and subscription
         $user = $this->createUser();
         $monthlyPlan = $this->createMonthlyPrice();
-        $subscription = $user->subscribeTo($monthlyPlan, $this->createTestToken());
+        $subscription = $user->subscribeTo($monthlyPlan, 1, $this->createTestToken());
         $timestamp = Carbon::now()->addDays(35)->getTimestamp();
 
         // 2. Do extend trial by timestamp

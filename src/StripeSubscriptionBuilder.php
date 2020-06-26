@@ -14,36 +14,37 @@ class StripeSubscriptionBuilder
 {
     protected $owner;
 
-    /**
-     * @var Price
-     */
+    /** @var Price */
     protected $price;
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     protected $skipTrial;
+
+    /** @var int */
+    protected $trialDays;
 
     /**
      * StripeSubscriptionBuilder constructor.
      *
      * @param $owner
+     * @param int $trialDays
      * @param Price $price
      */
-    public function __construct($owner, $price)
-    {
+    public function __construct($owner, $price) {
         $this->owner = $owner;
         $this->price = $price;
-        $this->skipTrial = $this->price->trial_days === 0;
     }
 
     /**
+     * @param int $trialDays
      * @param null $token
      * @param array $options
      * @return Subscription
      */
-    public function create($token = null, array $options = [])
-    {
+    public function create(int $trialDays, $token = null, array $options = []) {
+        $this->trialDays = $trialDays;
+        $this->skipTrial = $trialDays === 0;
+
         $subscription = StripeSubscription::create(
             $this->owner->retrieveOrCreateStripeCustomer($token, $options),
             $this->getSubscriptionOptions()
@@ -66,8 +67,7 @@ class StripeSubscriptionBuilder
     /**
      * @return int|string
      */
-    protected function getTrialEnd()
-    {
+    protected function getTrialEnd() {
         if ($this->skipTrial) {
             return 'now';
         }
@@ -78,18 +78,16 @@ class StripeSubscriptionBuilder
     /**
      * @return Carbon
      */
-    public function getTrialExpiresAt()
-    {
-        return Carbon::now()->addDays($this->price->trial_days);
+    public function getTrialExpiresAt() {
+        return Carbon::now()->addDays($this->trialDays);
     }
 
     /**
      * @return array
      */
-    protected function getSubscriptionOptions(): array
-    {
+    protected function getSubscriptionOptions(): array {
         return array_filter([
-            'product' => $this->price->stripe_product_id,
+            'price' => $this->price->stripe_price_id,
             'trial_end' => $this->getTrialEnd(),
         ]);
     }
