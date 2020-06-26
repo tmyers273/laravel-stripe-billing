@@ -229,7 +229,7 @@ class Subscription extends Model
         }
 
         if ( is_a($plan, StripeBilling::getProductModel()) ) {
-            return $plan->is($this->price->plan);
+            return $plan->is($this->price->product);
         }
 
         return false;
