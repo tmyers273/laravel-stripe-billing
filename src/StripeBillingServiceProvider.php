@@ -17,6 +17,8 @@ class StripeBillingServiceProvider extends ServiceProvider
         $this->registerMigrationPublisher();
 
         $this->registerBladeDirectives();
+
+        $this->loadRoutesFrom(__DIR__.'/routes.php');
     }
 
     protected function registerConfigPublisher() {

@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use TMyers\StripeBilling\Models\PricingPlan;
 use TMyers\StripeBilling\Models\StripePrice;
 
 class UpdateSubscriptionRequest extends FormRequest {
