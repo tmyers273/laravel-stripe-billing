@@ -9,8 +9,8 @@ use Stripe\Customer;
 use TMyers\StripeBilling\Exceptions\AlreadySubscribed;
 use TMyers\StripeBilling\Exceptions\OnlyOneActiveSubscriptionIsAllowed;
 use TMyers\StripeBilling\Exceptions\SubscriptionNotFound;
-use TMyers\StripeBilling\Models\Price;
-use TMyers\StripeBilling\Models\Product;
+use TMyers\StripeBilling\Models\StripePrice;
+use TMyers\StripeBilling\Models\StripeProduct;
 use TMyers\StripeBilling\Models\Subscription;
 
 /**
@@ -23,7 +23,7 @@ use TMyers\StripeBilling\Models\Subscription;
 trait HasSubscriptions
 {
     /**
-     * @param Price|Product|string $plan
+     * @param StripePrice|StripeProduct|string $plan
      * @return bool
      */
     public function isSubscribedTo($plan): bool

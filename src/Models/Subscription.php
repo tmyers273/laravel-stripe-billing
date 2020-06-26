@@ -14,7 +14,7 @@ use TMyers\StripeBilling\StripeBilling;
  * Class Subscription
  *
  * @package TMyers\StripeBilling\Models
- * @property Price $price
+ * @property StripePrice $price
  * @property string $stripe_subscription_id
  * @property Carbon $trial_ends_at
  * @property Carbon $ends_at
@@ -197,7 +197,7 @@ class Subscription extends Model
     */
 
     /**
-     * @param string|Price $price
+     * @param string|StripePrice $price
      * @return bool
      */
     public function isStrictlyFor($price): bool
@@ -214,7 +214,7 @@ class Subscription extends Model
     }
 
     /**
-     * @param string|Price|Product $plan
+     * @param string|StripePrice|StripeProduct $plan
      * @return bool
      */
     public function isFor($plan): bool {

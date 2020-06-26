@@ -14,7 +14,7 @@ use TMyers\StripeBilling\StripeBilling;
  *
  * @package TMyers\StripeBilling\Models
  *
- * @property Product $product
+ * @property StripeProduct $product
  * @property integer $id
  * @property int $stripe_price_id
  * @property boolean $active
@@ -23,7 +23,7 @@ use TMyers\StripeBilling\StripeBilling;
  * @property string $interval
  * @property integer $price
  */
-class Price extends Model
+class StripePrice extends Model
 {
     protected $guarded = ['id'];
 
@@ -34,7 +34,7 @@ class Price extends Model
 
     /**
      * @param string $name
-     * @return Price
+     * @return StripePrice
      */
     public static function findByName(string $name): self {
         return static::whereName($name)->firstOrFail();
@@ -56,7 +56,7 @@ class Price extends Model
     }
 
     /**
-     * @param Price $price
+     * @param StripePrice $price
      * @return bool
      * @throws StripeBillingException
      */
@@ -69,7 +69,7 @@ class Price extends Model
     }
 
     /**
-     * @param Price $price
+     * @param StripePrice $price
      * @return bool
      * @throws StripeBillingException
      */

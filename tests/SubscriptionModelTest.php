@@ -7,8 +7,8 @@ use TMyers\StripeBilling\Exceptions\AlreadySubscribed;
 use TMyers\StripeBilling\Exceptions\PriceIsInactive;
 use TMyers\StripeBilling\Exceptions\StripeBillingException;
 use TMyers\StripeBilling\Facades\StripeSubscription;
-use TMyers\StripeBilling\Models\Product;
-use TMyers\StripeBilling\Models\Price;
+use TMyers\StripeBilling\Models\StripeProduct;
+use TMyers\StripeBilling\Models\StripePrice;
 use TMyers\StripeBilling\Models\Subscription;
 use TMyers\StripeBilling\Tests\Stubs\Models\User;
 use Mockery as m;
@@ -33,8 +33,8 @@ class SubscriptionModelTest extends TestCase
         ]);
 
         $this->assertInstanceOf(User::class, $subscription->owner);
-        $this->assertInstanceOf(Price::class, $subscription->price);
-        $this->assertInstanceOf(Product::class, $subscription->price->product);
+        $this->assertInstanceOf(StripePrice::class, $subscription->price);
+        $this->assertInstanceOf(StripeProduct::class, $subscription->price->product);
     }
 
     /*

@@ -4,8 +4,8 @@ return [
     'models' => [
         'owner' => 'App\User',
         'subscription' => \TMyers\StripeBilling\Models\Subscription::class,
-        'prices' => \TMyers\StripeBilling\Models\Price::class,
-        'product' => \TMyers\StripeBilling\Models\Product::class,
+        'prices' => \TMyers\StripeBilling\Models\StripePrice::class,
+        'product' => \TMyers\StripeBilling\Models\StripeProduct::class,
         'card' => \TMyers\StripeBilling\Models\Card::class,
     ],
 

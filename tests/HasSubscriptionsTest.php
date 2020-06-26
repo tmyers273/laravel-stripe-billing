@@ -10,7 +10,7 @@ use TMyers\StripeBilling\Exceptions\OnlyOneActiveSubscriptionIsAllowed;
 use TMyers\StripeBilling\Exceptions\SubscriptionNotFound;
 use TMyers\StripeBilling\Facades\StripeCustomer;
 use TMyers\StripeBilling\Facades\StripeSubscription;
-use TMyers\StripeBilling\Models\Price;
+use TMyers\StripeBilling\Models\StripePrice;
 use TMyers\StripeBilling\Models\Subscription;
 use TMyers\StripeBilling\Tests\Helpers\StripeObjectsFactory;
 use TMyers\StripeBilling\Tests\Helpers\SubscriptionFactory;

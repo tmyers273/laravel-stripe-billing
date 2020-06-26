@@ -11,8 +11,8 @@ namespace TMyers\StripeBilling\Tests;
 
 use Illuminate\Support\Str;
 use TMyers\StripeBilling\Models\Plan;
-use TMyers\StripeBilling\Models\Price;
-use TMyers\StripeBilling\Models\Product;
+use TMyers\StripeBilling\Models\StripePrice;
+use TMyers\StripeBilling\Models\StripeProduct;
 
 class PlanModelTest extends TestCase
 {
@@ -42,11 +42,11 @@ class PlanModelTest extends TestCase
 
         $this->assertTrue($pricing[0]->is($montlyPlan));
         $this->assertEquals('basic', $pricing[0]->getType());
-        $this->assertInstanceOf(Product::class, $pricing[0]->product);
+        $this->assertInstanceOf(StripeProduct::class, $pricing[0]->product);
 
         $this->assertTrue($pricing[1]->is($yearlyPlan));
         $this->assertEquals('basic', $pricing[1]->getType());
-        $this->assertInstanceOf(Product::class, $pricing[1]->product);
+        $this->assertInstanceOf(StripeProduct::class, $pricing[1]->product);
     }
 
     /** @test */
@@ -90,55 +90,55 @@ class PlanModelTest extends TestCase
     /** @test */
     public function products_can_be_compared()
     {
-        $basicPlan = Product::create([
+        $basicPlan = StripeProduct::create([
             'name' => 'basic',
             'stripe_product_id' => Str::random(),
         ]);
 
-        $proPlan = Product::create([
+        $proPlan = StripeProduct::create([
             'name' => 'pro',
             'stripe_product_id' => Str::random(),
         ]);
 
-        $freePlan = Product::create([
+        $freePlan = StripeProduct::create([
             'name' => 'free',
             'stripe_product_id' => Str::random(),
         ]);
 
-        $freePrice = Price::create([
+        $freePrice = StripePrice::create([
             'name' => 'free_plan_0',
             'product_id' => $freePlan->id,
             'price' => 0
         ]);
 
-        $proMonthlyPrice = Price::create([
+        $proMonthlyPrice = StripePrice::create([
             'name' => 'pro_monthly_plan',
             'price' => 3000,
             'product_id' => $proPlan->id,
             'interval' => 'month'
         ]);
 
-        $proYearlyPrice = Price::create([
+        $proYearlyPrice = StripePrice::create([
             'name' => 'pro_yearly_plan',
             'price' => 45000,
             'product_id' => $proPlan->id,
             'interval' => 'year'
         ]);
 
-        $basicYearlyPrice = Price::create([
+        $basicYearlyPrice = StripePrice::create([
             'name' => 'basic_yearly_plan',
             'price' => 27000,
             'product_id' => $basicPlan->id,
             'interval' => 'year'
         ]);
 
-        $justMonthlyPlan = Price::create([
+        $justMonthlyPlan = StripePrice::create([
             'name' => 'simple_monthly',
             'price' => 2700,
             'interval' => 'month'
         ]);
 
-        $justYearlyPlan = Price::create([
+        $justYearlyPlan = StripePrice::create([
             'name' => 'simple_yearly',
             'price' => 45000,
             'interval' => 'year'

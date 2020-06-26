@@ -7,14 +7,14 @@ use Carbon\Carbon;
 use Stripe\Customer;
 use TMyers\StripeBilling\Facades\StripeCustomer;
 use TMyers\StripeBilling\Facades\StripeSubscription;
-use TMyers\StripeBilling\Models\Price;
+use TMyers\StripeBilling\Models\StripePrice;
 use TMyers\StripeBilling\Models\Subscription;
 
 class StripeSubscriptionBuilder
 {
     protected $owner;
 
-    /** @var Price */
+    /** @var StripePrice */
     protected $price;
 
     /** @var bool */
@@ -28,7 +28,7 @@ class StripeSubscriptionBuilder
      *
      * @param $owner
      * @param int $trialDays
-     * @param Price $price
+     * @param StripePrice $price
      */
     public function __construct($owner, $price) {
         $this->owner = $owner;

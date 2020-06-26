@@ -6,7 +6,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 use TMyers\StripeBilling\Models\Card;
-use TMyers\StripeBilling\Models\Price;
+use TMyers\StripeBilling\Models\StripePrice;
 use TMyers\StripeBilling\Models\Plan;
 use TMyers\StripeBilling\StripeBillingServiceProvider;
 use TMyers\StripeBilling\Tests\Helpers\ProductFactory;

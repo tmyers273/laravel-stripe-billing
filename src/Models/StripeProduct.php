@@ -20,7 +20,7 @@ use TMyers\StripeBilling\StripeBilling;
  * @property Collection $prices
  * @property Collection $subscriptions
  */
-class Product extends Model
+class StripeProduct extends Model
 {
     protected $guarded = ['id'];
 
@@ -28,7 +28,7 @@ class Product extends Model
 
     /**
      * @param string $name
-     * @return Product
+     * @return StripeProduct
      */
     public static function findByName(string $name): self
     {
@@ -59,7 +59,9 @@ class Product extends Model
     {
         return $this->hasManyThrough(
             StripeBilling::getSubscriptionModel(),
-            StripeBilling::getPricesModel()
+            StripeBilling::getPricesModel(),
+            'product_id',
+            'price_id'
         );
     }
 
