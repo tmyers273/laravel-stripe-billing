@@ -30,8 +30,7 @@ class StripeProduct extends Model
      * @param string $name
      * @return StripeProduct
      */
-    public static function findByName(string $name): self
-    {
+    public static function findByName(string $name): self {
         return static::whereName($name)->firstOrFail();
     }
 
@@ -41,8 +40,7 @@ class StripeProduct extends Model
     |--------------------------------------------------------------------------
     */
 
-    public function scopeActive(Builder $builder)
-    {
+    public function scopeActive(Builder $builder) {
         return $builder->whereActive(true);
     }
 
@@ -55,8 +53,7 @@ class StripeProduct extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
      */
-    public function subscriptions()
-    {
+    public function subscriptions() {
         return $this->hasManyThrough(
             StripeBilling::getSubscriptionModel(),
             StripeBilling::getPricesModel(),
@@ -68,10 +65,7 @@ class StripeProduct extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function prices()
-    {
-        return $this
-            ->hasMany(StripeBilling::getPricesModel(), 'product_id')
-            ->orderBy('price');
+    public function prices() {
+        return $this->hasMany(StripeBilling::getPricesModel(), 'product_id');
     }
 }
