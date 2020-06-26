@@ -2,7 +2,6 @@
 
 namespace TMyers\StripeBilling\Http\Controllers;
 
-use App\Http\Requests\UpdateSubscriptionRequest;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -17,6 +16,7 @@ use TMyers\StripeBilling\Exceptions\PlanIsInactive;
 use TMyers\StripeBilling\Exceptions\StripeBillingException;
 use TMyers\StripeBilling\Http\Requests\ApplyCouponRequest;
 use TMyers\StripeBilling\Http\Requests\CreateSubscriptionRequest;
+use TMyers\StripeBilling\Http\Requests\UpdateSubscriptionRequest;
 use TMyers\StripeBilling\Models\Subscription;
 use TMyers\StripeBilling\Services\UserSubscriptionManager;
 

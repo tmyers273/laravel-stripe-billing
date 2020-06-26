@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests;
+namespace TMyers\StripeBilling\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use TMyers\StripeBilling\Models\StripePrice;
