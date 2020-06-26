@@ -32,7 +32,7 @@ class CreateSubscriptionsTable extends Migration
             $table
                 ->foreign('price_id')
                 ->references('id')
-                ->on(config('stripe-billing.tables.pricing_plans'))
+                ->on(config('stripe-billing.tables.prices'))
                 ->onDelete('cascade');
         });
     }

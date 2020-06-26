@@ -12,8 +12,8 @@ return [
     'tables' => [
         'owner' => 'users',
         'subscriptions' => 'subscriptions',
-        'pricing_plans' => 'pricing_plans',
-        'plans' => 'plans',
+        'prices' => 'stripe_prices',
+        'products' => 'stripe_products',
         'cards' => 'cards',
     ],
 

@@ -26,12 +26,6 @@ class CreateStripePricesTable extends Migration
 
             $table->unique('name');
             $table->index('name');
-
-            $table
-                ->foreign('product_id')
-                ->references('id')
-                ->on(config('stripe-billing.tables.plans'))
-                ->onDelete('set null');
         });
     }
 
@@ -42,6 +36,6 @@ class CreateStripePricesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('pricing_plans');
+        Schema::dropIfExists('stripe_prices');
     }
 }

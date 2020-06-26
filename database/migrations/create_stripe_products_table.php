@@ -35,6 +35,6 @@ class CreateStripeProductsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('plans');
+        Schema::dropIfExists('stripe_products');
     }
 }
