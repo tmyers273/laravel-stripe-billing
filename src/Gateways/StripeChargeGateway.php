@@ -5,15 +5,14 @@ namespace TMyers\StripeBilling\Gateways;
 
 use Stripe\Charge;
 
-class StripeChargeGateway extends StripeGateway
-{
+class StripeChargeGateway extends StripeGateway {
+
     /**
      * @param array $params
      * @return \Stripe\Charge
-     * @throws \TMyers\StripeBilling\Exceptions\StripeGatewayException
+     * @throws \Stripe\Exception\ApiErrorException
      */
-    public function charge(array $params = []): Charge
-    {
-        return Charge::create($params, ['api_key' => $this->getApiKey()]);
+    public function charge(array $params = []): Charge {
+        return $this->client->charges->create($params);
     }
 }

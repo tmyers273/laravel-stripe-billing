@@ -7,6 +7,9 @@ use TMyers\StripeBilling\StripeBilling;
 
 class StripeGateway
 {
+    /** @var StripeClient $client */
+    protected $client;
+
     public function __construct() {
         $this->client = new StripeClient(StripeBilling::getApiKey());
     }

@@ -17,7 +17,7 @@ class StripeCustomerGateway extends StripeGateway
      * @return \Stripe\ApiResource
      * @throws \TMyers\StripeBilling\Exceptions\StripeGatewayException
      */
-    public function create(string $token, string $email, array $options = []) {
+    public function create(string $token, string $email, array $options = []): Customer {
         try {
             $options = array_merge($options, [
                 'email' => $email,
