@@ -31,9 +31,9 @@ class ChargeableIntegrationTest extends TestCase
     /**
      * @test
      * @throws \TMyers\StripeBilling\Exceptions\CardException
+     * @throws \TMyers\StripeBilling\Exceptions\StripeBillingException
      */
-    public function a_card_can_be_added_to_user_and_become_default()
-    {
+    public function a_card_can_be_added_to_user_and_become_default() {
         // Given we have a user without any card
         $user = $this->createUser();
 

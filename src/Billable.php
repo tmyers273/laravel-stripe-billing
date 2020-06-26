@@ -4,6 +4,7 @@ namespace TMyers\StripeBilling;
 
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Stripe\Customer;
 use TMyers\StripeBilling\Facades\StripeCustomer;
 use TMyers\StripeBilling\Models\Card;
 
@@ -12,17 +13,16 @@ trait Billable
     use HasSubscriptions, Chargeable;
 
     /**
-     * @return \Stripe\Customer
+     * @return Customer
      */
-    public function retrieveStripeCustomer(): \Stripe\Customer
-    {
+    public function retrieveStripeCustomer(): Customer {
         return StripeCustomer::retrieve($this->stripe_id);
     }
 
     /**
      * @param null $token
      * @param array $options
-     * @return \Stripe\Customer
+     * @return Customer
      */
     public function retrieveOrCreateStripeCustomer($token = null, array $options = [])
     {
