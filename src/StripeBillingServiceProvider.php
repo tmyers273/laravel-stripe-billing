@@ -3,11 +3,13 @@
 namespace TMyers\StripeBilling;
 
 
+use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use TMyers\StripeBilling\Gateways\StripeChargeGateway;
 use TMyers\StripeBilling\Gateways\StripeCustomerGateway;
 use TMyers\StripeBilling\Gateways\StripeSubscriptionGateway;
+use TMyers\StripeBilling\Middleware\SubscriptionMiddleware;
 
 class StripeBillingServiceProvider extends ServiceProvider
 {
@@ -19,6 +21,10 @@ class StripeBillingServiceProvider extends ServiceProvider
         $this->registerBladeDirectives();
 
         $this->loadRoutesFrom(__DIR__.'/routes.php');
+
+        // Register middleware
+        $router = $this->app->make(Router::class);
+        $router->aliasMiddleware('subscribed', SubscriptionMiddleware::class);
     }
 
     protected function registerConfigPublisher() {

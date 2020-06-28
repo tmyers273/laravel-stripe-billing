@@ -29,6 +29,10 @@ class CardsController extends Controller
         $user = $request->user();
 
         $cards = $user->cards()->with('owner')->get();
+        
+        foreach($cards as $card) {
+            $card->is_default = $card->isDefault();
+        }
 
         return response()->json($cards);
     }
