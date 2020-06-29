@@ -10,6 +10,10 @@ class StripeGateway
     /** @var StripeClient $client */
     protected $client;
 
+    public static function client() {
+        return new StripeClient(StripeBilling::getApiKey());
+    }
+
     public function __construct() {
         $this->client = new StripeClient(StripeBilling::getApiKey());
     }

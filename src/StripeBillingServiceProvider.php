@@ -2,10 +2,10 @@
 
 namespace TMyers\StripeBilling;
 
-
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
+use TMyers\StripeBilling\Commands\BillingSyncProducts;
 use TMyers\StripeBilling\Gateways\StripeChargeGateway;
 use TMyers\StripeBilling\Gateways\StripeCustomerGateway;
 use TMyers\StripeBilling\Gateways\StripeSubscriptionGateway;
@@ -25,6 +25,14 @@ class StripeBillingServiceProvider extends ServiceProvider
         // Register middleware
         $router = $this->app->make(Router::class);
         $router->aliasMiddleware('subscribed', SubscriptionMiddleware::class);
+
+        if ($this->app->runningInConsole()) {
+            // publish config file
+
+            $this->commands([
+                BillingSyncProducts::class,
+            ]);
+        }
     }
 
     protected function registerConfigPublisher() {
