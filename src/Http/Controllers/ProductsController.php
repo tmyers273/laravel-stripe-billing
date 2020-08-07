@@ -4,6 +4,7 @@ namespace TMyers\StripeBilling\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use TMyers\StripeBilling\BillableContract;
 use TMyers\StripeBilling\Models\StripeProduct;
 
 class ProductsController extends Controller {
@@ -16,7 +17,7 @@ class ProductsController extends Controller {
 
         $subscription = null;
         try {
-            $subscription = $user->getFirstActiveSubscription();
+            $subscription = $user->subscriptions->first();
         } catch (\Exception $e) {
             // Catch subscription not found exception
         }
