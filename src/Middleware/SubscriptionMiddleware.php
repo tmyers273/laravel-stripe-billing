@@ -4,13 +4,11 @@ namespace TMyers\StripeBilling\Middleware;
 
 use Closure;
 
-class SubscriptionMiddleware
-{
-    public function handle($request, Closure $next, $plans = null)
-    {
+class SubscriptionMiddleware {
+    public function handle($request, Closure $next, $plans = null) {
         $user = $request->user();
 
-        if (!$plans && optional($user)->hasActiveSubscriptions()) {
+        if (! $plans && optional($user)->hasActiveSubscriptions()) {
             return $next($request);
         }
 
@@ -26,11 +24,10 @@ class SubscriptionMiddleware
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function forbiddenResponse($request)
-    {
+    protected function forbiddenResponse($request) {
         if ($request->ajax() || $request->expectsJson()) {
             return response()->json('Unauthorized.', 403);
         }

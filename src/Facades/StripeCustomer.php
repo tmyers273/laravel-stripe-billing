@@ -15,8 +15,7 @@ use Stripe\Customer;
  * @method static createSource(Customer $customer, string $token): \Stripe\Card
  * @method static deleteSource(Customer $customer, string $sourceId)
  */
-class StripeCustomer extends Facade
-{
+class StripeCustomer extends Facade {
     /**
      * Get the registered name of the component.
      *
@@ -24,8 +23,7 @@ class StripeCustomer extends Facade
      *
      * @throws \RuntimeException
      */
-    protected static function getFacadeAccessor()
-    {
+    protected static function getFacadeAccessor() {
         return 'stripe-customer-gateway';
     }
 }

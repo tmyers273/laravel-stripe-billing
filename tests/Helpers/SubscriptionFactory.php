@@ -8,10 +8,8 @@ use TMyers\StripeBilling\Models\PricingPlan;
 use TMyers\StripeBilling\Models\Subscription;
 use TMyers\StripeBilling\Tests\Stubs\Models\User;
 
-trait SubscriptionFactory
-{
-    public function createActiveSubscription(User $user, PricingPlan $pricingPlan, array $overrides = []): Subscription
-    {
+trait SubscriptionFactory {
+    public function createActiveSubscription(User $user, PricingPlan $pricingPlan, array $overrides = []): Subscription {
         return Subscription::create(array_merge([
             'owner_id' => $user->id,
             'pricing_plan_id' => $pricingPlan->id,
@@ -19,8 +17,7 @@ trait SubscriptionFactory
         ], $overrides));
     }
 
-    public function createOnTrialSubscription(User $user, PricingPlan $plan, array $overrides = []): Subscription
-    {
+    public function createOnTrialSubscription(User $user, PricingPlan $plan, array $overrides = []): Subscription {
         return Subscription::create(array_merge([
             'owner_id' => $user->id,
             'pricing_plan_id' => $plan->id,
@@ -29,8 +26,7 @@ trait SubscriptionFactory
         ], $overrides));
     }
 
-    public function createGraceSubscription(User $user, PricingPlan $plan, array $overrides = []): Subscription
-    {
+    public function createGraceSubscription(User $user, PricingPlan $plan, array $overrides = []): Subscription {
         return Subscription::create(array_merge([
             'owner_id' => $user->id,
             'pricing_plan_id' => $plan->id,
@@ -45,8 +41,7 @@ trait SubscriptionFactory
      * @param array $overrides
      * @return Subscription
      */
-    public function createExpiredSubscription(User $user, PricingPlan $plan, array $overrides = []): Subscription
-    {
+    public function createExpiredSubscription(User $user, PricingPlan $plan, array $overrides = []): Subscription {
         return Subscription::create(array_merge([
             'owner_id' => $user->id,
             'pricing_plan_id' => $plan->id,

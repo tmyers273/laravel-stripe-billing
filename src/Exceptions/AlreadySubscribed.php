@@ -9,10 +9,8 @@
 namespace TMyers\StripeBilling\Exceptions;
 
 
-class AlreadySubscribed extends StripeBillingException
-{
-    public static function toPlan($plan): self
-    {
+class AlreadySubscribed extends StripeBillingException {
+    public static function toPlan($plan): self {
         $planName = is_string($plan) ? $plan : $plan->name;
 
         return new static("Already subscibed to {$planName}");

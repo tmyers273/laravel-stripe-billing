@@ -9,43 +9,41 @@ use TMyers\StripeBilling\Gateways\StripeChargeGateway;
 use TMyers\StripeBilling\Gateways\StripeCustomerGateway;
 use TMyers\StripeBilling\Gateways\StripeSubscriptionGateway;
 
-class StripeBillingServiceProvider extends ServiceProvider
-{
-    public function boot()
-    {
+class StripeBillingServiceProvider extends ServiceProvider {
+    public function boot() {
         $this->publishes([
-            __DIR__.'/../config/stripe-billing.php' => config_path('stripe-billing.php'),
+            __DIR__ . '/../config/stripe-billing.php' => config_path('stripe-billing.php'),
         ], 'config');
 
-        if ( ! class_exists('AddStripeBillingColumnsToOwnerTable')) {
+        if (! class_exists('AddStripeBillingColumnsToOwnerTable')) {
             $this->publishes([
                 __DIR__ . '/../database/migrations/add_stripe_billing_columns_to_owner_table.php' =>
                     database_path('migrations/' . date('Y_m_d_His', time()) . '_add_stripe_billing_columns_to_owner_table.php'),
             ], 'migrations');
         }
 
-        if ( ! class_exists('CreatePlansTable')) {
+        if (! class_exists('CreatePlansTable')) {
             $this->publishes([
                 __DIR__ . '/../database/migrations/create_plans_table.php' =>
                     database_path('migrations/' . date('Y_m_d_His', time()) . '_create_plans_table.php'),
             ], 'migrations');
         }
 
-        if ( ! class_exists('CreatePricingPlansTable')) {
+        if (! class_exists('CreatePricingPlansTable')) {
             $this->publishes([
                 __DIR__ . '/../database/migrations/create_pricing_plans_table.php' =>
                     database_path('migrations/' . date('Y_m_d_His', time()) . '_create_pricing_plans_table.php'),
             ], 'migrations');
         }
 
-        if ( ! class_exists('CreateSubscriptionsTable')) {
+        if (! class_exists('CreateSubscriptionsTable')) {
             $this->publishes([
                 __DIR__ . '/../database/migrations/create_subscriptions_table.php' =>
                     database_path('migrations/' . date('Y_m_d_His', time()) . '_create_subscriptions_table.php'),
             ], 'migrations');
         }
 
-        if ( ! class_exists('CreateCardsTable')) {
+        if (! class_exists('CreateCardsTable')) {
             $this->publishes([
                 __DIR__ . '/../database/migrations/create_cards_table.php' =>
                     database_path('migrations/' . date('Y_m_d_His', time()) . '_create_cards_table.php'),
@@ -55,41 +53,39 @@ class StripeBillingServiceProvider extends ServiceProvider
         $this->registerBladeDirectives();
     }
 
-    public function register()
-    {
+    public function register() {
         $this->mergeConfigFrom(
-            __DIR__.'/../config/stripe-billing.php',
+            __DIR__ . '/../config/stripe-billing.php',
             'stripe-billing'
         );
 
-        $this->app->bind('stripe-customer-gateway', function() {
+        $this->app->bind('stripe-customer-gateway', function () {
             return new StripeCustomerGateway();
         });
 
-        $this->app->bind('stripe-subscription-gateway', function() {
+        $this->app->bind('stripe-subscription-gateway', function () {
             return new StripeSubscriptionGateway();
         });
 
-        $this->app->bind('stripe-charge-gateway', function() {
+        $this->app->bind('stripe-charge-gateway', function () {
             return new StripeChargeGateway();
         });
     }
 
-    protected function registerBladeDirectives()
-    {
-        Blade::directive('subscribed', function() {
+    protected function registerBladeDirectives() {
+        Blade::directive('subscribed', function () {
             return "<?php if(auth()->check() && auth()->user()->hasActiveSubscriptions()): ?>";
         });
 
-        Blade::directive('endsubscribed', function() {
+        Blade::directive('endsubscribed', function () {
             return "<?php endif; ?>";
         });
 
-        Blade::directive('unless_subscribed', function() {
+        Blade::directive('unless_subscribed', function () {
             return "<?php if(auth()->check() && !auth()->user()->hasActiveSubscriptions()): ?>";
         });
 
-        Blade::directive('endunless_subscribed', function() {
+        Blade::directive('endunless_subscribed', function () {
             return "<?php endif; ?>";
         });
     }

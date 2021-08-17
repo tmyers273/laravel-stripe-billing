@@ -12,13 +12,11 @@ use TMyers\StripeBilling\Facades\StripeToken;
 use TMyers\StripeBilling\Tests\Stubs\Models\User;
 use Mockery as m;
 
-class ChargeableTest extends TestCase
-{
+class ChargeableTest extends TestCase {
     const FAKE_CUSTOMER_100 = 'fake-customer-100';
     const FAKE_TOKEN_1 = 'fake-token-1';
 
-    protected function tearDown()
-    {
+    protected function tearDown() {
         m::close();
         parent::tearDown();
     }
@@ -27,8 +25,7 @@ class ChargeableTest extends TestCase
      * @test
      * @throws \TMyers\StripeBilling\Exceptions\CardException
      */
-    public function a_card_can_be_added_to_user()
-    {
+    public function a_card_can_be_added_to_user() {
         // Given we have a user without any card
         $user = $this->createUser();
         $token = self::FAKE_TOKEN_1;
@@ -49,7 +46,7 @@ class ChargeableTest extends TestCase
 
         $card = $user->addCardFromToken($token);
 
-        tap($user->fresh(), function(User $user) use ($card) {
+        tap($user->fresh(), function (User $user) use ($card) {
             $this->assertTrue($user->hasDefaultCard());
             $this->assertTrue($user->hasDefaultCard($card));
             $this->assertTrue($user->defaultCard->is($card));
@@ -72,8 +69,7 @@ class ChargeableTest extends TestCase
     }
 
     /** @test */
-    public function user_with_default_card_can_add_another_card()
-    {
+    public function user_with_default_card_can_add_another_card() {
         // Given we have a user with an active default card
         list($user, $firstCard) = $this->createUserWithDefaultCard();
         $token = self::FAKE_TOKEN_1;
@@ -101,7 +97,7 @@ class ChargeableTest extends TestCase
         $secondCard = $user->addCardFromToken($token);
 
         // Expect user to have $secondCard as default
-        tap($user->fresh(), function(User $user) use ($secondCard, $firstCard) {
+        tap($user->fresh(), function (User $user) use ($secondCard, $firstCard) {
             $this->assertTrue($user->hasDefaultCard());
             $this->assertTrue($user->hasDefaultCard($secondCard));
             $this->assertFalse($user->hasDefaultCard($firstCard));
@@ -124,10 +120,9 @@ class ChargeableTest extends TestCase
         $this->assertFalse($firstCard->isDefault());
         $this->assertTrue($secondCard->isDefault());
     }
-    
+
     /** @test */
-    public function user_with_different_cards_can_swap_them()
-    {
+    public function user_with_different_cards_can_swap_them() {
         // Given we have a user with an active default card and another card
         list($user, $defaultCard) = $this->createUserWithDefaultCard();
 
@@ -152,7 +147,7 @@ class ChargeableTest extends TestCase
             'default_card_id' => $anotherCard->id,
         ]);
 
-        tap($user->fresh(), function(User $user) use ($anotherCard, $defaultCard) {
+        tap($user->fresh(), function (User $user) use ($anotherCard, $defaultCard) {
             $this->assertTrue($user->hasDefaultCard());
             $this->assertTrue($user->hasDefaultCard($anotherCard));
             $this->assertFalse($user->hasDefaultCard($defaultCard));

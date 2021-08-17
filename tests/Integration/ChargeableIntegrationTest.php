@@ -11,11 +11,9 @@ use TMyers\StripeBilling\StripeBilling;
 use TMyers\StripeBilling\Tests\Stubs\Models\User;
 use TMyers\StripeBilling\Tests\TestCase;
 
-class ChargeableIntegrationTest extends TestCase
-{
-    public function setUp()
-    {
-        if (!env('RUN_INTEGRATION_TESTS')) {
+class ChargeableIntegrationTest extends TestCase {
+    public function setUp() {
+        if (! env('RUN_INTEGRATION_TESTS')) {
             $this->markTestSkipped('Integration tests are being skipped. See phpunit.xml');
         }
 
@@ -24,8 +22,7 @@ class ChargeableIntegrationTest extends TestCase
         Carbon::setTestNow(now()->addMinutes(5));
     }
 
-    protected function tearDown()
-    {
+    protected function tearDown() {
         Carbon::setTestNow();
         parent::tearDown();
     }
@@ -34,14 +31,13 @@ class ChargeableIntegrationTest extends TestCase
      * @test
      * @throws \TMyers\StripeBilling\Exceptions\CardException
      */
-    public function a_card_can_be_added_to_user_and_become_default()
-    {
+    public function a_card_can_be_added_to_user_and_become_default() {
         // Given we have a user without any card
         $user = $this->createUser();
 
         $user->addCardFromToken($this->createTestToken());
 
-        tap($user->fresh(), function(User $user) {
+        tap($user->fresh(), function (User $user) {
             $this->assertCount(1, $user->cards);
 
             $this->assertNotNull($user->stripe_id);
@@ -60,8 +56,7 @@ class ChargeableIntegrationTest extends TestCase
      * @test
      * @throws \TMyers\StripeBilling\Exceptions\CardException
      */
-    public function user_can_add_a_card_already_having_a_default_one()
-    {
+    public function user_can_add_a_card_already_having_a_default_one() {
         // Given we have a user without any card
         $user = $this->createUser();
         $stripeId = null;
@@ -69,30 +64,30 @@ class ChargeableIntegrationTest extends TestCase
 
         $user->addCardFromToken($this->createTestToken());
 
-        tap($user->fresh(), function(User $user) use (&$stripeId, &$defaultCardId) {
+        tap($user->fresh(), function (User $user) use (&$stripeId, &$defaultCardId) {
             $stripeId = $user->stripe_id;
             $defaultCardId = $user->default_card_id;
         });
 
         $user->addCardFromToken($this->createTestToken());
 
-        tap($user->fresh(), function(User $user) use ($stripeId, $defaultCardId) {
-             $this->assertCount(2, $user->cards);
+        tap($user->fresh(), function (User $user) use ($stripeId, $defaultCardId) {
+            $this->assertCount(2, $user->cards);
 
-             $this->assertEquals($stripeId, $user->stripe_id);
-             $this->assertEquals($defaultCardId, $user->default_card_id);
+            $this->assertEquals($stripeId, $user->stripe_id);
+            $this->assertEquals($defaultCardId, $user->default_card_id);
 
-             foreach ($user->cards as $card) {
-                 $this->assertInstanceOf(Card::class, $card);
-                 $this->assertEquals('Visa', $card->brand);
-                 $this->assertEquals(4242, $card->last_4);
-                 $this->assertNotNull($card->stripe_card_id);
-             }
+            foreach ($user->cards as $card) {
+                $this->assertInstanceOf(Card::class, $card);
+                $this->assertEquals('Visa', $card->brand);
+                $this->assertEquals(4242, $card->last_4);
+                $this->assertNotNull($card->stripe_card_id);
+            }
 
-             $this->assertNotEquals(
-                 $user->cards[0]->stripe_card_id,
-                 $user->cards[1]->stripe_card_id
-             );
+            $this->assertNotEquals(
+                $user->cards[0]->stripe_card_id,
+                $user->cards[1]->stripe_card_id
+            );
         });
     }
 
@@ -100,8 +95,7 @@ class ChargeableIntegrationTest extends TestCase
      * @test
      * @throws \TMyers\StripeBilling\Exceptions\CardException
      */
-    public function two_cards_can_be_swapped()
-    {
+    public function two_cards_can_be_swapped() {
         // Given we have a user without any card
         $user = $this->createUser();
 
@@ -110,7 +104,7 @@ class ChargeableIntegrationTest extends TestCase
 
         $user->setCardAsDefault($anotherCard);
 
-        tap($user->fresh(), function(User $user) use ($anotherCard, $defaultCard) {
+        tap($user->fresh(), function (User $user) use ($anotherCard, $defaultCard) {
             $this->assertNotNull($user->default_card_id);
             $this->assertTrue($user->hasDefaultCard());
 
@@ -124,8 +118,7 @@ class ChargeableIntegrationTest extends TestCase
      * @test
      * @throws \TMyers\StripeBilling\Exceptions\CardException
      */
-    public function it_will_throw_on_wrong_card_for_a_wrong_user()
-    {
+    public function it_will_throw_on_wrong_card_for_a_wrong_user() {
         // Given we have 2 different users each with a card
         $firstUser = $this->createUser();
         $anotherUser = $this->createUser();
@@ -147,23 +140,22 @@ class ChargeableIntegrationTest extends TestCase
         // Do try giving one user a card of another user
         $firstUser->setCardAsDefault($anotherCard);
     }
-    
+
     /*
     |--------------------------------------------------------------------------
     | Card removal
     |--------------------------------------------------------------------------
     */
-    
+
     /** @test */
-    public function default_card_can_be_removed()
-    {
+    public function default_card_can_be_removed() {
         // Given we have a user without any card
         $user = $this->createUser();
 
         // Do add a card to the user
         $card = $user->addCardFromToken($this->createTestToken());
 
-        tap($user->fresh(), function(User $user) use ($card) {
+        tap($user->fresh(), function (User $user) use ($card) {
             // Do remove the card
             $user->removeCard($card);
 
@@ -185,8 +177,7 @@ class ChargeableIntegrationTest extends TestCase
      * @test
      * @throws CardException
      */
-    public function additional_card_can_be_removed_without_affecting_default_one()
-    {
+    public function additional_card_can_be_removed_without_affecting_default_one() {
         // Given we have a user without any card
         $user = $this->createUser();
 
@@ -197,7 +188,7 @@ class ChargeableIntegrationTest extends TestCase
         // Do remove one card
         $user->removeCard($anotherCard);
 
-        tap($user->fresh(), function(User $user) use ($anotherCard, $defaultCard) {
+        tap($user->fresh(), function (User $user) use ($anotherCard, $defaultCard) {
             // Expect user to still have default card
             $this->assertTrue($user->hasDefaultCard());
             $this->assertTrue($user->hasDefaultCard($defaultCard));
@@ -213,7 +204,7 @@ class ChargeableIntegrationTest extends TestCase
         // Expect user not to have a source any more
         $this->assertCount(1, $user->retrieveStripeCustomer()->sources->data);
     }
-    
+
     /*
     |--------------------------------------------------------------------------
     | Single charges
@@ -221,8 +212,7 @@ class ChargeableIntegrationTest extends TestCase
     */
 
     /** @test */
-    public function single_charge_cab_be_made_with_a_token()
-    {
+    public function single_charge_cab_be_made_with_a_token() {
         StripeBilling::setCurrency('gbp');
 
         // Given we have a user without any card
@@ -237,8 +227,7 @@ class ChargeableIntegrationTest extends TestCase
     }
 
     /** @test */
-    public function single_charge_cab_be_made_with_a_token_via_a_special_method()
-    {
+    public function single_charge_cab_be_made_with_a_token_via_a_special_method() {
         StripeBilling::setCurrency('usd');
 
         // Given we have a user without any card
@@ -256,8 +245,7 @@ class ChargeableIntegrationTest extends TestCase
      * @test
      * @throws CardException
      */
-    public function single_charge_can_be_made_via_a_credit_card()
-    {
+    public function single_charge_can_be_made_via_a_credit_card() {
         StripeBilling::setCurrency('usd');
 
         // Given we have a user without any card
@@ -278,8 +266,7 @@ class ChargeableIntegrationTest extends TestCase
      * @test
      * @throws CardException
      */
-    public function single_charge_can_be_made_via_default_card()
-    {
+    public function single_charge_can_be_made_via_default_card() {
         StripeBilling::setCurrency('usd');
 
         // Given we have a user without any card

@@ -3,5 +3,5 @@
 namespace TMyers\StripeBilling\Exceptions;
 
 
-class StripeBillingException extends \Exception
-{}
+class StripeBillingException extends \Exception {
+}

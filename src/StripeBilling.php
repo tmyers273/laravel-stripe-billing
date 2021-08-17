@@ -5,8 +5,7 @@ namespace TMyers\StripeBilling;
 
 use TMyers\StripeBilling\Exceptions\StripeBillingException;
 
-class StripeBilling
-{
+class StripeBilling {
     /**
      * @var string
      */
@@ -20,64 +19,56 @@ class StripeBilling
     /**
      * @return string
      */
-    public static function getCurrency(): string
-    {
+    public static function getCurrency(): string {
         return static::$currency;
     }
 
     /**
      * @param string $currency
      */
-    public static function setCurrency(string $currency)
-    {
+    public static function setCurrency(string $currency) {
         static::$currency = $currency;
     }
 
     /**
      * @return string
      */
-    public static function getOwnerModel(): string
-    {
+    public static function getOwnerModel(): string {
         return config('stripe-billing.models.owner');
     }
 
     /**
      * @return string
      */
-    public static function getCardModel(): string
-    {
+    public static function getCardModel(): string {
         return config('stripe-billing.models.card');
     }
 
     /**
      * @return string
      */
-    public static function getSubscriptionModel(): string
-    {
+    public static function getSubscriptionModel(): string {
         return config('stripe-billing.models.subscription');
     }
 
     /**
      * @return string
      */
-    public static function getPlanModel(): string
-    {
+    public static function getPlanModel(): string {
         return config('stripe-billing.models.plan');
     }
 
     /**
      * @return string
      */
-    public static function getPricingPlanModel(): string
-    {
+    public static function getPricingPlanModel(): string {
         return config('stripe-billing.models.pricing_plan');
     }
 
     /**
      * @param string $apiKey
      */
-    public static function setApiKey(string $apiKey)
-    {
+    public static function setApiKey(string $apiKey) {
         static::$apiKey = $apiKey;
     }
 
@@ -85,8 +76,7 @@ class StripeBilling
      * @return array|false|\Illuminate\Config\Repository|mixed|null|string
      * @throws StripeBillingException
      */
-    public static function getApiKey()
-    {
+    public static function getApiKey() {
         if (static::$apiKey) {
             return static::$apiKey;
         }
@@ -106,8 +96,7 @@ class StripeBilling
      * @return mixed|null
      * @throws StripeBillingException
      */
-    public static function createTestToken()
-    {
+    public static function createTestToken() {
         return \Stripe\Token::create([
             'card' => [
                 'number' => '4242424242424242',

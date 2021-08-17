@@ -7,16 +7,14 @@ use Carbon\Carbon;
 use Stripe\Customer;
 use Stripe\Subscription;
 
-class StripeSubscriptionGateway extends StripeGateway
-{
+class StripeSubscriptionGateway extends StripeGateway {
     /**
      * @param Customer $customer
      * @param array $options
      * @return Subscription
      * @throws \TMyers\StripeBilling\Exceptions\StripeGatewayException
      */
-    public function create($customer, array $options)
-    {
+    public function create($customer, array $options) {
         return $customer->subscriptions->create($options, $this->getApiKey());
     }
 
@@ -25,8 +23,7 @@ class StripeSubscriptionGateway extends StripeGateway
      * @return \Stripe\Subscription
      * @throws \TMyers\StripeBilling\Exceptions\StripeGatewayException
      */
-    public function retrieve(string $stripeSubscriptionId)
-    {
+    public function retrieve(string $stripeSubscriptionId) {
         return Subscription::retrieve($stripeSubscriptionId, $this->getApiKey());
     }
 
@@ -34,8 +31,7 @@ class StripeSubscriptionGateway extends StripeGateway
      * @param Subscription $subscription
      * @return Carbon
      */
-    public function parseCurrentPeriodEnd(Subscription $subscription): Carbon
-    {
+    public function parseCurrentPeriodEnd(Subscription $subscription): Carbon {
         return Carbon::createFromTimestamp(
             $subscription->current_period_end
         );

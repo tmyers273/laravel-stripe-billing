@@ -20,14 +20,12 @@ use TMyers\StripeBilling\Models\Subscription;
  * @property Collection $activeSubscriptions
  * @property Collection $subscriptions
  */
-trait HasSubscriptions
-{
+trait HasSubscriptions {
     /**
      * @param PricingPlan|Plan|string $plan
      * @return bool
      */
-    public function isSubscribedTo($plan): bool
-    {
+    public function isSubscribedTo($plan): bool {
         $subscriptions = $this->activeSubscriptions;
 
         /** @var Subscription $subscription */
@@ -44,8 +42,7 @@ trait HasSubscriptions
      * @param $pricingPlan
      * @return bool
      */
-    public function isSubscribedStrictlyTo($pricingPlan): bool
-    {
+    public function isSubscribedStrictlyTo($pricingPlan): bool {
         $subscriptions = $this->activeSubscriptions;
 
         /** @var Subscription $subscription */
@@ -66,8 +63,7 @@ trait HasSubscriptions
      * @throws AlreadySubscribed
      * @throws OnlyOneActiveSubscriptionIsAllowed
      */
-    public function subscribeTo($plan, $token = null, array $options = []): Subscription
-    {
+    public function subscribeTo($plan, $token = null, array $options = []): Subscription {
         if (is_null($plan)) {
             throw new \InvalidArgumentException("Plan cannot be null.");
         }
@@ -95,13 +91,12 @@ trait HasSubscriptions
      * @return Subscription
      * @throws SubscriptionNotFound
      */
-    public function getSubscriptionFor($plan)
-    {
-        $found = $this->activeSubscriptions->first(function($subscription) use ($plan) {
+    public function getSubscriptionFor($plan) {
+        $found = $this->activeSubscriptions->first(function ($subscription) use ($plan) {
             return $subscription->isStrictlyFor($plan);
         });
 
-        if (!$found) {
+        if (! $found) {
             throw SubscriptionNotFound::forPlan($plan);
         }
 
@@ -112,8 +107,7 @@ trait HasSubscriptions
      * @param string|Coupon $coupon
      * @return Customer
      */
-    public function applyCoupon($coupon): Customer
-    {
+    public function applyCoupon($coupon): Customer {
         $customer = $this->retrieveStripeCustomer();
 
         $customer->coupon = $coupon;
@@ -126,8 +120,7 @@ trait HasSubscriptions
     /**
      * @return bool
      */
-    public function hasActiveSubscriptions(): bool
-    {
+    public function hasActiveSubscriptions(): bool {
         return $this->activeSubscriptions->count() > 0;
     }
 
@@ -135,11 +128,10 @@ trait HasSubscriptions
      * @return mixed
      * @throws SubscriptionNotFound
      */
-    public function getFirstActiveSubscription()
-    {
+    public function getFirstActiveSubscription() {
         $found = $this->activeSubscriptions->first();
 
-        if (!$found) {
+        if (! $found) {
             throw new SubscriptionNotFound("User [{$this->id}] does not have any active subscriptions.");
         }
 
@@ -149,9 +141,8 @@ trait HasSubscriptions
     /**
      * @return bool
      */
-    public function canHaveOnlyOneSubscription(): bool
-    {
-        return !! config('stripe-billing.unique_active_subscription');
+    public function canHaveOnlyOneSubscription(): bool {
+        return ! ! config('stripe-billing.unique_active_subscription');
     }
 
     /*
@@ -160,16 +151,14 @@ trait HasSubscriptions
     |--------------------------------------------------------------------------
     */
 
-    public function subscriptions()
-    {
+    public function subscriptions() {
         return $this->hasMany(StripeBilling::getSubscriptionModel(), 'owner_id');
     }
 
-    public function activeSubscriptions()
-    {
+    public function activeSubscriptions() {
         return $this
             ->hasMany(StripeBilling::getSubscriptionModel(), 'owner_id')
-            ->where(function($q) {
+            ->where(function ($q) {
                 $q->whereNull('ends_at')->orWhere('ends_at', '>', now());
             });
     }

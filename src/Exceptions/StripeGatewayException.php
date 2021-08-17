@@ -9,24 +9,21 @@
 namespace TMyers\StripeBilling\Exceptions;
 
 
-class StripeGatewayException extends StripeBillingException
-{
+class StripeGatewayException extends StripeBillingException {
     protected $cardWasDeclined;
 
     /**
      * @param \Exception $e
      * @return StripeGatewayException
      */
-    public static function cardDeclined(\Exception $e): self
-    {
+    public static function cardDeclined(\Exception $e): self {
         $e = new static($e->getMessage(), $e->getCode(), $e);
         $e->cardWasDeclined = true;
 
         return $e;
     }
 
-    public function cardWasDeclined(): bool
-    {
-        return !! $this->cardWasDeclined;
+    public function cardWasDeclined(): bool {
+        return ! ! $this->cardWasDeclined;
     }
 }

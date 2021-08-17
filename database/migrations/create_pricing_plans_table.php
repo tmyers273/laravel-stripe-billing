@@ -4,15 +4,13 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreatePricingPlansTable extends Migration
-{
+class CreatePricingPlansTable extends Migration {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
-    {
+    public function up() {
         Schema::create('pricing_plans', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('plan_id')->nullable();
@@ -42,8 +40,7 @@ class CreatePricingPlansTable extends Migration
      *
      * @return void
      */
-    public function down()
-    {
+    public function down() {
         Schema::dropIfExists('pricing_plans');
     }
 }

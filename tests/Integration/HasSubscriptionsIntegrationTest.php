@@ -10,11 +10,9 @@ use TMyers\StripeBilling\StripeBilling;
 use TMyers\StripeBilling\Tests\Stubs\Models\User;
 use TMyers\StripeBilling\Tests\TestCase;
 
-class HasSubscriptionsIntegrationTest extends TestCase
-{
-    public function setUp()
-    {
-        if (!env('RUN_INTEGRATION_TESTS')) {
+class HasSubscriptionsIntegrationTest extends TestCase {
+    public function setUp() {
+        if (! env('RUN_INTEGRATION_TESTS')) {
             $this->markTestSkipped('Integration tests are being skipped. See phpunit.xml');
         }
 
@@ -23,15 +21,13 @@ class HasSubscriptionsIntegrationTest extends TestCase
         Carbon::setTestNow(now()->addMinutes(5));
     }
 
-    protected function tearDown()
-    {
+    protected function tearDown() {
         Carbon::setTestNow();
         parent::tearDown();
     }
 
     /** @test */
-    public function user_can_subscribe_to_regular_monthly_plan()
-    {
+    public function user_can_subscribe_to_regular_monthly_plan() {
         // Given we have a user and two plans
         $user = $this->createUser();
         $monthlyPlan = $this->createMonthlyPricingPlan();
@@ -42,13 +38,13 @@ class HasSubscriptionsIntegrationTest extends TestCase
         $this->assertInstanceOf(Subscription::class, $subscription);
 
         $this->assertDatabaseHas('subscriptions', [
-            'owner_id'=> $user->id,
+            'owner_id' => $user->id,
             'pricing_plan_id' => $monthlyPlan->id,
             'type' => 'default',
             'ends_at' => null,
         ]);
 
-        tap($user->fresh(), function(User $user) use ($monthlyPlan, $teamMonthlyPricingPlan) {
+        tap($user->fresh(), function (User $user) use ($monthlyPlan, $teamMonthlyPricingPlan) {
             $this->assertTrue($user->isSubscribedTo($monthlyPlan));
             $this->assertFalse($user->isSubscribedTo($teamMonthlyPricingPlan));
 
@@ -59,7 +55,7 @@ class HasSubscriptionsIntegrationTest extends TestCase
 
             $this->assertDatabaseHas('cards', [
                 'id' => $defaultCard->id,
-                'owner_id'=> $user->id,
+                'owner_id' => $user->id,
                 'last_4' => 4242,
                 'brand' => 'Visa',
             ]);
@@ -67,8 +63,7 @@ class HasSubscriptionsIntegrationTest extends TestCase
     }
 
     /** @test */
-    public function user_can_subscribe_to_basic_type_monthly_plan()
-    {
+    public function user_can_subscribe_to_basic_type_monthly_plan() {
         // Given we have a user and two plans
         $user = $this->createUser();
         $basicPlan = $this->createBasicPlan();
@@ -83,13 +78,13 @@ class HasSubscriptionsIntegrationTest extends TestCase
 
         // expect subscription to be created
         $this->assertDatabaseHas('subscriptions', [
-            'owner_id'=> $user->id,
+            'owner_id' => $user->id,
             'pricing_plan_id' => $basicMonthlyPricingPlan->id,
             'type' => 'basic',
             'trial_ends_at' => now()->addDays(11)
         ]);
 
-        tap($user->fresh(), function(User $user) use ($basicPlan, $basicMonthlyPricingPlan, $teamPlan, $teamMonthlyPricingPlan) {
+        tap($user->fresh(), function (User $user) use ($basicPlan, $basicMonthlyPricingPlan, $teamPlan, $teamMonthlyPricingPlan) {
             // expect to be subscribed to basic plan
             $this->assertTrue($user->isSubscribedTo($basicMonthlyPricingPlan));
             $this->assertTrue($user->isSubscribedTo($basicPlan));
@@ -106,7 +101,7 @@ class HasSubscriptionsIntegrationTest extends TestCase
 
             $this->assertDatabaseHas('cards', [
                 'id' => $defaultCard->id,
-                'owner_id'=> $user->id,
+                'owner_id' => $user->id,
                 'last_4' => 4242,
                 'brand' => 'Visa',
             ]);
@@ -114,8 +109,7 @@ class HasSubscriptionsIntegrationTest extends TestCase
     }
 
     /** @test */
-    public function user_can_create_new_subscription_given_an_old_canceled_one()
-    {
+    public function user_can_create_new_subscription_given_an_old_canceled_one() {
         // Given we have a user and two plans
         $user = $this->createUser();
         $basicPlan = $this->createBasicPlan();
@@ -138,10 +132,9 @@ class HasSubscriptionsIntegrationTest extends TestCase
         $this->assertCount(1, $user->fresh()->activeSubscriptions);
         $this->assertTrue($user->fresh()->hasActiveSubscriptions());
     }
-    
+
     /** @test */
-    public function user_can_create_new_subscription_given_an_old_canceled_one_and_unique_subscription_constraint()
-    {
+    public function user_can_create_new_subscription_given_an_old_canceled_one_and_unique_subscription_constraint() {
         // Given only one subscription is allowed per user
         config()->set('stripe-billing.unique_active_subscription', true);
 

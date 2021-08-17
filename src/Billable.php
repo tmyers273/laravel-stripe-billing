@@ -7,15 +7,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use TMyers\StripeBilling\Facades\StripeCustomer;
 use TMyers\StripeBilling\Models\Card;
 
-trait Billable
-{
+trait Billable {
     use HasSubscriptions, Chargeable;
 
     /**
      * @return \Stripe\Customer
      */
-    public function retrieveStripeCustomer(): \Stripe\Customer
-    {
+    public function retrieveStripeCustomer(): \Stripe\Customer {
         return StripeCustomer::retrieve($this->stripe_id);
     }
 
@@ -24,8 +22,7 @@ trait Billable
      * @param array $options
      * @return \Stripe\Customer
      */
-    public function retrieveOrCreateStripeCustomer($token = null, array $options = [])
-    {
+    public function retrieveOrCreateStripeCustomer($token = null, array $options = []) {
         if (! $this->stripe_id) {
             list($customer, $card) = $this->createCustomerWithDefaultCardFromToken($token, $options);
 
@@ -40,8 +37,7 @@ trait Billable
      * @param array $options
      * @return array
      */
-    public function createCustomerWithDefaultCardFromToken($token, array $options = []): array
-    {
+    public function createCustomerWithDefaultCardFromToken($token, array $options = []): array {
         $customer = StripeCustomer::create($token, $this->email, $options);
 
         $this->forceFill([

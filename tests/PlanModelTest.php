@@ -12,11 +12,9 @@ namespace TMyers\StripeBilling\Tests;
 use TMyers\StripeBilling\Models\Plan;
 use TMyers\StripeBilling\Models\PricingPlan;
 
-class PlanModelTest extends TestCase
-{
+class PlanModelTest extends TestCase {
     /** @test */
-    public function it_can_have_multiple_pricing_plans()
-    {
+    public function it_can_have_multiple_pricing_plans() {
         // Given
         $basic = $this->createBasicPlan();
 
@@ -52,8 +50,7 @@ class PlanModelTest extends TestCase
     }
 
     /** @test */
-    public function it_can_view_all_underlying_subscriptions()
-    {
+    public function it_can_view_all_underlying_subscriptions() {
         $userA = $this->createUser();
         $userB = $this->createUser();
 
@@ -92,8 +89,7 @@ class PlanModelTest extends TestCase
     }
 
     /** @test */
-    public function plans_can_be_sorted_by_weight()
-    {
+    public function plans_can_be_sorted_by_weight() {
         $teamPlan = Plan::create([
             'description' => 'Team plan',
             'name' => 'team',
@@ -132,8 +128,7 @@ class PlanModelTest extends TestCase
     }
 
     /** @test */
-    public function plans_can_be_compared()
-    {
+    public function plans_can_be_compared() {
         $basicPlan = Plan::create([
             'description' => 'Basic plan',
             'name' => 'basic',

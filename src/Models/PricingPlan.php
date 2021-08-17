@@ -24,8 +24,7 @@ use TMyers\StripeBilling\StripeBilling;
  * @property integer $price
  * @property integer $trial_days
  */
-class PricingPlan extends Model
-{
+class PricingPlan extends Model {
     protected $guarded = ['id'];
 
     protected $casts = [
@@ -38,26 +37,23 @@ class PricingPlan extends Model
      * @param string $name
      * @return PricingPlan
      */
-    public static function findByName(string $name): self
-    {
+    public static function findByName(string $name): self {
         return static::whereName($name)->firstOrFail();
     }
 
     /**
      * @return bool
      */
-    public function isActive(): bool
-    {
-        return !! $this->active;
+    public function isActive(): bool {
+        return ! ! $this->active;
     }
 
-    public function hasSameTypeAs($plan)
-    {
+    public function hasSameTypeAs($plan) {
         if (is_null($this->plan_id)) {
             return false;
         }
 
-        return (int) $this->plan->id === (int) $plan->plan_id;
+        return (int)$this->plan->id === (int)$plan->plan_id;
     }
 
     /**
@@ -65,9 +61,8 @@ class PricingPlan extends Model
      * @return bool
      * @throws StripeBillingException
      */
-    public function isBetterThan($pricingPlan): bool
-    {
-        if (!is_a($pricingPlan, StripeBilling::getPricingPlanModel())) {
+    public function isBetterThan($pricingPlan): bool {
+        if (! is_a($pricingPlan, StripeBilling::getPricingPlanModel())) {
             throw new StripeBillingException("Only pricing plans are allowed for comparison");
         }
 
@@ -83,9 +78,8 @@ class PricingPlan extends Model
      * @return bool
      * @throws StripeBillingException
      */
-    public function isWorthThan($pricingPlan): bool
-    {
-        if (!is_a($pricingPlan, StripeBilling::getPricingPlanModel())) {
+    public function isWorthThan($pricingPlan): bool {
+        if (! is_a($pricingPlan, StripeBilling::getPricingPlanModel())) {
             throw new StripeBillingException("Only pricing plans are allowed for comparison");
         }
 
@@ -95,15 +89,14 @@ class PricingPlan extends Model
 
         return $this->price < $pricingPlan->price;
     }
-    
+
     /*
     |--------------------------------------------------------------------------
     | Scopes
     |--------------------------------------------------------------------------
     */
 
-    public function scopeActive(Builder $builder)
-    {
+    public function scopeActive(Builder $builder) {
         return $builder->whereActive(true);
     }
 
@@ -113,8 +106,7 @@ class PricingPlan extends Model
     |--------------------------------------------------------------------------
     */
 
-    public function subscriptions()
-    {
+    public function subscriptions() {
         return $this->hasMany(
             StripeBilling::getSubscriptionModel()
         );
@@ -123,8 +115,7 @@ class PricingPlan extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function plan()
-    {
+    public function plan() {
         return $this->belongsTo(
             StripeBilling::getPlanModel()
         );
@@ -133,8 +124,7 @@ class PricingPlan extends Model
     /**
      * @return string
      */
-    public function getType(): string
-    {
+    public function getType(): string {
         return $this->plan ? $this->plan->name : 'default';
     }
 }

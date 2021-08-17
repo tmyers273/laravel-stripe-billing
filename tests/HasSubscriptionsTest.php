@@ -17,24 +17,20 @@ use TMyers\StripeBilling\Tests\Helpers\StripeObjectsFactory;
 use TMyers\StripeBilling\Tests\Helpers\SubscriptionFactory;
 use TMyers\StripeBilling\Tests\Stubs\Models\User;
 
-class HasSubscriptionsTest extends TestCase
-{
-    public function setUp()
-    {
+class HasSubscriptionsTest extends TestCase {
+    public function setUp() {
         parent::setUp();
 
         Carbon::setTestNow(now());
     }
 
-    protected function tearDown()
-    {
+    protected function tearDown() {
         Carbon::setTestNow();
         parent::tearDown();
     }
 
     /** @test */
-    public function user_can_subscribe_to_regular_monthly_plan_with_credit_card_token()
-    {
+    public function user_can_subscribe_to_regular_monthly_plan_with_credit_card_token() {
         // Given we have a user and two simple plans
         $user = $this->createUser();
         $monthlyPricingPlan = $this->createMonthlyPricingPlan();
@@ -81,12 +77,12 @@ class HasSubscriptionsTest extends TestCase
         ]);
 
         $this->assertDatabaseHas('subscriptions', [
-            'owner_id'=> $user->id,
+            'owner_id' => $user->id,
             'pricing_plan_id' => $monthlyPricingPlan->id,
             'stripe_subscription_id' => 'new-subscription-id',
         ]);
 
-        tap($user->fresh(), function(User $user) use ($monthlyPricingPlan, $teamPlan) {
+        tap($user->fresh(), function (User $user) use ($monthlyPricingPlan, $teamPlan) {
             $this->assertTrue($user->isSubscribedTo($monthlyPricingPlan));
             $this->assertFalse($user->isSubscribedTo($teamPlan));
 
@@ -95,7 +91,7 @@ class HasSubscriptionsTest extends TestCase
 
             $this->assertDatabaseHas('cards', [
                 'id' => $defaultCard->id,
-                'owner_id'=> $user->id,
+                'owner_id' => $user->id,
                 'stripe_card_id' => 'fake-card-id',
                 'last_4' => 4242,
                 'brand' => 'FakeBrand',
@@ -104,8 +100,7 @@ class HasSubscriptionsTest extends TestCase
     }
 
     /** @test */
-    public function user_can_subscribe_to_basic_type_monthly_plan()
-    {
+    public function user_can_subscribe_to_basic_type_monthly_plan() {
         // Given we have a user and two plans
         $user = $this->createUser();
         $basicPlan = $this->createBasicPlan();
@@ -152,14 +147,14 @@ class HasSubscriptionsTest extends TestCase
 
         // expect subscription to be created
         $this->assertDatabaseHas('subscriptions', [
-            'owner_id'=> $user->id,
+            'owner_id' => $user->id,
             'pricing_plan_id' => $basicMonthlyPricingPlan->id,
             'type' => 'basic',
             'stripe_subscription_id' => 'new-subscription-id',
             'trial_ends_at' => now()->addDays(11)
         ]);
 
-        tap($user->fresh(), function(User $user) use ($subscription, $basicPlan, $basicMonthlyPricingPlan, $teamType, $teamPlan) {
+        tap($user->fresh(), function (User $user) use ($subscription, $basicPlan, $basicMonthlyPricingPlan, $teamType, $teamPlan) {
             // expect to be subscribed to basic plan
             $this->assertTrue($user->isSubscribedTo($basicMonthlyPricingPlan));
             $this->assertTrue($user->isSubscribedTo($basicPlan));
@@ -177,7 +172,7 @@ class HasSubscriptionsTest extends TestCase
 
             $this->assertDatabaseHas('cards', [
                 'id' => $defaultCard->id,
-                'owner_id'=> $user->id,
+                'owner_id' => $user->id,
                 'stripe_card_id' => 'fake-card-id',
                 'last_4' => 4242,
                 'brand' => 'FakeBrand',
@@ -188,8 +183,7 @@ class HasSubscriptionsTest extends TestCase
     /** @test
      * @throws SubscriptionNotFound
      */
-    public function it_can_get_subscription_for_user()
-    {
+    public function it_can_get_subscription_for_user() {
         // Given we have a user and two plans
         $user = $this->createUser();
         $basicPlan = $this->createBasicPlan();
@@ -226,8 +220,7 @@ class HasSubscriptionsTest extends TestCase
     }
 
     /** @test */
-    public function it_will_throw_if_subscription_not_found()
-    {
+    public function it_will_throw_if_subscription_not_found() {
         // Given we have a user and two plans
         $user = $this->createUser();
         $basicPlan = $this->createBasicPlan();
@@ -249,8 +242,7 @@ class HasSubscriptionsTest extends TestCase
      * @test
      * @throws AlreadySubscribed
      */
-    public function user_cannot_subscribe_to_the_same_pricing_plan_twice()
-    {
+    public function user_cannot_subscribe_to_the_same_pricing_plan_twice() {
         // Given we have a user and two plans
         $user = $this->createUser();
         $basicPlan = $this->createBasicPlan();
@@ -267,8 +259,7 @@ class HasSubscriptionsTest extends TestCase
      * @throws AlreadySubscribed
      * @throws \TMyers\StripeBilling\Exceptions\OnlyOneActiveSubscriptionIsAllowed
      */
-    public function user_cannot_subscribe_to_the_same_plan_twice()
-    {
+    public function user_cannot_subscribe_to_the_same_plan_twice() {
         // Given we have a user and two plans
         $user = $this->createUser();
         $basicPlan = $this->createBasicPlan();
@@ -284,8 +275,7 @@ class HasSubscriptionsTest extends TestCase
     /**
      * @test
      */
-    public function user_can_be_forced_to_have_only_one_active_subscription()
-    {
+    public function user_can_be_forced_to_have_only_one_active_subscription() {
         // Given only one subscription is allowed per user
         config()->set('stripe-billing.unique_active_subscription', true);
 

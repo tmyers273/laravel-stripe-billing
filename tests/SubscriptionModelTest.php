@@ -16,17 +16,14 @@ use TMyers\StripeBilling\Tests\Helpers\SubscriptionFactory;
 use TMyers\StripeBilling\Tests\Stubs\Models\User;
 use Mockery as m;
 
-class SubscriptionModelTest extends TestCase
-{
-    protected function tearDown()
-    {
+class SubscriptionModelTest extends TestCase {
+    protected function tearDown() {
         m::close();
         parent::tearDown();
     }
 
     /** @test */
-    public function it_belongs_to_user()
-    {
+    public function it_belongs_to_user() {
         $user = $this->createUser();
         $plan = $this->createBasicMonthlyPricingPlan();
 
@@ -40,7 +37,7 @@ class SubscriptionModelTest extends TestCase
         $this->assertInstanceOf(PricingPlan::class, $subscription->pricingPlan);
         $this->assertInstanceOf(Plan::class, $subscription->pricingPlan->plan);
     }
-    
+
     /*
     |--------------------------------------------------------------------------
     | Periods and active status
@@ -48,8 +45,7 @@ class SubscriptionModelTest extends TestCase
     */
 
     /** @test */
-    public function it_can_verify_on_trial_period()
-    {
+    public function it_can_verify_on_trial_period() {
         $user = $this->createUser();
         $plan = $this->createMonthlyPricingPlan();
 
@@ -72,8 +68,7 @@ class SubscriptionModelTest extends TestCase
     }
 
     /** @test */
-    public function it_can_verify_on_grace_period()
-    {
+    public function it_can_verify_on_grace_period() {
         $user = $this->createUser();
         $plan = $this->createMonthlyPricingPlan();
 
@@ -88,8 +83,7 @@ class SubscriptionModelTest extends TestCase
     }
 
     /** @test */
-    public function it_can_verify_on_grace_period_is_over()
-    {
+    public function it_can_verify_on_grace_period_is_over() {
         $user = $this->createUser();
         $plan = $this->createMonthlyPricingPlan();
 
@@ -102,16 +96,15 @@ class SubscriptionModelTest extends TestCase
 
         $this->assertFalse($graceSubscription->onTrial());
     }
-    
+
     /*
     |--------------------------------------------------------------------------
     | Cancellation
     |--------------------------------------------------------------------------
     */
-    
+
     /** @test */
-    public function active_subscription_can_be_cancelled_at_period_end()
-    {
+    public function active_subscription_can_be_cancelled_at_period_end() {
         $user = $this->createUser();
         $plan = $this->createMonthlyPricingPlan();
         $stripeId = 'fake-id';
@@ -137,7 +130,7 @@ class SubscriptionModelTest extends TestCase
         // Do cancel subscription
         $activeSubscription->cancelAtPeriodEnd();
 
-        tap($activeSubscription->fresh(), function(Subscription $subscription) {
+        tap($activeSubscription->fresh(), function (Subscription $subscription) {
             $this->assertTrue($subscription->onGracePeriod());
             $this->assertTrue($subscription->isActive());
             $this->assertEquals(1, $subscription->daysUntilTheEndOfTheGracePeriod());
@@ -145,8 +138,7 @@ class SubscriptionModelTest extends TestCase
     }
 
     /** @test */
-    public function active_on_trial_subscription_can_be_cancelled_at_period_end()
-    {
+    public function active_on_trial_subscription_can_be_cancelled_at_period_end() {
         $user = $this->createUser();
         $plan = $this->createMonthlyPricingPlan();
         $stripeId = 'fake-id';
@@ -172,17 +164,16 @@ class SubscriptionModelTest extends TestCase
         // Do cancel subscription
         $activeSubscription->cancelAtPeriodEnd();
 
-        tap($activeSubscription->fresh(), function(Subscription $subscription) use ($trialEndsAt) {
+        tap($activeSubscription->fresh(), function (Subscription $subscription) use ($trialEndsAt) {
             // Expect subscription to be active for until the end of initial trial period
             $this->assertTrue($subscription->onGracePeriod());
             $this->assertTrue($subscription->isActive());
             $this->assertEquals($trialEndsAt, $subscription->daysUntilTheEndOfTheGracePeriod());
         });
     }
-    
+
     /** @test */
-    public function subscription_can_be_cancelled_immediately()
-    {
+    public function subscription_can_be_cancelled_immediately() {
         $user = $this->createUser();
         $plan = $this->createMonthlyPricingPlan();
         $stripeId = 'fake-id';
@@ -204,7 +195,7 @@ class SubscriptionModelTest extends TestCase
         // Do cancel now
         $activeSubscription->cancelNow();
 
-        tap($activeSubscription->fresh(), function(Subscription $subscription) {
+        tap($activeSubscription->fresh(), function (Subscription $subscription) {
             // Expect subscription to be active for until the end of initial trial period
             $this->assertFalse($subscription->onGracePeriod());
             $this->assertFalse($subscription->isActive());
@@ -213,8 +204,7 @@ class SubscriptionModelTest extends TestCase
     }
 
     /** @test */
-    public function it_can_swap_plans()
-    {
+    public function it_can_swap_plans() {
         $user = $this->createUser();
         $monthlyPlan = $this->createMonthlyPricingPlan();
         $basicPlan = $this->createBasicMonthlyPricingPlan($basicType = $this->createBasicPlan());
@@ -243,7 +233,7 @@ class SubscriptionModelTest extends TestCase
             'pricing_plan_id' => $basicPlan->id,
         ]);
 
-        tap($activeSubscription->fresh(), function(Subscription $subscription) use ($basicPlan, $basicType) {
+        tap($activeSubscription->fresh(), function (Subscription $subscription) use ($basicPlan, $basicType) {
             // Expect subscription to have changed plan
             $this->assertTrue($subscription->isFor($basicPlan));
             $this->assertTrue($subscription->isFor($basicType));
@@ -257,8 +247,7 @@ class SubscriptionModelTest extends TestCase
     }
 
     /** @test */
-    public function it_can_swap_plans_being_on_trial()
-    {
+    public function it_can_swap_plans_being_on_trial() {
         $user = $this->createUser();
         $monthlyPlan = $this->createMonthlyPricingPlan();
         $basicPlan = $this->createBasicMonthlyPricingPlan($basicType = $this->createBasicPlan());
@@ -289,7 +278,7 @@ class SubscriptionModelTest extends TestCase
             'pricing_plan_id' => $basicPlan->id,
         ]);
 
-        tap($activeSubscription->fresh(), function(Subscription $subscription) use ($basicPlan, $basicType) {
+        tap($activeSubscription->fresh(), function (Subscription $subscription) use ($basicPlan, $basicType) {
             // Expect subscription to have changed plan
             $this->assertTrue($subscription->isFor($basicPlan));
             $this->assertTrue($subscription->isFor($basicType));
@@ -303,8 +292,7 @@ class SubscriptionModelTest extends TestCase
     }
 
     /** @test */
-    public function it_will_throw_if_trying_to_change_to_plan_that_it_is_already_for()
-    {
+    public function it_will_throw_if_trying_to_change_to_plan_that_it_is_already_for() {
         $user = $this->createUser();
         $monthlyPlan = $this->createMonthlyPricingPlan();
         $stripeId = 'fake-id';
@@ -319,10 +307,9 @@ class SubscriptionModelTest extends TestCase
         // Do change again to the same plan
         $activeSubscription->changeTo($monthlyPlan);
     }
-    
+
     /** @test */
-    public function it_will_throw_if_try_to_change_to_plan_that_is_not_active_any_more()
-    {
+    public function it_will_throw_if_try_to_change_to_plan_that_is_not_active_any_more() {
         $user = $this->createUser();
         $monthlyPlan = $this->createMonthlyPricingPlan();
         $inactivePlan = $this->createInactivePricingPlan();
@@ -345,8 +332,7 @@ class SubscriptionModelTest extends TestCase
     |--------------------------------------------------------------------------
     */
 
-    public function subscription_can_be_resumed_during_grace_period()
-    {
+    public function subscription_can_be_resumed_during_grace_period() {
         $user = $this->createUser();
         $stripeId = 'fake-id';
         $graceSubscription = $this->createGraceSubscription($user, $this->createMonthlyPricingPlan());
@@ -367,7 +353,7 @@ class SubscriptionModelTest extends TestCase
             'ends_at' => null,
         ]);
 
-        tap($graceSubscription->fresh(), function(Subscription $subscription) {
+        tap($graceSubscription->fresh(), function (Subscription $subscription) {
             // Expect subscription to be active for until the end of initial trial period
             $this->assertFalse($subscription->onGracePeriod());
             $this->assertTrue($subscription->isActive());
@@ -376,8 +362,7 @@ class SubscriptionModelTest extends TestCase
     }
 
     /** @test */
-    public function it_will_throw_if_subscription_is_not_on_grace_period()
-    {
+    public function it_will_throw_if_subscription_is_not_on_grace_period() {
         $user = $this->createUser();
         $graceSubscription = $this->createExpiredSubscription($user, $this->createMonthlyPricingPlan());
 
@@ -387,8 +372,7 @@ class SubscriptionModelTest extends TestCase
     }
 
     /** @test */
-    public function it_will_throw_if_plan_has_become_inactive()
-    {
+    public function it_will_throw_if_plan_has_become_inactive() {
         $user = $this->createUser();
         $graceSubscription = $this->createGraceSubscription($user, $this->createInactivePricingPlan());
 
@@ -398,8 +382,7 @@ class SubscriptionModelTest extends TestCase
     }
 
     /** @test */
-    public function it_can_retrieve_all_canceled_and_archived_subscriptions()
-    {
+    public function it_can_retrieve_all_canceled_and_archived_subscriptions() {
         $canceledA = $this->createExpiredSubscription($this->createUser(), $this->createMonthlyPricingPlan());
         $canceledB = $this->createExpiredSubscription($this->createUser(), $this->createBasicYearlyPricingPlan());
         $graceA = $this->createGraceSubscription($this->createUser(), $this->createInactivePricingPlan());

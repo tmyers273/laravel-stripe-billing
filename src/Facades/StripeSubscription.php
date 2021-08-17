@@ -16,8 +16,7 @@ use Illuminate\Support\Facades\Facade;
  * @package TMyers\StripeBilling\Facades
  * @method static retrieve(string $stripeSubscriptionId)
  */
-class StripeSubscription extends Facade
-{
+class StripeSubscription extends Facade {
     /**
      * Get the registered name of the component.
      *
@@ -25,8 +24,7 @@ class StripeSubscription extends Facade
      *
      * @throws \RuntimeException
      */
-    protected static function getFacadeAccessor()
-    {
+    protected static function getFacadeAccessor() {
         return 'stripe-subscription-gateway';
     }
 }

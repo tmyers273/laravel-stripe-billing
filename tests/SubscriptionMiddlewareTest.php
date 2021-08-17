@@ -14,11 +14,9 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use TMyers\StripeBilling\Middleware\SubscriptionMiddleware;
 
-class SubscriptionMiddlewareTest extends TestCase
-{
+class SubscriptionMiddlewareTest extends TestCase {
     /** @test */
-    public function user_with_active_subscriptions_passes_validation()
-    {
+    public function user_with_active_subscriptions_passes_validation() {
         // Given we have a user, am active plan and an active subscription
         $user = $this->createUser();
         $monthlyPricingPlan = $this->createMonthlyPricingPlan();
@@ -30,14 +28,14 @@ class SubscriptionMiddlewareTest extends TestCase
 
         $request = Request::create('/only/for/subscribed/users', 'GET');
 
-        $request->setUserResolver(function() {
+        $request->setUserResolver(function () {
             return auth()->user();
         });
 
         $middleware = new SubscriptionMiddleware();
 
         // Run middleware
-        $response = $middleware->handle($request, function($r) {
+        $response = $middleware->handle($request, function ($r) {
             return $r;
         });
 
@@ -46,8 +44,7 @@ class SubscriptionMiddlewareTest extends TestCase
     }
 
     /** @test */
-    public function user_without_active_subscription_will_not_pass_the_middleware()
-    {
+    public function user_without_active_subscription_will_not_pass_the_middleware() {
         // Given we have a user, am active plan and an active subscription
         $user = $this->createUser();
         $monthlyPricingPlan = $this->createMonthlyPricingPlan();
@@ -59,7 +56,7 @@ class SubscriptionMiddlewareTest extends TestCase
 
         $request = Request::create('/only/for/subscribed/users', 'GET');
 
-        $request->setUserResolver(function() {
+        $request->setUserResolver(function () {
             return auth()->user();
         });
 
@@ -70,14 +67,13 @@ class SubscriptionMiddlewareTest extends TestCase
         $middleware = new SubscriptionMiddleware();
 
         // Run middleware
-        $response = $middleware->handle($request, function($r) {
+        $response = $middleware->handle($request, function ($r) {
             return $r;
         });
     }
 
     /** @test */
-    public function user_without_active_subscription_will_not_pass_the_middleware_json_request()
-    {
+    public function user_without_active_subscription_will_not_pass_the_middleware_json_request() {
         // Given we have a user, am active plan and an active subscription
         $user = $this->createUser();
         $monthlyPricingPlan = $this->createMonthlyPricingPlan();
@@ -89,7 +85,7 @@ class SubscriptionMiddlewareTest extends TestCase
 
         $request = Request::create('/only/for/subscribed/users', 'GET');
 
-        $request->setUserResolver(function() {
+        $request->setUserResolver(function () {
             return auth()->user();
         });
 
@@ -99,7 +95,7 @@ class SubscriptionMiddlewareTest extends TestCase
         $middleware = new SubscriptionMiddleware();
 
         // Run middleware
-        $response = $middleware->handle($request, function($r) {
+        $response = $middleware->handle($request, function ($r) {
             return $r;
         });
 
@@ -111,8 +107,7 @@ class SubscriptionMiddlewareTest extends TestCase
     }
 
     /** @test */
-    public function unauthenticated_user_will_not_pass_the_middleware()
-    {
+    public function unauthenticated_user_will_not_pass_the_middleware() {
         // Given we have a user, am active plan and an active subscription
         $user = $this->createUser();
         $monthlyPricingPlan = $this->createMonthlyPricingPlan();
@@ -122,7 +117,7 @@ class SubscriptionMiddlewareTest extends TestCase
         // Initialize fake request
         $request = Request::create('/only/for/subscribed/users', 'GET');
 
-        $request->setUserResolver(function() {
+        $request->setUserResolver(function () {
             return auth()->user();
         });
 
@@ -133,7 +128,7 @@ class SubscriptionMiddlewareTest extends TestCase
         $middleware = new SubscriptionMiddleware();
 
         // Run middleware
-        $middleware->handle($request, function($r) {
+        $middleware->handle($request, function ($r) {
             return $r;
         });
     }
@@ -145,8 +140,7 @@ class SubscriptionMiddlewareTest extends TestCase
     */
 
     /** @test */
-    public function user_with_active_subscriptions_passes_validation_with_parameters()
-    {
+    public function user_with_active_subscriptions_passes_validation_with_parameters() {
         // Given we have a user, am active plan and an active subscription
         $user = $this->createUser();
         $monthlyPricingPlan = $this->createMonthlyPricingPlan();
@@ -160,14 +154,14 @@ class SubscriptionMiddlewareTest extends TestCase
 
         $request = Request::create('/only/for/subscribed/users', 'GET');
 
-        $request->setUserResolver(function() {
+        $request->setUserResolver(function () {
             return auth()->user();
         });
 
         $middleware = new SubscriptionMiddleware();
 
         // Run middleware
-        $response = $middleware->handle($request, function($r) {
+        $response = $middleware->handle($request, function ($r) {
             return $r;
         }, 'monthly,basic');
 
@@ -175,7 +169,7 @@ class SubscriptionMiddlewareTest extends TestCase
         $this->assertSame($request, $response);
 
         // Run middleware
-        $response = $middleware->handle($request, function($r) {
+        $response = $middleware->handle($request, function ($r) {
             return $r;
         }, 'monthly');
 
@@ -183,7 +177,7 @@ class SubscriptionMiddlewareTest extends TestCase
         $this->assertSame($request, $response);
 
         // Run middleware
-        $response = $middleware->handle($request, function($r) {
+        $response = $middleware->handle($request, function ($r) {
             return $r;
         }, 'basic');
 
@@ -191,7 +185,7 @@ class SubscriptionMiddlewareTest extends TestCase
         $this->assertSame($request, $response);
 
         // Run middleware
-        $response = $middleware->handle($request, function($r) {
+        $response = $middleware->handle($request, function ($r) {
             return $r;
         }, 'basic,monthly');
 
@@ -199,7 +193,7 @@ class SubscriptionMiddlewareTest extends TestCase
         $this->assertSame($request, $response);
 
         // Run middleware
-        $response = $middleware->handle($request, function($r) {
+        $response = $middleware->handle($request, function ($r) {
             return $r;
         }, 'basic-monthly,basic');
 

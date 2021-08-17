@@ -15,12 +15,10 @@ use TMyers\StripeBilling\Tests\Helpers\SubscriptionFactory;
 use TMyers\StripeBilling\Tests\Helpers\UserAndCardFactory;
 use TMyers\StripeBilling\Tests\Stubs\Models\User;
 
-abstract class TestCase extends OrchestraTestCase
-{
+abstract class TestCase extends OrchestraTestCase {
     use UserAndCardFactory, PlanFactory, SubscriptionFactory, StripeObjectsFactory;
 
-    public function setUp()
-    {
+    public function setUp() {
         parent::setUp();
 
         config()->set('stripe-billing.models.owner', User::class);
@@ -31,15 +29,13 @@ abstract class TestCase extends OrchestraTestCase
     /**
      * @return array
      */
-    protected function getPackageProviders($app)
-    {
+    protected function getPackageProviders($app) {
         return [
             StripeBillingServiceProvider::class
         ];
     }
 
-    protected function getEnvironmentSetup($app)
-    {
+    protected function getEnvironmentSetup($app) {
         $app['config']->set('database.default', 'sqlite');
         $app['config']->set('database.connections.sqlite', [
             'driver' => 'sqlite',
@@ -48,8 +44,7 @@ abstract class TestCase extends OrchestraTestCase
         ]);
     }
 
-    protected function setUpDatabase($app)
-    {
+    protected function setUpDatabase($app) {
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
@@ -60,8 +55,8 @@ abstract class TestCase extends OrchestraTestCase
         include_once __DIR__ . '/../database/migrations/add_stripe_billing_columns_to_owner_table.php';
         include_once __DIR__ . '/../database/migrations/create_plans_table.php';
         include_once __DIR__ . '/../database/migrations/create_pricing_plans_table.php';
-        include_once __DIR__.'/../database/migrations/create_subscriptions_table.php';
-        include_once __DIR__.'/../database/migrations/create_cards_table.php';
+        include_once __DIR__ . '/../database/migrations/create_subscriptions_table.php';
+        include_once __DIR__ . '/../database/migrations/create_cards_table.php';
 
         (new \AddStripeBillingColumnsToOwnerTable())->up();
         (new \CreatePlansTable())->up();

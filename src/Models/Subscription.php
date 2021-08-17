@@ -22,8 +22,7 @@ use TMyers\StripeBilling\StripeBilling;
  * @property integer $pricing_plan_id
  * @property mixed $user
  */
-class Subscription extends Model
-{
+class Subscription extends Model {
     protected $guarded = ['id'];
 
     protected $with = ['pricingPlan', 'pricingPlan.plan'];
@@ -53,8 +52,7 @@ class Subscription extends Model
     |--------------------------------------------------------------------------
     */
 
-    public function cancelAtPeriodEnd(): self
-    {
+    public function cancelAtPeriodEnd(): self {
         $stripeSubscription = StripeSubscription::retrieve($this->stripe_subscription_id);
 
         $stripeSubscription->cancel_at_period_end = true;
@@ -72,8 +70,7 @@ class Subscription extends Model
         return $this;
     }
 
-    public function cancelNow(): self
-    {
+    public function cancelNow(): self {
         /** @var \Stripe\Subscription $stripeSubscription */
         $stripeSubscription = StripeSubscription::retrieve($this->stripe_subscription_id);
 
@@ -84,8 +81,7 @@ class Subscription extends Model
         return $this;
     }
 
-    public function markAsCanceled()
-    {
+    public function markAsCanceled() {
         $this->fill(['ends_at' => Carbon::now()])->save();
     }
 
@@ -118,9 +114,8 @@ class Subscription extends Model
      * @throws AlreadySubscribed
      * @throws PlanIsInactive
      */
-    public function changeTo($plan): self
-    {
-        if ( ! is_a($plan, StripeBilling::getPricingPlanModel()) ) {
+    public function changeTo($plan): self {
+        if (! is_a($plan, StripeBilling::getPricingPlanModel())) {
             throw new \InvalidArgumentException(
                 "Plan must be an instance of " . StripeBilling::getPricingPlanModel()
             );
@@ -130,7 +125,7 @@ class Subscription extends Model
             throw AlreadySubscribed::toPlan($plan);
         }
 
-        if ( ! $plan->isActive()) {
+        if (! $plan->isActive()) {
             throw PlanIsInactive::plan($plan);
         }
 
@@ -160,15 +155,14 @@ class Subscription extends Model
     /**
      * @throws StripeBillingException
      */
-    public function resume(): self
-    {
-        if (!$this->onGracePeriod()) {
+    public function resume(): self {
+        if (! $this->onGracePeriod()) {
             throw new StripeBillingException(
                 "Subscription for plan {$this->pricingPlan->name} is not on grace period"
             );
         }
 
-        if (!$this->pricingPlan->isActive()) {
+        if (! $this->pricingPlan->isActive()) {
             throw PlanIsInactive::plan($this->pricingPlan);
         }
 
@@ -201,13 +195,12 @@ class Subscription extends Model
      * @param string|PricingPlan $pricingPlan
      * @return bool
      */
-    public function isStrictlyFor($pricingPlan): bool
-    {
-        if ( is_string($pricingPlan))  {
+    public function isStrictlyFor($pricingPlan): bool {
+        if (is_string($pricingPlan)) {
             return $this->pricingPlan->name === $pricingPlan;
         }
 
-        if ( is_a($pricingPlan, StripeBilling::getPricingPlanModel()) ) {
+        if (is_a($pricingPlan, StripeBilling::getPricingPlanModel())) {
             return $this->pricing_plan_id === $pricingPlan->id;
         }
 
@@ -218,9 +211,8 @@ class Subscription extends Model
      * @param string|PricingPlan|Plan $plan
      * @return bool
      */
-    public function isFor($plan): bool
-    {
-        if (!$this->isActive()) {
+    public function isFor($plan): bool {
+        if (! $this->isActive()) {
             return false;
         }
 
@@ -228,47 +220,41 @@ class Subscription extends Model
             return $this->pricingPlan->name === $plan || $this->pricingPlan->getType() === $plan;
         }
 
-        if ( is_a($plan, StripeBilling::getPricingPlanModel()) ) {
+        if (is_a($plan, StripeBilling::getPricingPlanModel())) {
             return $this->pricingPlan->is($plan) || $this->pricingPlan->hasSameTypeAs($plan);
         }
 
-        if ( is_a($plan, StripeBilling::getPlanModel()) ) {
+        if (is_a($plan, StripeBilling::getPlanModel())) {
             return $plan->is($this->pricingPlan->plan);
         }
 
         return false;
     }
 
-    public function cancelled()
-    {
+    public function cancelled() {
         return ! is_null($this->ends_at);
     }
 
-    public function ended()
-    {
+    public function ended() {
         return $this->cancelled() && ! $this->onGracePeriod();
     }
 
-    public function onTrial(): bool
-    {
+    public function onTrial(): bool {
         return $this->trial_ends_at && $this->trial_ends_at->isFuture();
     }
 
-    public function isActive(): bool
-    {
+    public function isActive(): bool {
         return is_null($this->ends_at) || $this->ends_at->gt(now());
     }
 
-    public function onGracePeriod(): bool
-    {
+    public function onGracePeriod(): bool {
         return $this->ends_at && $this->ends_at->isFuture();
     }
 
     /**
      * @return int
      */
-    public function daysUntilTheEndOfTheGracePeriod(): int
-    {
+    public function daysUntilTheEndOfTheGracePeriod(): int {
         if ($this->onGracePeriod()) {
             return $this->ends_at->diffInDays(now());
         }
@@ -282,13 +268,11 @@ class Subscription extends Model
     |--------------------------------------------------------------------------
     */
 
-    public function scopeActive()
-    {
+    public function scopeActive() {
         return $this->whereNull('ends_at')->orWhere('ends_at', '>', now());
     }
 
-    public function scopeCanceledAndArchived()
-    {
+    public function scopeCanceledAndArchived() {
         return $this->whereNotNull('ends_at')->where('ends_at', '<', now());
     }
 
@@ -298,13 +282,11 @@ class Subscription extends Model
     |--------------------------------------------------------------------------
     */
 
-    public function pricingPlan()
-    {
+    public function pricingPlan() {
         return $this->belongsTo(StripeBilling::getPricingPlanModel(), 'pricing_plan_id');
     }
 
-    public function owner()
-    {
+    public function owner() {
         return $this->belongsTo(StripeBilling::getOwnerModel(), 'owner_id');
     }
 }

@@ -10,8 +10,7 @@ use TMyers\StripeBilling\Facades\StripeSubscription;
 use TMyers\StripeBilling\Models\PricingPlan;
 use TMyers\StripeBilling\Models\Subscription;
 
-class StripeSubscriptionBuilder
-{
+class StripeSubscriptionBuilder {
     protected $owner;
 
     /**
@@ -30,8 +29,7 @@ class StripeSubscriptionBuilder
      * @param $owner
      * @param PricingPlan $pricingPlan
      */
-    public function __construct($owner, $pricingPlan)
-    {
+    public function __construct($owner, $pricingPlan) {
         $this->owner = $owner;
         $this->pricingPlan = $pricingPlan;
         $this->skipTrial = $this->pricingPlan->trial_days === 0;
@@ -42,8 +40,7 @@ class StripeSubscriptionBuilder
      * @param array $options
      * @return Subscription
      */
-    public function create($token = null, array $options = [])
-    {
+    public function create($token = null, array $options = []) {
         $subscription = StripeSubscription::create(
             $this->owner->retrieveOrCreateStripeCustomer($token, $options),
             $this->getSubscriptionOptions()
@@ -66,8 +63,7 @@ class StripeSubscriptionBuilder
     /**
      * @return int|string
      */
-    protected function getTrialEnd()
-    {
+    protected function getTrialEnd() {
         if ($this->skipTrial) {
             return 'now';
         }
@@ -78,16 +74,14 @@ class StripeSubscriptionBuilder
     /**
      * @return Carbon
      */
-    public function getTrialExpiresAt()
-    {
+    public function getTrialExpiresAt() {
         return Carbon::now()->addDays($this->pricingPlan->trial_days);
     }
 
     /**
      * @return array
      */
-    protected function getSubscriptionOptions(): array
-    {
+    protected function getSubscriptionOptions(): array {
         return array_filter([
             'plan' => $this->pricingPlan->stripe_plan_id,
             'trial_end' => $this->getTrialEnd(),

@@ -11,10 +11,8 @@ use Illuminate\Support\Facades\Facade;
  *
  * @method static charge(array $params = []): Charge
  */
-class StripeCharge extends Facade
-{
-    protected static function getFacadeAccessor()
-    {
+class StripeCharge extends Facade {
+    protected static function getFacadeAccessor() {
         return 'stripe-charge-gateway';
     }
 }

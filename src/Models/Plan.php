@@ -21,8 +21,7 @@ use TMyers\StripeBilling\StripeBilling;
  * @property Collection $pricingPlans
  * @property Collection $subscriptions
  */
-class Plan extends Model
-{
+class Plan extends Model {
     protected $guarded = ['id'];
 
     protected $casts = ['weight' => 'integer'];
@@ -31,42 +30,36 @@ class Plan extends Model
      * @param string $name
      * @return Plan
      */
-    public static function findByName(string $name): self
-    {
+    public static function findByName(string $name): self {
         return static::whereName($name)->firstOrFail();
     }
 
     /**
      * @return bool
      */
-    public function isFree(): bool
-    {
-        return !! $this->is_free;
+    public function isFree(): bool {
+        return ! ! $this->is_free;
     }
-    
+
     /*
     |--------------------------------------------------------------------------
     | Scopes
     |--------------------------------------------------------------------------
     */
 
-    public function scopeActive(Builder $builder)
-    {
+    public function scopeActive(Builder $builder) {
         return $builder->whereActive(true);
     }
 
-    public function scopeForIndividualUsers(Builder $builder)
-    {
+    public function scopeForIndividualUsers(Builder $builder) {
         return $builder->whereTeamsEnabled(false);
     }
 
-    public function scopeForTeams(Builder $builder)
-    {
+    public function scopeForTeams(Builder $builder) {
         return $builder->whereTeamsEnabled(true);
     }
 
-    public function scopeWeighted(Builder $builder)
-    {
+    public function scopeWeighted(Builder $builder) {
         return $builder->orderBy('weight');
     }
 
@@ -79,8 +72,7 @@ class Plan extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
      */
-    public function subscriptions()
-    {
+    public function subscriptions() {
         return $this->hasManyThrough(
             StripeBilling::getSubscriptionModel(),
             StripeBilling::getPricingPlanModel()
@@ -90,8 +82,7 @@ class Plan extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function pricingPlans()
-    {
+    public function pricingPlans() {
         return $this
             ->hasMany(StripeBilling::getPricingPlanModel(), 'plan_id')
             ->orderBy('price');

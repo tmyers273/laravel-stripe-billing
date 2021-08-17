@@ -6,14 +6,12 @@ namespace TMyers\StripeBilling\Tests\Helpers;
 use TMyers\StripeBilling\Models\PricingPlan;
 use TMyers\StripeBilling\Models\Plan;
 
-trait PlanFactory
-{
+trait PlanFactory {
     /**
      * @param array $overrides
      * @return Plan
      */
-    protected function createFreePlan(array $overrides = []): Plan
-    {
+    protected function createFreePlan(array $overrides = []): Plan {
         return Plan::create(array_merge([
             'description' => 'Free plan',
             'name' => 'free',
@@ -25,8 +23,7 @@ trait PlanFactory
      * @param array $overrides
      * @return Plan
      */
-    protected function createBasicPlan(array $overrides = []): Plan
-    {
+    protected function createBasicPlan(array $overrides = []): Plan {
         return Plan::create(array_merge([
             'description' => 'Basic plan',
             'name' => 'basic',
@@ -38,8 +35,7 @@ trait PlanFactory
      * @param array $overrides
      * @return Plan
      */
-    protected function createTeamPlan(array $overrides = []): Plan
-    {
+    protected function createTeamPlan(array $overrides = []): Plan {
         return Plan::create(array_merge([
             'description' => 'Team plan',
             'name' => 'team',
@@ -54,8 +50,7 @@ trait PlanFactory
      * @param array $attributes
      * @return PricingPlan
      */
-    protected function createPricingPlan(Plan $plan, array $attributes): PricingPlan
-    {
+    protected function createPricingPlan(Plan $plan, array $attributes): PricingPlan {
         return $plan->pricingPlans()->create($attributes);
     }
 
@@ -64,8 +59,7 @@ trait PlanFactory
      * @param array $overrides
      * @return PricingPlan
      */
-    protected function createMonthlyPricingPlan(array $overrides = []): PricingPlan
-    {
+    protected function createMonthlyPricingPlan(array $overrides = []): PricingPlan {
         return PricingPlan::create(array_merge([
             'plan_id' => null,
             'description' => 'Monthly plan',
@@ -83,8 +77,7 @@ trait PlanFactory
      * @param array $overrides
      * @return PricingPlan
      */
-    protected function createBasicMonthlyPricingPlan(Plan $plan = null, array $overrides = []): PricingPlan
-    {
+    protected function createBasicMonthlyPricingPlan(Plan $plan = null, array $overrides = []): PricingPlan {
         $plan = $plan ?: $this->createBasicPlan();
 
         return PricingPlan::create(array_merge([
@@ -104,8 +97,7 @@ trait PlanFactory
      * @param array $overrides
      * @return PricingPlan
      */
-    protected function createBasicYearlyPricingPlan(Plan $plan = null, array $overrides = []): PricingPlan
-    {
+    protected function createBasicYearlyPricingPlan(Plan $plan = null, array $overrides = []): PricingPlan {
         $plan = $plan ?: $this->createBasicPlan();
 
         return PricingPlan::create(array_merge([
@@ -125,8 +117,7 @@ trait PlanFactory
      * @param array $overrides
      * @return PricingPlan
      */
-    protected function createTeamMonthlyPricingPlan(Plan $plan = null, array $overrides = []): PricingPlan
-    {
+    protected function createTeamMonthlyPricingPlan(Plan $plan = null, array $overrides = []): PricingPlan {
         $plan = $plan ?: $this->createTeamPlan();
 
         return PricingPlan::create(array_merge([
@@ -144,8 +135,7 @@ trait PlanFactory
      * @param array $overrides
      * @return PricingPlan
      */
-    public function createInactivePricingPlan(array $overrides = []): PricingPlan
-    {
+    public function createInactivePricingPlan(array $overrides = []): PricingPlan {
         return PricingPlan::create(array_merge([
             'description' => 'Team monthly plan for 24 users',
             'name' => 'team-monthly-24',

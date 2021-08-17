@@ -9,14 +9,12 @@ use TMyers\StripeBilling\Facades\StripeCharge;
 use TMyers\StripeBilling\Facades\StripeCustomer;
 use TMyers\StripeBilling\Models\Card;
 
-trait Chargeable
-{
+trait Chargeable {
     /**
      * @param array $data
      * @return Card
      */
-    public function addNewDefaultCard(array $data)
-    {
+    public function addNewDefaultCard(array $data) {
         $cardModel = StripeBilling::getCardModel();
 
         $card = $cardModel::create([
@@ -40,9 +38,8 @@ trait Chargeable
      * @return Card
      * @throws CardException
      */
-    public function addCardFromToken(string $token)
-    {
-        if (!$this->stripe_id) {
+    public function addCardFromToken(string $token) {
+        if (! $this->stripe_id) {
             list($customer, $card) = $this->createCustomerWithDefaultCardFromToken($token);
 
             return $card;
@@ -67,7 +64,7 @@ trait Chargeable
             'exp_year' => $stripeCard->exp_year,
         ]);
 
-        if (!$this->default_card_id) {
+        if (! $this->default_card_id) {
             $this->setCardAsDefault($card);
         }
 
@@ -78,9 +75,8 @@ trait Chargeable
      * @param Card $card
      * @throws CardException
      */
-    public function setCardAsDefault($card)
-    {
-        if (!$card->isOwnedBy($this)) {
+    public function setCardAsDefault($card) {
+        if (! $card->isOwnedBy($this)) {
             throw new CardException("Card does not belong to that owner.");
         }
 
@@ -98,13 +94,12 @@ trait Chargeable
      * @param $card
      * @throws CardException
      */
-    public function removeCard($card)
-    {
-        if (!is_a($card, StripeBilling::getCardModel())) {
+    public function removeCard($card) {
+        if (! is_a($card, StripeBilling::getCardModel())) {
             throw CardException::wrongType($card, StripeBilling::getCardModel());
         }
 
-        if (!$card->isOwnedBy($this)) {
+        if (! $card->isOwnedBy($this)) {
             throw CardException::notOwnedBy($this);
         }
 
@@ -130,11 +125,10 @@ trait Chargeable
      * @param Card|null $card
      * @return bool
      */
-    public function hasDefaultCard($card = null): bool
-    {
+    public function hasDefaultCard($card = null): bool {
         if ($card) {
             return is_a($card, StripeBilling::getCardModel()) &&
-                (int) $this->default_card_id === $card->id;
+                (int)$this->default_card_id === $card->id;
         }
 
         return ! is_null($this->default_card_id);
@@ -143,8 +137,7 @@ trait Chargeable
     /**
      * @return string
      */
-    protected function getCardClass(): string
-    {
+    protected function getCardClass(): string {
         return config('stripe-billing.models.card');
     }
 
@@ -159,15 +152,14 @@ trait Chargeable
      * @param array $params
      * @return mixed
      */
-    public function charge(int $amount, array $params = [])
-    {
+    public function charge(int $amount, array $params = []) {
         $params = array_merge($params, [
             'currency' => StripeBilling::getCurrency(),
         ]);
 
         $params['amount'] = $amount;
 
-        if (!array_key_exists('source', $params) && $this->stripe_id) {
+        if (! array_key_exists('source', $params) && $this->stripe_id) {
             $params['customer'] = $this->stripe_id;
         }
 
@@ -184,8 +176,7 @@ trait Chargeable
      * @param array $params
      * @return mixed
      */
-    public function chargeCard(int $amount, $card, array $params = [])
-    {
+    public function chargeCard(int $amount, $card, array $params = []) {
         if (is_a($card, StripeBilling::getCardModel())) {
             $params['customer'] = $card->owner->stripe_id;
             $params['source'] = $card->stripe_card_id;
@@ -202,11 +193,10 @@ trait Chargeable
      * @param array $params
      * @return mixed
      */
-    public function chargeByToken(int $amount, string $token, array $params = [])
-    {
+    public function chargeByToken(int $amount, string $token, array $params = []) {
         return $this->charge($amount, array_merge($params, ['source' => $token]));
     }
-    
+
     /*
     |--------------------------------------------------------------------------
     | Relationships
@@ -216,16 +206,14 @@ trait Chargeable
     /**
      * @return mixed
      */
-    public function cards()
-    {
+    public function cards() {
         return $this->hasMany(StripeBilling::getCardModel(), 'owner_id');
     }
 
     /**
      * @return BelongsTo
      */
-    public function defaultCard()
-    {
+    public function defaultCard() {
         return $this->belongsTo(
             StripeBilling::getCardModel(),
             'default_card_id'

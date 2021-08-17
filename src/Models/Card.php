@@ -16,8 +16,7 @@ use TMyers\StripeBilling\StripeBilling;
  * @property string $last_4
  * @property string $stripe_card_id
  */
-class Card extends Model
-{
+class Card extends Model {
     protected $guarded = ['id'];
 
     protected $casts = [
@@ -28,28 +27,25 @@ class Card extends Model
      * @param $owner
      * @return bool
      */
-    public function isOwnedBy($owner): bool
-    {
-        if (!is_a($owner, StripeBilling::getOwnerModel())) {
+    public function isOwnedBy($owner): bool {
+        if (! is_a($owner, StripeBilling::getOwnerModel())) {
             return false;
         }
 
-        return (int) $owner->id === (int) $this->owner_id;
+        return (int)$owner->id === (int)$this->owner_id;
     }
 
     /**
      * @return bool
      */
-    public function isDefault(): bool
-    {
+    public function isDefault(): bool {
         return $this->owner->hasDefaultCard($this);
     }
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function owner()
-    {
+    public function owner() {
         return $this->belongsTo(StripeBilling::getOwnerModel(), 'owner_id');
     }
 }
