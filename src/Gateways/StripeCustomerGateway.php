@@ -5,11 +5,11 @@ namespace TMyers\StripeBilling\Gateways;
 
 use Stripe\Card;
 use Stripe\Customer;
+use Stripe\Exception\CardException;
 use Stripe\Token;
 use TMyers\StripeBilling\Exceptions\StripeGatewayException;
 
-class StripeCustomerGateway extends StripeGateway
-{
+class StripeCustomerGateway extends StripeGateway {
     /**
      * @param $token
      * @param string $email
@@ -17,8 +17,7 @@ class StripeCustomerGateway extends StripeGateway
      * @return \Stripe\ApiResource
      * @throws \TMyers\StripeBilling\Exceptions\StripeGatewayException
      */
-    public function create(string $token, string $email, array $options = [])
-    {
+    public function create(string $token, string $email, array $options = []) {
         try {
             $options = array_merge($options, [
                 'email' => $email,
@@ -26,7 +25,7 @@ class StripeCustomerGateway extends StripeGateway
             ]);
 
             $customer = Customer::create($options, $this->getApiKey());
-        } catch (\Stripe\Error\Card $e) {
+        } catch (CardException $e) {
             throw StripeGatewayException::cardDeclined($e);
         } catch (\Throwable $t) {
             throw new StripeGatewayException($t->getMessage(), $t->getCode(), $t);
@@ -41,8 +40,7 @@ class StripeCustomerGateway extends StripeGateway
      * @return \Stripe\StripeObject
      * @throws StripeGatewayException
      */
-    public function retrieve(string $stripeId)
-    {
+    public function retrieve(string $stripeId) {
         return Customer::retrieve($stripeId, $this->getApiKey());
     }
 
@@ -51,8 +49,7 @@ class StripeCustomerGateway extends StripeGateway
      * @param $token
      * @return Card
      */
-    public function createSource(Customer $customer, string $token): Card
-    {
+    public function createSource(Customer $customer, string $token): Card {
         return $customer->sources->create(['source' => $token]);
     }
 
@@ -62,8 +59,7 @@ class StripeCustomerGateway extends StripeGateway
      * @return bool
      * @throws StripeGatewayException
      */
-    public function isDefaultSource(Customer $stripeCustomer, string $token): bool
-    {
+    public function isDefaultSource(Customer $stripeCustomer, string $token): bool {
         $stripeToken = Token::retrieve($token, ['api_key' => $this->getApiKey()]);
 
         return $stripeToken[$stripeToken->type]->id === $stripeCustomer->default_source;
@@ -73,8 +69,7 @@ class StripeCustomerGateway extends StripeGateway
      * @param Customer $customer
      * @param string $sourceId
      */
-    public function deleteSource(Customer $customer, string $sourceId)
-    {
+    public function deleteSource(Customer $customer, string $sourceId) {
         /** @var \Stripe\Card $stripeCard */
         foreach ($customer->sources->data as $stripeCard) {
             if ($stripeCard->id === $sourceId) {
@@ -87,8 +82,7 @@ class StripeCustomerGateway extends StripeGateway
      * @param Customer $customer
      * @return array
      */
-    public function parseDefaultCard(Customer $customer): array
-    {
+    public function parseDefaultCard(Customer $customer): array {
         return [
             'stripe_card_id' => $customer->sources->data[0]->id,
             'brand' => $customer->sources->data[0]->brand,
